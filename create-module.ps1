@@ -12,17 +12,25 @@ New-Item -ItemType Directory -Name $MODULE_NAME -Force | Out-Null
 Set-Location $MODULE_NAME
 
 # Create folders
-New-Item -ItemType Directory -Path "src", "tests" -Force | Out-Null
+New-Item -ItemType Directory -Path "src", "docs", "tests" -Force | Out-Null
 dotnet new sln -n $MODULE_NAME
 
 # 1. Domain
 dotnet new classlib -n "$MODULE_NAME.Domain" -o "src/$MODULE_NAME.Domain" -f $DOTNET_VERSION
 dotnet sln add "src/$MODULE_NAME.Domain"
 
+# Create Split Repository Structure
+New-Item -ItemType Directory -Path "src/$MODULE_NAME.Domain/Repositories" -Force | Out-Null
+New-Item -ItemType Directory -Path "src/$MODULE_NAME.Domain/QueryRepositories" -Force | Out-Null
+
 # 2. Core
 dotnet new classlib -n "$MODULE_NAME.Core" -o "src/$MODULE_NAME.Core" -f $DOTNET_VERSION
 dotnet sln add "src/$MODULE_NAME.Core"
 dotnet add "src/$MODULE_NAME.Core" reference "src/$MODULE_NAME.Domain"
+
+# Create Split Repository Structure
+New-Item -ItemType Directory -Path "src/$MODULE_NAME.Core/Services" -Force | Out-Null
+New-Item -ItemType Directory -Path "src/$MODULE_NAME.Core/Orchestrators" -Force | Out-Null
 
 # 3. Infrastructure
 dotnet new classlib -n "$MODULE_NAME.Infrastructure" -o "src/$MODULE_NAME.Infrastructure" -f $DOTNET_VERSION
@@ -30,6 +38,12 @@ dotnet sln add "src/$MODULE_NAME.Infrastructure"
 dotnet add "src/$MODULE_NAME.Infrastructure" reference "src/$MODULE_NAME.Domain"
 dotnet add "src/$MODULE_NAME.Infrastructure" reference "src/$MODULE_NAME.Core"
 dotnet add "src/$MODULE_NAME.Infrastructure" package Npgsql.EntityFrameworkCore.PostgreSQL
+
+# Create Split Repository Structure
+New-Item -ItemType Directory -Path "src/$MODULE_NAME.Infrastructure/Migrations" -Force | Out-Null
+New-Item -ItemType Directory -Path "src/$MODULE_NAME.Infrastructure/Configurations" -Force | Out-Null
+New-Item -ItemType Directory -Path "src/$MODULE_NAME.Infrastructure/Repositories" -Force | Out-Null
+New-Item -ItemType Directory -Path "src/$MODULE_NAME.Infrastructure/QueryRepositories" -Force | Out-Null
 
 # 4. API
 dotnet new webapi -n "$MODULE_NAME.API" -o "src/$MODULE_NAME.API" -f $DOTNET_VERSION

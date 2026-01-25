@@ -1,0 +1,15 @@
+using IAM.Domain.DTOs.Responses;
+using IAM.Domain.Entities;
+
+namespace IAM.Core.Services;
+
+public interface ICustomerService
+{
+    Task<CustomerDto?> GetByIdAsync(Guid id);
+    Task<IEnumerable<CustomerDto>> GetAllAsync();
+    Task<CustomerDto?> GetByNameAsync(string name);
+    Task<Customer> CreateAsync(Customer customer);
+    Task UpdateAsync(Customer customer);
+    Task DeleteAsync(Guid id);
+    Task<bool> ExistsAsync(Guid id);
+}

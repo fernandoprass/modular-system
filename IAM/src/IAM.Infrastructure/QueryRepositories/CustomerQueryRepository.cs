@@ -1,0 +1,63 @@
+using IAM.Domain.DTOs.Responses;
+using IAM.Domain.Repositories;
+using IAM.Domain.QueryRepositories;
+using Microsoft.EntityFrameworkCore;
+
+namespace IAM.Infrastructure.QueryRepositories;
+
+public class CustomerQueryRepository : ICustomerQueryRepository
+{
+    private readonly IamDbContext _context;
+
+    public CustomerQueryRepository(IamDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<CustomerDto?> GetByIdAsync(Guid id)
+    {
+        return await _context.Customers
+            .AsNoTracking()
+            .Where(c => c.Id == id)
+            .Select(c => new CustomerDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Description = c.Description,
+                CreatedAt = c.CreatedAt,
+                UpdatedAt = c.UpdatedAt
+            })
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<CustomerDto?> GetByNameAsync(string name)
+    {
+        return await _context.Customers
+            .AsNoTracking()
+            .Where(c => c.Name == name)
+            .Select(c => new CustomerDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Description = c.Description,
+                CreatedAt = c.CreatedAt,
+                UpdatedAt = c.UpdatedAt
+            })
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<IEnumerable<CustomerDto>> GetAllAsync()
+    {
+        return await _context.Customers
+            .AsNoTracking()
+            .Select(c => new CustomerDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Description = c.Description,
+                CreatedAt = c.CreatedAt,
+                UpdatedAt = c.UpdatedAt
+            })
+            .ToListAsync();
+    }
+}

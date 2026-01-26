@@ -20,14 +20,6 @@ public class UserController : BaseController
       _authService = authService;
    }
 
-   [HttpGet]
-   [Authorize]
-   public async Task<ActionResult<IEnumerable<UserDto>>> GetAll()
-   {
-      var users = await _userService.GetAllAsync();
-      return Ok(users);
-   }
-
    [HttpGet("{id}")]
    [Authorize]
    public async Task<Results<Ok<UserDto>, NotFound>> GetById(Guid id)

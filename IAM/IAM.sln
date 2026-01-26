@@ -4,6 +4,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
+	ProjectSection(SolutionItems) = preProject
+		.env = .env
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IAM.Domain", "src\IAM.Domain\IAM.Domain.csproj", "{9868007C-56CE-44A4-998F-3EAA3F842DA0}"
 EndProject
@@ -104,5 +108,8 @@ Global
 		{9F64FA8F-A53C-4DFA-8B66-694F924720E1} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{62DC3B6E-F3E3-4171-853B-2D1F3DE7A702} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{A6101803-3313-44EC-A576-9ABB07C6854F} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7F361E04-37CB-42C8-BBF8-7358DE674F86}
 	EndGlobalSection
 EndGlobal

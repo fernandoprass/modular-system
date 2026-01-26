@@ -17,13 +17,6 @@ public class CustomerController : BaseController
       _customerService = customerService;
    }
 
-   [HttpGet]
-   public async Task<Ok<IEnumerable<CustomerDto>>> GetAll()
-   {
-      var customers = await _customerService.GetAllAsync();
-      return TypedResults.Ok(customers);
-   }
-
    [HttpGet("{id}")]
    public async Task<Results<Ok<CustomerDto>, NotFound>> GetById(Guid id)
    {

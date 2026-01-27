@@ -18,13 +18,13 @@ if (-not (Test-Path $ENV_FILE)) {
     
     $defaultEnvContent = @"
 # PostgreSQL Configuration
-POSTGRES_USER=fernando_admin
-POSTGRES_PASSWORD=your_secure_password
-POSTGRES_DB=modular_system_db
+POSTGRES_USER=admin
+POSTGRES_PASSWORD=msadmin123
+POSTGRES_DB=IAM
 
 # pgAdmin Configuration
 PGADMIN_EMAIL=admin@system.com
-PGADMIN_PASSWORD=admin_secret_pass
+PGADMIN_PASSWORD=msadmin123
 "@
     $defaultEnvContent | Set-Content -Path $ENV_FILE
     Write-Host "[SUCCESS] .env file created." -ForegroundColor Green
@@ -51,7 +51,7 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "  Database environment is UP and RUNNING!" -ForegroundColor Green
     Write-Host "----------------------------------------------------------" -ForegroundColor Green
     Write-Host "  PostgreSQL: localhost:5432"
-    Write-Host "  pgAdmin:    http://localhost:8080"
+    Write-Host "  pgAdmin:    http://localhost:8080 or http://127.0.0.1:8080"
     Write-Host "----------------------------------------------------------"
 }
 else {

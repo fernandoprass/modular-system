@@ -83,4 +83,18 @@ This file defines how services (PostgreSQL & pgAdmin) are built and linked. It u
 ## 6. Quick Start
 1. Open PowerShell in the root folder.
 2. Run `./setup-db.ps1`.
-3. Open `http://localhost:8080` to manage your database.
+3. Open `http://localhost:8080` or `http://127.0.0.1:8080` to manage your database.
+
+### 🔧 Connecting pgAdmin to the PostgreSQL Container
+
+If the Server was not register by docker, you need to do this manually following these steps:
+
+1.  **Main Dashboard:** Click on the **"Add New Server"** icon.
+2.  **General Tab:** In the **"Name"** field, type `Local-Modular-System`.
+3.  **Connection Tab:**
+    * **Host name/address:** Type `db` (This is the service name defined in your `docker-compose.yml`. Docker's internal DNS resolves this name to the correct container IP).
+    * **Port:** `5432`
+    * **Maintenance database:** Use the name defined in your `.env` file (e.g., `IAM`).
+    * **Username:** The user defined in your `.env` file (e.g., `admin`).
+    * **Password:** The password defined in your `.env` file.
+4.  **Save:** Click the **Save** button.

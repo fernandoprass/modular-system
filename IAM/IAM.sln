@@ -27,6 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8EC462FD-D
 		docs\entities.md = docs\entities.md
 		docs\folder-structure.md = docs\folder-structure.md
 		docs\libraries.md = docs\libraries.md
+		migrations.md = migrations.md
 	EndProjectSection
 EndProject
 Global

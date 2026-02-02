@@ -1,14 +1,10 @@
+using IAM.API.Configure;
 using IAM.Core.Services;
-using IAM.Domain.Repositories;
-using IAM.Domain.QueryRepositories;
 using IAM.Infrastructure;
-using IAM.Infrastructure.QueryRepositories;
-using IAM.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using IAM.API.Configure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,12 +55,15 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-//Seed database in development
+// Apply migrations and seed database in development
 if (app.Environment.IsDevelopment())
 {
-   using var scope = app.Services.CreateScope();
-   var seeder = scope.ServiceProvider.GetRequiredService<IDatabaseSeeder>();
-   await seeder.SeedAsync();
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<IamDbContext>();
+    db.Database.Migrate();
+
+    var seeder = scope.ServiceProvider.GetRequiredService<IDatabaseSeeder>();
+    await seeder.SeedAsync();
 }
 
 app.Run();

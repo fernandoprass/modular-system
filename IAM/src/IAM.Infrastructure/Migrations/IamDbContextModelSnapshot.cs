@@ -22,7 +22,7 @@ namespace IAM.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("IAM.Domain.Customer", b =>
+            modelBuilder.Entity("IAM.Domain.Entities.Customer", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -48,7 +48,7 @@ namespace IAM.Infrastructure.Migrations
                     b.ToTable("Customers");
                 });
 
-            modelBuilder.Entity("IAM.Domain.User", b =>
+            modelBuilder.Entity("IAM.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -70,6 +70,16 @@ namespace IAM.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("PasswordSalt")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -83,9 +93,9 @@ namespace IAM.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("IAM.Domain.User", b =>
+            modelBuilder.Entity("IAM.Domain.Entities.User", b =>
                 {
-                    b.HasOne("IAM.Domain.Customer", "Customer")
+                    b.HasOne("IAM.Domain.Entities.Customer", "Customer")
                         .WithMany("Users")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -94,7 +104,7 @@ namespace IAM.Infrastructure.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("IAM.Domain.Customer", b =>
+            modelBuilder.Entity("IAM.Domain.Entities.Customer", b =>
                 {
                     b.Navigation("Users");
                 });

@@ -12,9 +12,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 // Add DbContext
 builder.Services.AddDbContext<IamDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("IAM")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("IAM")).
+    UseSnakeCaseNamingConvention());
 
 DependencyInjection.RegisterRepositories(builder);
 
@@ -56,14 +58,14 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Apply migrations and seed database in development
-if (app.Environment.IsDevelopment())
-{
-    using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<IamDbContext>();
-    db.Database.Migrate();
+//if (app.Environment.IsDevelopment())
+//{
+//    using var scope = app.Services.CreateScope();
+//    var db = scope.ServiceProvider.GetRequiredService<IamDbContext>();
+//    db.Database.Migrate();
 
-    var seeder = scope.ServiceProvider.GetRequiredService<IDatabaseSeeder>();
-    await seeder.SeedAsync();
-}
+//    var seeder = scope.ServiceProvider.GetRequiredService<IDatabaseSeeder>();
+//    await seeder.SeedAsync();
+//}
 
 app.Run();

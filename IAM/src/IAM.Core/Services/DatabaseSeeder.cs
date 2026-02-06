@@ -47,7 +47,7 @@ public class DatabaseSeeder : IDatabaseSeeder
         {
             var user1 = new User
             {
-                Id = Guid.Parse("550e8400-e29b-41d4-a716-446655440010"),
+                Id = Guid.CreateVersion7(),
                 Name = "John Doe",
                 Email = "john.doe@acme.com",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123", BCrypt.Net.BCrypt.GenerateSalt()),
@@ -58,7 +58,7 @@ public class DatabaseSeeder : IDatabaseSeeder
 
             var user2 = new User
             {
-                Id = Guid.Parse("550e8400-e29b-41d4-a716-446655440011"),
+                Id = Guid.CreateVersion7(),
                 Name = "Jane Smith",
                 Email = "jane.smith@techstart.com",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123", BCrypt.Net.BCrypt.GenerateSalt()),
@@ -69,7 +69,7 @@ public class DatabaseSeeder : IDatabaseSeeder
 
             var user3 = new User
             {
-                Id = Guid.Parse("550e8400-e29b-41d4-a716-446655440012"),
+                Id = Guid.CreateVersion7(),
                 Name = "Bob Johnson",
                 Email = "bob.johnson@acme.com",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123", BCrypt.Net.BCrypt.GenerateSalt()),

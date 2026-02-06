@@ -1,9 +1,8 @@
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
+using IAM.Domain.Entities;
 using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
-using BCrypt.Net;
-using IAM.Domain.Entities;
 
 namespace IAM.Core.Services;
 
@@ -46,7 +45,7 @@ public class UserService : IUserService
 
    public async Task<User> CreateAsync(User user)
    {
-      user.Id = GenerateUuidV7();
+      user.Id = Guid.CreateVersion7();
       user.CreatedAt = DateTime.UtcNow;
       await _unitOfWork.Users.AddAsync(user);
       await _unitOfWork.SaveChangesAsync();
@@ -121,31 +120,5 @@ public class UserService : IUserService
    public async Task<bool> ExistsAsync(Guid id)
    {
       return await _unitOfWork.Users.ExistsAsync(id);
-   }
-
-   private static Guid GenerateUuidV7()
-   {
-      // UUID v7: timestamp (48 bits) + version (4 bits) + random (76 bits)
-      var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-      var timestampBytes = BitConverter.GetBytes(timestamp);
-      if (BitConverter.IsLittleEndian)
-      {
-         Array.Reverse(timestampBytes);
-      }
-
-      var randomBytes = new byte[10];
-      Random.Shared.NextBytes(randomBytes);
-
-      // Set version to 7 (bits 48-51)
-      timestampBytes[6] = (byte)((timestampBytes[6] & 0x0F) | 0x70);
-
-      // Set variant to RFC 4122 (bits 60-63)
-      randomBytes[0] = (byte)((randomBytes[0] & 0x3F) | 0x80);
-
-      var uuidBytes = new byte[16];
-      Array.Copy(timestampBytes, 2, uuidBytes, 0, 6); // timestamp (48 bits, but we take 6 bytes)
-      Array.Copy(randomBytes, 0, uuidBytes, 6, 10);
-
-      return new Guid(uuidBytes);
    }
 }

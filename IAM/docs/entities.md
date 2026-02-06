@@ -12,8 +12,7 @@ The `User` entity represents an individual user in the system, typically an empl
 - **Id** (Guid): Unique identifier for the user. GUIDs ensure global uniqueness across distributed systems.
 - **Name** (string): The user's full name.
 - **Email** (string): The user's email address, used for login and communication.
-- **PasswordHash** (string): Hashed version of the user's password for security. Passwords are never stored in plain text; instead, they are hashed using BCrypt.
-- **PasswordSalt** (string): Random salt used in password hashing to prevent rainbow table attacks.
+- **PasswordHash** (string): Hashed version of the user's password for security. Passwords are never stored in plain text; instead, they are hashed using Isopoh.Cryptography.Argon2.
 - **CustomerId** (Guid): Foreign key linking the user to their associated customer.
 - **CreatedAt** (DateTime): Timestamp of when the user was created, in UTC.
 - **UpdatedAt** (DateTime?): Optional timestamp of the last update, in UTC.

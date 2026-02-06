@@ -48,8 +48,7 @@ public class UserQueryRepository : IUserQueryRepository
                 CustomerName = u.Customer.Name,
                 CreatedAt = u.CreatedAt,
                 UpdatedAt = u.UpdatedAt,
-                PasswordHash = u.PasswordHash,
-                PasswordSalt = u.PasswordSalt
+                PasswordHash = u.PasswordHash
             })
             .FirstOrDefaultAsync();
     }

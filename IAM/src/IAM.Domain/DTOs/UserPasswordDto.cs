@@ -16,6 +16,5 @@ namespace IAM.Domain.DTOs
       public DateTime CreatedAt { get; set; }
       public DateTime? UpdatedAt { get; set; }
       public string PasswordHash { get; set; } = string.Empty;
-      public string PasswordSalt { get; set; } = string.Empty;
    }
 }

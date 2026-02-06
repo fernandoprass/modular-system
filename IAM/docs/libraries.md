@@ -17,9 +17,10 @@ This project uses .NET 9.0 and leverages various NuGet packages to implement fun
 - **Microsoft.EntityFrameworkCore.Design** (v9.0.0): Tools for EF Core migrations and scaffolding. Used for generating database schemas from code models.
 - **Microsoft.EntityFrameworkCore.Relational** (v9.0.0): Relational database provider for EF Core, supporting SQL databases.
 - **Npgsql.EntityFrameworkCore.PostgreSQL** (v9.0.0): PostgreSQL provider for EF Core. PostgreSQL is an advanced open-source relational database known for its robustness and feature set.
+- **EFCore.NamingConventions** (v9.0.0): Provides naming conventions for EF Core models, ensuring consistent database schema naming.
 
 ## Business Logic and Utilities
-- **BCrypt.Net-Next** (v4.0.3): A .NET implementation of the BCrypt password hashing function. BCrypt is a key derivation function designed to be slow and computationally expensive, making it resistant to brute-force attacks.
+- **Isopoh.Cryptography.Argon2** (v2.0.0): A .NET implementation of the Argon2 password hashing algorithm. Argon2 is a modern, secure hashing algorithm designed to protect against brute-force attacks, making it ideal for password storage.
 - **Microsoft.Extensions.Configuration** (v9.0.0): Provides configuration abstractions for .NET applications, allowing settings from various sources (e.g., JSON files, environment variables).
 
 ## Testing
@@ -34,7 +35,7 @@ The Shared module is a simple .NET library without external dependencies, design
 ## Rationale for Choices
 - **EF Core with PostgreSQL**: Chosen for its strong LINQ support, migrations, and compatibility with PostgreSQL, a popular open-source database.
 - **JWT for Auth**: Industry-standard for stateless authentication in web APIs.
-- **BCrypt for Passwords**: Provides secure hashing to protect user credentials.
+- **Isopoh.Cryptography.Argon2**: Provides secure hashing to protect user credentials.
 - **xUnit for Testing**: Lightweight and extensible, fitting .NET testing best practices.
 - **ASP.NET Core**: Microsoft's modern web framework for building scalable APIs.
 

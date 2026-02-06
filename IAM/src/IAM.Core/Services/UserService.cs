@@ -3,6 +3,7 @@ using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;
 using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
+using Isopoh.Cryptography.Argon2;
 
 namespace IAM.Core.Services;
 
@@ -62,15 +63,13 @@ public class UserService : IUserService
       }
 
       // Generate salt and hash password
-      var salt = BCrypt.Net.BCrypt.GenerateSalt();
-      var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password, salt);
+      var passwordHash = Argon2.Hash(request.Password);
 
       var user = new User
       {
          Name = request.Name,
          Email = request.Email,
          PasswordHash = passwordHash,
-         PasswordSalt = salt,
          CustomerId = request.CustomerId
       };
 
@@ -86,7 +85,7 @@ public class UserService : IUserService
       }
 
       // Verify password
-      var isValid = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+      var isValid = Argon2.Verify(password, user.PasswordHash);
       if (!isValid)
       {
          return null;

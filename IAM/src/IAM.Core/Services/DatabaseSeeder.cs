@@ -1,5 +1,6 @@
 using IAM.Domain.Entities;
 using IAM.Domain.Repositories;
+using Isopoh.Cryptography.Argon2;
 
 namespace IAM.Core.Services;
 
@@ -50,8 +51,7 @@ public class DatabaseSeeder : IDatabaseSeeder
                 Id = Guid.CreateVersion7(),
                 Name = "John Doe",
                 Email = "john.doe@acme.com",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123", BCrypt.Net.BCrypt.GenerateSalt()),
-                PasswordSalt = BCrypt.Net.BCrypt.GenerateSalt(),
+                PasswordHash = Argon2.Hash("password123"),
                 CustomerId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                 CreatedAt = DateTime.UtcNow
             };
@@ -61,9 +61,8 @@ public class DatabaseSeeder : IDatabaseSeeder
                 Id = Guid.CreateVersion7(),
                 Name = "Jane Smith",
                 Email = "jane.smith@techstart.com",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123", BCrypt.Net.BCrypt.GenerateSalt()),
-                PasswordSalt = BCrypt.Net.BCrypt.GenerateSalt(),
-                CustomerId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+               PasswordHash = Argon2.Hash("password123"),
+               CustomerId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -72,9 +71,8 @@ public class DatabaseSeeder : IDatabaseSeeder
                 Id = Guid.CreateVersion7(),
                 Name = "Bob Johnson",
                 Email = "bob.johnson@acme.com",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123", BCrypt.Net.BCrypt.GenerateSalt()),
-                PasswordSalt = BCrypt.Net.BCrypt.GenerateSalt(),
-                CustomerId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+               PasswordHash = Argon2.Hash("password123"),
+               CustomerId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                 CreatedAt = DateTime.UtcNow
             };
 

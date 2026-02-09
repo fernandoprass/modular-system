@@ -22,7 +22,7 @@ Contains the source code, divided into projects:
   - `Repositories/`: Interfaces for data access (e.g., `IUserRepository`).
   - `QueryRepositories/`: Interfaces for read-only queries (e.g., `IUserQueryRepository`).
 
-- **`IAM.Core/`**: Contains application logic, services, and use cases. This layer orchestrates business operations and depends only on the Domain layer.
+- **`IAM.Application/`**: Contains application logic, services, and use cases. This layer orchestrates business operations and depends only on the Domain layer.
   - `Services/`: Business services like `UserService`, `AuthService`.
   - `Orchestrators/`: (Currently empty) For complex workflows.
 
@@ -38,14 +38,14 @@ Contains the source code, divided into projects:
   - `appsettings.json`: Configuration files.
 
 ### `tests/`
-- **`IAM.Core.Tests/`**: Unit tests for the Core layer, ensuring business logic correctness.
+- **`IAM.Application.Tests/`**: Unit tests for the Application layer, ensuring business logic correctness.
 
 ### `docs/`
 - Documentation files (this file and others).
 
 ## Dependency Flow
 Dependencies flow inward:
-- API → Core → Infrastructure → Domain
+- API → Application → Infrastructure → Domain
 - Infrastructure implements Domain interfaces.
 - Core uses Domain abstractions.
 - API uses Core services.

@@ -3,7 +3,7 @@ using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;
 using Myce.Response;
 
-namespace IAM.Core.Services;
+namespace IAM.Application.Services;
 
 public interface IUserService
 {

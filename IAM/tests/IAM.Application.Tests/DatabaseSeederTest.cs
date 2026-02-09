@@ -1,10 +1,6 @@
-using IAM.Core.Services;
-using IAM.Domain;
-using IAM.Domain.Repositories;
-using IAM.Domain.QueryRepositories;
+using IAM.Application.Services;
 using IAM.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IAM.API.Testing;
@@ -22,16 +18,16 @@ public class DatabaseSeederTest
             options.UseInMemoryDatabase("TestDb"));
 
         // Register repositories
-        services.AddScoped<IAM.Domain.Repositories.ICustomerRepository, IAM.Infrastructure.Repositories.CustomerRepository>();
-        services.AddScoped<IAM.Domain.Repositories.IUserRepository, IAM.Infrastructure.Repositories.UserRepository>();
-        services.AddScoped<IAM.Domain.QueryRepositories.ICustomerQueryRepository, IAM.Infrastructure.QueryRepositories.CustomerQueryRepository>();
-        services.AddScoped<IAM.Domain.Repositories.IUserQueryRepository, IAM.Infrastructure.Repositories.UserQueryRepository>();
+        services.AddScoped<Domain.Repositories.ICustomerRepository, Infrastructure.Repositories.CustomerRepository>();
+        services.AddScoped<Domain.Repositories.IUserRepository, Infrastructure.Repositories.UserRepository>();
+        services.AddScoped<Domain.QueryRepositories.ICustomerQueryRepository, Infrastructure.QueryRepositories.CustomerQueryRepository>();
+        services.AddScoped<Domain.Repositories.IUserQueryRepository, Infrastructure.Repositories.UserQueryRepository>();
 
         // Register services
-        services.AddScoped<ICustomerService, IAM.Core.Services.CustomerService>();
-        services.AddScoped<IUserService, IAM.Core.Services.UserService>();
-        services.AddScoped<IAuthService, IAM.Core.Services.AuthService>();
-        services.AddScoped<IDatabaseSeeder, IAM.Core.Services.DatabaseSeeder>();
+        services.AddScoped<ICustomerService,CustomerService>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IDatabaseSeeder,DatabaseSeeder>();
 
         var serviceProvider = services.BuildServiceProvider();
 

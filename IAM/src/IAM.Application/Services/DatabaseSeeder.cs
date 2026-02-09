@@ -2,7 +2,7 @@ using IAM.Domain.Entities;
 using IAM.Domain.Repositories;
 using Isopoh.Cryptography.Argon2;
 
-namespace IAM.Core.Services;
+namespace IAM.Application.Services;
 
 public interface IDatabaseSeeder
 {

@@ -2,7 +2,7 @@
 using Myce.Response;
 using Myce.Validation;
 
-namespace IAM.Core.Validators.User
+namespace IAM.Application.Validators.User
 {
    internal class CreateUserValidator 
    {
@@ -17,7 +17,6 @@ namespace IAM.Core.Validators.User
          var isValid = validator.Validate(request);
 
          return isValid ? Result.Success() : Result.Failure(validator.Messages);
-
       }
    }
 }

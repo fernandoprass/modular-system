@@ -1,5 +1,5 @@
-using IAM.Core.Services;
-using IAM.Core.Validators;
+using IAM.Application.Services;
+using IAM.Application.Validators;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.Entities;
 using IAM.Domain.QueryRepositories;
@@ -7,7 +7,7 @@ using IAM.Domain.Repositories;
 using Moq;
 using Xunit;
 
-namespace IAM.Core.Tests.Services;
+namespace IAM.Application.Tests.Services;
 
 public class UserServiceTests
 {

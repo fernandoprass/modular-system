@@ -4,14 +4,13 @@ using IAM.Domain.Entities;
 using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
 using Isopoh.Cryptography.Argon2;
-
-namespace IAM.Core.Services;
-
-using IAM.Core.Validators;
-using IAM.Core.Validators.User;
+using IAM.Application.Validators.User;
 using IAM.Domain.Messages;
 using IAM.Domain.Messages.Errors;
 using Myce.Response;
+
+namespace IAM.Application.Services;
+
 
 public class UserService : IUserService
 {
@@ -60,7 +59,7 @@ public class UserService : IUserService
 
    public async Task<Result<User>> CreateUserAsync(CreateUserRequest request)
    {
-      var validate = CreateUserValidator.Validate(request);
+      var validate = new CreateUserValidator().Validate(request);
 
       if (!validate.IsValid)
       {

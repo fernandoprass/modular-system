@@ -2,7 +2,7 @@ using IAM.Domain.DTOs.Requests;
 using Myce.Response;
 using Myce.Validation;
 
-namespace IAM.Core.Validators;
+namespace IAM.Application.Validators;
 
 public class UserValidator
 {

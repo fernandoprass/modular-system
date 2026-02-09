@@ -1,4 +1,4 @@
-# 🐋 Docker & Containerization Guide
+# Docker & Containerization Guide
 
 This guide explains the infrastructure setup for this project using Docker, Docker Compose, and environment variables.
 

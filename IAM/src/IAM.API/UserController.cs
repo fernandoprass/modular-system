@@ -1,5 +1,5 @@
 using IAM.API.Controllers;
-using IAM.Core.Services;
+using IAM.Application.Services;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;

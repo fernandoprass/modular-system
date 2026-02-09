@@ -1,4 +1,4 @@
-using IAM.Core.Services;
+using IAM.Application.Services;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
 using Microsoft.Extensions.Configuration;
@@ -7,7 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace IAM.Core.Services;
+namespace IAM.Application.Services;
 
 public interface IAuthService
 {

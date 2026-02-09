@@ -1,5 +1,4 @@
 using IAM.API.Configure;
-using IAM.Core.Services;
 using IAM.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;

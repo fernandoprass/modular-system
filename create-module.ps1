@@ -23,20 +23,20 @@ dotnet sln add "src/$MODULE_NAME.Domain"
 New-Item -ItemType Directory -Path "src/$MODULE_NAME.Domain/Repositories" -Force | Out-Null
 New-Item -ItemType Directory -Path "src/$MODULE_NAME.Domain/QueryRepositories" -Force | Out-Null
 
-# 2. Core
-dotnet new classlib -n "$MODULE_NAME.Core" -o "src/$MODULE_NAME.Core" -f $DOTNET_VERSION
-dotnet sln add "src/$MODULE_NAME.Core"
-dotnet add "src/$MODULE_NAME.Core" reference "src/$MODULE_NAME.Domain"
+# 2. Application
+dotnet new classlib -n "$MODULE_NAME.Application" -o "src/$MODULE_NAME.Application" -f $DOTNET_VERSION
+dotnet sln add "src/$MODULE_NAME.Application"
+dotnet add "src/$MODULE_NAME.Application" reference "src/$MODULE_NAME.Domain"
 
 # Create Split Repository Structure
-New-Item -ItemType Directory -Path "src/$MODULE_NAME.Core/Services" -Force | Out-Null
-New-Item -ItemType Directory -Path "src/$MODULE_NAME.Core/Orchestrators" -Force | Out-Null
+New-Item -ItemType Directory -Path "src/$MODULE_NAME.Application/Services" -Force | Out-Null
+New-Item -ItemType Directory -Path "src/$MODULE_NAME.Application/Orchestrators" -Force | Out-Null
 
 # 3. Infrastructure
 dotnet new classlib -n "$MODULE_NAME.Infrastructure" -o "src/$MODULE_NAME.Infrastructure" -f $DOTNET_VERSION
 dotnet sln add "src/$MODULE_NAME.Infrastructure"
 dotnet add "src/$MODULE_NAME.Infrastructure" reference "src/$MODULE_NAME.Domain"
-dotnet add "src/$MODULE_NAME.Infrastructure" reference "src/$MODULE_NAME.Core"
+dotnet add "src/$MODULE_NAME.Infrastructure" reference "src/$MODULE_NAME.Application"
 dotnet add "src/$MODULE_NAME.Infrastructure" package Npgsql.EntityFrameworkCore.PostgreSQL
 
 # Create Split Repository Structure
@@ -49,13 +49,13 @@ New-Item -ItemType Directory -Path "src/$MODULE_NAME.Infrastructure/QueryReposit
 dotnet new webapi -n "$MODULE_NAME.API" -o "src/$MODULE_NAME.API" -f $DOTNET_VERSION
 dotnet sln add "src/$MODULE_NAME.API"
 dotnet add "src/$MODULE_NAME.API" reference "src/$MODULE_NAME.Domain"
-dotnet add "src/$MODULE_NAME.API" reference "src/$MODULE_NAME.Core"
+dotnet add "src/$MODULE_NAME.API" reference "src/$MODULE_NAME.Application"
 dotnet add "src/$MODULE_NAME.API" reference "src/$MODULE_NAME.Infrastructure"
 
-# 5. Tests (Example: Core Tests)
-dotnet new xunit -n "$MODULE_NAME.Core.Tests" -o "tests/$MODULE_NAME.Core.Tests" -f $DOTNET_VERSION
-dotnet sln add "tests/$MODULE_NAME.Core.Tests"
-dotnet add "tests/$MODULE_NAME.Core.Tests" reference "src/$MODULE_NAME.Core"
+# 5. Tests (Example: Application Tests)
+dotnet new xunit -n "$MODULE_NAME.Application.Tests" -o "tests/$MODULE_NAME.Application.Tests" -f $DOTNET_VERSION
+dotnet sln add "tests/$MODULE_NAME.Application.Tests"
+dotnet add "tests/$MODULE_NAME.Application.Tests" reference "src/$MODULE_NAME.Application"
 
 # Cleanup
 Get-ChildItem -Recurse -Filter "Class1.cs" | Remove-Item

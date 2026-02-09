@@ -3,7 +3,7 @@ using IAM.Domain.Entities;
 using IAM.Domain.Repositories;
 using IAM.Domain.QueryRepositories;
 
-namespace IAM.Core.Services;
+namespace IAM.Application.Services;
 
 public class CustomerService : ICustomerService
 {

@@ -1,4 +1,5 @@
 ﻿using IAM.Core.Services;
+using IAM.Core.Validators;
 using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
 using IAM.Infrastructure.QueryRepositories;

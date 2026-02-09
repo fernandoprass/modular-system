@@ -27,7 +27,7 @@ public class CustomerQueryRepository : ICustomerQueryRepository
                 CreatedAt = c.CreatedAt,
                 UpdatedAt = c.UpdatedAt
             })
-            .FirstOrDefaultAsync();
+            .SingleOrDefaultAsync();
     }
 
     public async Task<CustomerDto?> GetByNameAsync(string name)

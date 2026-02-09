@@ -21,7 +21,9 @@ This project uses .NET 9.0 and leverages various NuGet packages to implement fun
 
 ## Business Logic and Utilities
 - **Isopoh.Cryptography.Argon2** (v2.0.0): A .NET implementation of the Argon2 password hashing algorithm. Argon2 is a modern, secure hashing algorithm designed to protect against brute-force attacks, making it ideal for password storage.
-- **Microsoft.Extensions.Configuration** (v9.0.0): Provides configuration abstractions for .NET applications, allowing settings from various sources (e.g., JSON files, environment variables).
+- **Microsoft.Extensions.Configuration** (v9.0.0): Provides configuration abstractions for .NET applications, allowing settings from various sources (e.g., JSON files, environment variables).+
+- **Myce.Validation** (v1.0.0): A fluent validation library designed to simplify entity validation in .NET applications.
+- **Myce.Response** (v1.0.0): Lightweight and robust .NET library implementing the Result Pattern to standardize API responses, handle business logic flow, and manage complex messaging with frontend-driven internationalization support.
 
 ## Testing
 - **xunit** (v2.9.2): A free, open-source, community-focused unit testing tool for .NET. xUnit is a modern testing framework emphasizing simplicity and extensibility.

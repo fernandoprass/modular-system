@@ -13,7 +13,17 @@ public abstract class BaseRepository<T> where T : class
         _dbSet = context.Set<T>();
     }
 
-    public virtual Task AddAsync(T entity)
+    public virtual async Task<T?> GetByIdAsync(Guid id)
+    {
+        return await _dbSet.FindAsync(id);
+    }
+
+   public virtual async Task<T?> GetByIdAsync(int id)
+   {
+      return await _dbSet.FindAsync(id);
+   }
+
+   public virtual Task AddAsync(T entity)
     {
         return _dbSet.AddAsync(entity).AsTask();
     }

@@ -1,5 +1,4 @@
 using IAM.Domain.Repositories;
-using IAM.Infrastructure.Repositories;
 
 namespace IAM.Infrastructure.Repositories;
 
@@ -9,7 +8,9 @@ public class UnitOfWork : IUnitOfWork
     public IUserRepository Users { get; }
     public ICustomerRepository Customers { get; }
 
-    public UnitOfWork(IamDbContext context, IUserRepository userRepository, ICustomerRepository customerRepository)
+    public UnitOfWork(IamDbContext context, 
+       IUserRepository userRepository, 
+       ICustomerRepository customerRepository)
     {
         _context = context;
         Users = userRepository;

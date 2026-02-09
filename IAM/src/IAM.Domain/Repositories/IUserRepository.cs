@@ -7,5 +7,6 @@ public interface IUserRepository
     Task AddAsync(User user);
     void Update(User user);
     Task DeleteAsync(Guid id);
+    Task<User?> GetByIdAsync(Guid id);
     Task<bool> ExistsAsync(Guid id);
 }

@@ -7,6 +7,12 @@ using Isopoh.Cryptography.Argon2;
 
 namespace IAM.Core.Services;
 
+using IAM.Core.Validators;
+using IAM.Core.Validators.User;
+using IAM.Domain.Messages;
+using IAM.Domain.Messages.Errors;
+using Myce.Response;
+
 public class UserService : IUserService
 {
    private readonly IUnitOfWork _unitOfWork;
@@ -25,8 +31,7 @@ public class UserService : IUserService
 
    public async Task<UserDto?> GetByIdAsync(Guid id)
    {
-      var users = await _userQueryRepository.GetAllAsync();
-      return users.FirstOrDefault(u => u.Id == id);
+      return await _userQueryRepository.GetByIdAsync(id);
    }
 
    public async Task<IEnumerable<UserDto>> GetAllAsync()
@@ -53,31 +58,40 @@ public class UserService : IUserService
       return user;
    }
 
-   public async Task<User> CreateUserAsync(CreateUserRequest request)
+   public async Task<Result<User>> CreateUserAsync(CreateUserRequest request)
    {
-      // Check if email already exists
+      var validate = CreateUserValidator.Validate(request);
+
+      if (!validate.IsValid)
+      {
+         return Result<User>.Failure(validate.Messages);
+      }
+
       var existingUser = await _userQueryRepository.GetByEmailAsync(request.Email);
       if (existingUser != null)
       {
-         throw new InvalidOperationException("User with this email already exists");
+         return Result<User>.Failure(new UserEmailAlreadyExistError(request.Email));
       }
-
-      // Generate salt and hash password
-      var passwordHash = Argon2.Hash(request.Password);
 
       var user = new User
       {
+         Id = Guid.CreateVersion7(),
          Name = request.Name,
          Email = request.Email,
-         PasswordHash = passwordHash,
+         PasswordHash = Argon2.Hash(request.Password),
+         CreatedAt = DateTime.UtcNow,
          CustomerId = request.CustomerId
       };
 
-      return await CreateAsync(user);
+      var result = await CreateAsync(user);
+
+      return result is not null ? Result<User>.Success(result) : Result<User>.Failure(new FailedToRecordDataError());
    }
 
    public async Task<UserDto?> ValidateCredentialsAsync(string email, string password)
    {
+      //_userValidator.ValidateCredentials(email, password);
+
       var user = await _userQueryRepository.GetByEmailWithPasswordAsync(email) ;
       if (user == null)
       {
@@ -98,8 +112,6 @@ public class UserService : IUserService
          Email = user.Email,
          CustomerId = user.CustomerId,
          CustomerName = user.CustomerName,
-         CreatedAt = user.CreatedAt,
-         UpdatedAt = user.UpdatedAt
       };
    }
 
@@ -107,6 +119,37 @@ public class UserService : IUserService
    {
       user.UpdatedAt = DateTime.UtcNow;
       _unitOfWork.Users.Update(user);
+      await _unitOfWork.SaveChangesAsync();
+   }
+
+   public async Task UpdatePasswordAsync(UpdatePasswordRequest request)
+   {
+      //_userValidator.Validate(request);
+
+      var user = await _userQueryRepository.GetByEmailWithPasswordAsync(request.Email);
+      if (user == null)
+      {
+         throw new InvalidOperationException("User not found");
+      }
+
+      var isValid = Argon2.Verify(request.PasswordOld, user.PasswordHash);
+      if (!isValid)
+      {
+         throw new InvalidOperationException("Invalid old password");
+      }
+
+      // We need to retrieve the Domain User entity to update it, because QueryRepository returns DTO/projection
+      // Assuming IUserRepository has GetByIdAsync that returns User entity.
+      var userEntity = await _userRepository.GetByIdAsync(user.Id);
+      if (userEntity == null)
+      {
+          throw new InvalidOperationException("User entity not found");
+      }
+
+      userEntity.PasswordHash = Argon2.Hash(request.PasswordNew);
+      userEntity.UpdatedAt = DateTime.UtcNow;
+
+      _unitOfWork.Users.Update(userEntity);
       await _unitOfWork.SaveChangesAsync();
    }
 

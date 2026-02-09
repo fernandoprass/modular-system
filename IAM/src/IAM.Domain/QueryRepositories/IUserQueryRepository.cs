@@ -5,6 +5,7 @@ namespace IAM.Domain.QueryRepositories;
 
 public interface IUserQueryRepository
 {
+   Task<UserDto?> GetByIdAsync(Guid id);
    Task<UserDto?> GetByEmailAsync(string email);
    Task<IEnumerable<UserDto>> GetByCustomerIdAsync(Guid customerId);
    Task<IEnumerable<UserDto>> GetAllAsync();

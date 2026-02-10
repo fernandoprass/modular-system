@@ -33,11 +33,29 @@ public class CustomerService : ICustomerService
         return await _customerQueryRepository.GetByNameAsync(name);
     }
 
-    public async Task<Customer> CreateAsync(Customer customer)
+    public async Task<Customer> CreateAsync(CustomerCreateRequest customerCreate)
     {
-        customer.Id = Guid.NewGuid();
-        customer.CreatedAt = DateTime.UtcNow;
+        var customer = new Customer
+        {
+            Id = Guid.createVersion7(),
+            Type = customerCreate.Type,
+            Name = customerCreate.CustomerName,
+            Code = customerCreate.CustomerCode,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        var user = new User
+        {
+            Id = Guid.CreateVersion7(),
+            Name = customerCreate.UserName,
+            Email = customerCreate.UserEmail,
+            PasswordHash = Argon2.Hash(customerCreate.UserPassword),
+            CustomerId = customer.Id,
+            CreatedAt = DateTime.UtcNow
+        };
+
         await _unitOfWork.Customers.AddAsync(customer);
+        await _unitOfWork.Customers.AddAsync(user);
         await _unitOfWork.SaveChangesAsync();
         return customer;
     }

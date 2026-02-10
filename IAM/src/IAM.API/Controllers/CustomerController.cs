@@ -31,7 +31,7 @@ public class CustomerController : BaseController
    }
 
    [HttpPost]
-   public async Task<IActionResult> Create([FromBody] Customer customer)
+   public async Task<IActionResult> Create([FromBody] CustomerCreateRequest customer)
    {
       if (!ModelState.IsValid)
       {

@@ -8,7 +8,7 @@ public interface ICustomerService
     Task<CustomerDto?> GetByIdAsync(Guid id);
     Task<IEnumerable<CustomerDto>> GetAllAsync();
     Task<CustomerDto?> GetByNameAsync(string name);
-    Task<Customer> CreateAsync(Customer customer);
+    Task<Customer> CreateAsync(CustomerCreateRequest customerCreateRequest);
     Task UpdateAsync(Customer customer);
     Task DeleteAsync(Guid id);
     Task<bool> ExistsAsync(Guid id);

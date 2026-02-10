@@ -51,6 +51,15 @@ public class UserQueryRepository : IUserQueryRepository
           .SingleOrDefaultAsync();
    }
 
+   public async Task<Guid?> GetIdByEmailAsync(string email)
+   {
+      return await _context.Users
+          .AsNoTracking()
+          .Where(u => u.Email == email)
+          .Select(u => u.Id)
+          .SingleOrDefaultAsync();
+   }
+
    public async Task<UserPasswordDto?> GetByEmailWithPasswordAsync(string email)
    {
       return await _context.Users

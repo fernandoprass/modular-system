@@ -3,7 +3,7 @@ namespace IAM.Domain.Entities;
 public class Customer
 {
     public Guid Id { get; set; }
-    public bool Type { get; set; }
+    public CustomerType Type { get; set; }
     public string Code { get; set; }
     public string Name { get; set; }
     public string? Description { get; set; }

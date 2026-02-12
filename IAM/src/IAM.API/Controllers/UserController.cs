@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Myce.Response;
 using Myce.Response.Messages;
 
-namespace IAM.API;
+namespace IAM.API.Controllers;
 
 [Route("api/[controller]")]
 public class UserController : BaseController

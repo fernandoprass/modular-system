@@ -37,9 +37,11 @@ public class CustomerService : ICustomerService
     {
         var customer = new Customer
         {
-            Id = Guid.createVersion7(),
+            Id = Guid.CreateVersion7(),
             Type = customerCreate.Type,
-            Name = customerCreate.CustomerName,
+            Name = customerCreate.Type == CustomerType.Company 
+                   ? customerCreate.CustomerName 
+                   : customerCreate.UserName,
             Code = customerCreate.CustomerCode,
             CreatedAt = DateTime.UtcNow
         };

@@ -2,7 +2,7 @@
 
 public sealed record UpdatePasswordRequest
 {
-    public string Email { get; set; } = string.Empty;
-    public string PasswordOld { get; set; } = string.Empty;
-    public string PasswordNew { get; set; } = string.Empty;
+    public string Email { get; init; } = string.Empty;
+    public string PasswordOld { get; init; } = string.Empty;
+    public string PasswordNew { get; init; } = string.Empty;
 }

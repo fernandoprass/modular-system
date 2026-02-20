@@ -1,19 +1,17 @@
-﻿using IAM.Domain.DTOs.Requests;
+﻿using Myce.FluentValidator;
 using Myce.Response;
-using Myce.Validation;
 
 namespace IAM.Application.Validators.User
 {
    internal class CreateCustometerValidator 
    {
-      public Result Validate(CreateCustomerRequest request)
+      public Result Validate(CustomerCreateRequest request)
       {
-         var validator = new EntityValidator<CreateCustomerRequest>()
-             .RuleFor(x => x.CustomerName).IsRequired().MinLength(3).Apply()
-             .RuleFor(x => x.CustomerCode).IsRequired().MinLength(3).Apply()
-             .RuleFor(x => x.UserEmail).IsRequired().IsValidEmailAddress().Apply()
-             .RuleFor(x => x.Password).IsRequired().MinLength(8).Apply();
-             
+         var validator = new FluentValidator<CustomerCreateRequest>()
+             .RuleFor(x => x.Name).IsRequired().MinLength(3)
+             .RuleFor(x => x.Code).IsRequired().MinLength(3);
+
+         //todo: validate user
          var isValid = validator.Validate(request);
 
          return isValid ? Result.Success() : Result.Failure(validator.Messages);

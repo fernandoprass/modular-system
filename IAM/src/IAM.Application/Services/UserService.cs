@@ -57,9 +57,10 @@ public class UserService : IUserService
       return user;
    }
 
-   public async Task<Result<User>> CreateUserAsync(CreateUserRequest request)
+   public async Task<Result<User>> CreateUserAsync(UserCreateRequest request)
    {
-      var validate = new CreateUserValidator().Validate(request);
+      //todo fix it to use dependency injection and not create new instance every time
+      var validate = new UserCreateValidator(_userQueryRepository).Validate(request);
 
       if (!validate.IsValid)
       {
@@ -121,7 +122,7 @@ public class UserService : IUserService
       await _unitOfWork.SaveChangesAsync();
    }
 
-   public async Task UpdatePasswordAsync(UpdatePasswordRequest request)
+   public async Task UpdatePasswordAsync(UserUpdatePasswordRequest request)
    {
       //_userValidator.Validate(request);
 

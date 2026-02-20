@@ -80,7 +80,7 @@ public class UserServiceTests
    public async Task UpdatePasswordAsync_ShouldCallValidator()
    {
       // Arrange
-      var request = new UpdatePasswordRequest
+      var request = new UserUpdatePasswordRequest
       {
          Email = "test@example.com",
          PasswordOld = "old",

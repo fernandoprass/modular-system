@@ -48,7 +48,7 @@ public class UserController : BaseController
    }
 
    [HttpPost("register")]
-   public async Task<IActionResult> Register([FromBody] CreateUserRequest request)
+   public async Task<IActionResult> Register([FromBody] UserCreateRequest request)
    {
       if (!ModelState.IsValid)
       {

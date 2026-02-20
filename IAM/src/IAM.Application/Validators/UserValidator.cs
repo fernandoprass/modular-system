@@ -1,17 +1,16 @@
 using IAM.Domain.DTOs.Requests;
-using Myce.Response;
-using Myce.Validation;
+using Myce.FluentValidator;
 
 namespace IAM.Application.Validators;
 
 public class UserValidator
 {
-   public void Validate(UpdatePasswordRequest request)
+   public void Validate(UserUpdatePasswordRequest request)
    {
-      var validator = new EntityValidator<UpdatePasswordRequest>()
-          .RuleFor(x => x.Email).IsRequired().IsValidEmailAddress().Apply()
-          .RuleFor(x => x.PasswordOld).IsRequired().Apply()
-          .RuleFor(x => x.PasswordNew).IsRequired().MinLength(8).Apply();
+      var validator = new FluentValidator<UserUpdatePasswordRequest>()
+          .RuleFor(x => x.Email).IsRequired().IsValidEmailAddress()
+          .RuleFor(x => x.PasswordOld).IsRequired()
+          .RuleFor(x => x.PasswordNew).IsRequired().MinLength(8);
 
       if (!validator.Validate(request))
       {
@@ -23,9 +22,9 @@ public class UserValidator
    {
       // Using a record to validate loose parameters
       var credentials = new Credentials { Email = email, Password = password };
-      var validator = new EntityValidator<Credentials>()
-          .RuleFor(x => x.Email).IsRequired().IsValidEmailAddress().Apply()
-          .RuleFor(x => x.Password).IsRequired().Apply();
+      var validator = new FluentValidator<Credentials>()
+          .RuleFor(x => x.Email).IsRequired().IsValidEmailAddress()
+          .RuleFor(x => x.Password).IsRequired();
 
       if (!validator.Validate(credentials))
       {

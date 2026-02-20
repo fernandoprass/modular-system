@@ -2,6 +2,7 @@ using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;
 using IAM.Domain.Repositories;
 using IAM.Domain.QueryRepositories;
+using Isopoh.Cryptography.Argon2;
 
 namespace IAM.Application.Services;
 
@@ -39,25 +40,23 @@ public class CustomerService : ICustomerService
         {
             Id = Guid.CreateVersion7(),
             Type = customerCreate.Type,
-            Name = customerCreate.Type == CustomerType.Company 
-                   ? customerCreate.CustomerName 
-                   : customerCreate.UserName,
-            Code = customerCreate.CustomerCode,
+            Name = customerCreate.Type == CustomerType.Company ? customerCreate.Name  : customerCreate.Name,
+            Code = customerCreate.Code,
             CreatedAt = DateTime.UtcNow
         };
 
         var user = new User
         {
             Id = Guid.CreateVersion7(),
-            Name = customerCreate.UserName,
-            Email = customerCreate.UserEmail,
-            PasswordHash = Argon2.Hash(customerCreate.UserPassword),
+            Name = customerCreate.User.Name,
+            Email = customerCreate.User.Email,
+            PasswordHash = Argon2.Hash(customerCreate.User.Password),
             CustomerId = customer.Id,
             CreatedAt = DateTime.UtcNow
         };
 
         await _unitOfWork.Customers.AddAsync(customer);
-        await _unitOfWork.Customers.AddAsync(user);
+        await _unitOfWork.Users.AddAsync(user);
         await _unitOfWork.SaveChangesAsync();
         return customer;
     }
@@ -79,4 +78,9 @@ public class CustomerService : ICustomerService
     {
         return await _unitOfWork.Customers.ExistsAsync(id);
     }
+
+   public Task<Customer> CreateAsync(Customer customer)
+   {
+      throw new NotImplementedException();
+   }
 }

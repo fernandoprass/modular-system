@@ -7,8 +7,8 @@
   <ItemGroup>
     <PackageReference Include="Isopoh.Cryptography.Argon2" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
-    <PackageReference Include="Myce.Response" Version="1.0.0" />
-    <PackageReference Include="Myce.Validation" Version="1.0.0" />
+    <PackageReference Include="Myce.FluentValidator" Version="1.1.0" />
+    <PackageReference Include="Myce.Response" Version="1.0.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
   </ItemGroup>
 

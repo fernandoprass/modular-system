@@ -1,4 +1,5 @@
 using IAM.API.Configure;
+using IAM.Application.Services;
 using IAM.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -56,15 +57,15 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// Apply migrations and seed database in development
-//if (app.Environment.IsDevelopment())
-//{
-//    using var scope = app.Services.CreateScope();
-//    var db = scope.ServiceProvider.GetRequiredService<IamDbContext>();
-//    db.Database.Migrate();
+//Apply migrations and seed database in development
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+var db = scope.ServiceProvider.GetRequiredService<IamDbContext>();
+db.Database.Migrate();
 
-//    var seeder = scope.ServiceProvider.GetRequiredService<IDatabaseSeeder>();
-//    await seeder.SeedAsync();
-//}
+var seeder = scope.ServiceProvider.GetRequiredService<IDatabaseSeeder>();
+await seeder.SeedAsync();
+}
 
 app.Run();

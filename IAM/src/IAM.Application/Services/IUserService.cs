@@ -12,10 +12,10 @@ public interface IUserService
    Task<UserDto?> GetByEmailAsync(string email);
    Task<IEnumerable<UserDto>> GetByCustomerIdAsync(Guid customerId);
    Task<User> CreateAsync(User user);
-   Task<Result<User>> CreateUserAsync(CreateUserRequest request);
+   Task<Result<User>> CreateUserAsync(UserCreateRequest request);
    Task<UserDto?> ValidateCredentialsAsync(string email, string password);
    Task UpdateAsync(User user);
-   Task UpdatePasswordAsync(UpdatePasswordRequest request);
+   Task UpdatePasswordAsync(UserUpdatePasswordRequest request);
    Task DeleteAsync(Guid id);
    Task<bool> ExistsAsync(Guid id);
 }

@@ -1,6 +1,6 @@
 ﻿namespace IAM.Domain.DTOs.Requests;
 
-public sealed record UpdatePasswordRequest
+public sealed record UserUpdatePasswordRequest
 {
     public string Email { get; init; } = string.Empty;
     public string PasswordOld { get; init; } = string.Empty;

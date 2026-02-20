@@ -44,7 +44,7 @@ public class UserController : BaseController
    {
       var users = await _userService.GetByCustomerIdAsync(customerId);
       // Returns a Result with the collection
-      return Ok(Result<IEnumerable<UserDto>>.Success(users));
+      return Ok(Result<IEnumerable<UserLiteDto>>.Success(users));
    }
 
    [HttpPost("register")]

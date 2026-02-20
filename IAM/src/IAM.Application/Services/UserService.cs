@@ -7,6 +7,7 @@ using Isopoh.Cryptography.Argon2;
 using IAM.Application.Validators.User;
 using IAM.Domain.Messages;
 using IAM.Domain.Messages.Errors;
+using IAM.Domain.Messages.Info;
 using Myce.Response;
 
 namespace IAM.Application.Services;
@@ -43,7 +44,7 @@ public class UserService : IUserService
       return await _userQueryRepository.GetByEmailAsync(email);
    }
 
-   public async Task<IEnumerable<UserDto>> GetByCustomerIdAsync(Guid customerId)
+   public async Task<IEnumerable<UserLiteDto>> GetByCustomerIdAsync(Guid customerId)
    {
       return await _userQueryRepository.GetByCustomerIdAsync(customerId);
    }
@@ -115,11 +116,12 @@ public class UserService : IUserService
       };
    }
 
-   public async Task UpdateAsync(User user)
+   public async Task<Result> UpdateAsync(User user)
    {
       user.UpdatedAt = DateTime.UtcNow;
       _unitOfWork.Users.Update(user);
       await _unitOfWork.SaveChangesAsync();
+      return Result.Success(new SuccessInfo());
    }
 
    public async Task UpdatePasswordAsync(UserUpdatePasswordRequest request)

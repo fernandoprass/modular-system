@@ -3,6 +3,7 @@ using IAM.Domain.Entities;
 using IAM.Domain.Repositories;
 using IAM.Domain.QueryRepositories;
 using Isopoh.Cryptography.Argon2;
+using IAM.Application.Contracts;
 
 namespace IAM.Application.Services;
 

@@ -1,8 +1,11 @@
-﻿using IAM.Application.Services;
+﻿using IAM.Application.Contracts;
+using IAM.Application.Services;
+using IAM.Application.Validators;
 using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
 using IAM.Infrastructure.QueryRepositories;
 using IAM.Infrastructure.Repositories;
+
 
 namespace IAM.API.Configure
 {
@@ -10,7 +13,6 @@ namespace IAM.API.Configure
    {
       public static void RegisterRepositories(WebApplicationBuilder builder)
       {
-         // Register Unit of Work and Repositories
          builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
          builder.Services.AddScoped<IUserRepository, UserRepository>();
          builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
@@ -20,11 +22,15 @@ namespace IAM.API.Configure
 
       public static void RegisterServices(WebApplicationBuilder builder)
       {
-         // Register services
          builder.Services.AddScoped<ICustomerService, CustomerService>();
          builder.Services.AddScoped<IUserService, UserService>();
          builder.Services.AddScoped<IAuthService, AuthService>();
          builder.Services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
+      }
+
+      public static void RegisterValidators(WebApplicationBuilder builder)
+      {
+         builder.Services.AddScoped<IUserFluentValidator, UserFluentValidator>();
       }
    }
 }

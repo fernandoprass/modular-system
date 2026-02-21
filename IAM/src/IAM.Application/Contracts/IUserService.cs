@@ -3,19 +3,18 @@ using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;
 using Myce.Response;
 
-namespace IAM.Application.Services;
+namespace IAM.Application.Contracts;
 
 public interface IUserService
 {
    Task<UserDto?> GetByIdAsync(Guid id);
-   Task<IEnumerable<UserDto>> GetAllAsync();
    Task<UserDto?> GetByEmailAsync(string email);
-   Task<IEnumerable<UserDto>> GetByCustomerIdAsync(Guid customerId);
-   Task<User> CreateAsync(User user);
-   Task<Result<User>> CreateUserAsync(UserCreateRequest request);
+   Task<IEnumerable<UserLiteDto>> GetByCustomerIdAsync(Guid customerId);
+   Task<Result<UserDto>> CreateUserAsync(UserCreateRequest request);
    Task<UserDto?> ValidateCredentialsAsync(string email, string password);
-   Task UpdateAsync(User user);
+   Task<Result> UpdateAsync(Guid id, UserUpdateRequest user);
    Task UpdatePasswordAsync(UserUpdatePasswordRequest request);
    Task DeleteAsync(Guid id);
    Task<bool> ExistsAsync(Guid id);
+   Task UpdateLastLoginAsync(Guid id);
 }

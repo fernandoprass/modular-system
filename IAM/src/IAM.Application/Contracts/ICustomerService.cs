@@ -1,7 +1,7 @@
 using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;
 
-namespace IAM.Application.Services;
+namespace IAM.Application.Contracts;
 
 public interface ICustomerService
 {

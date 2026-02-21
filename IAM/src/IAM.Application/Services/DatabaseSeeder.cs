@@ -26,6 +26,7 @@ public class DatabaseSeeder : IDatabaseSeeder
          var customer1 = new Customer
          {
             Id = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+            Type = CustomerType.Company,
             Code = "ACME",
             Name = "Acme Corporation",
             Description = "Leading technology company",
@@ -35,6 +36,7 @@ public class DatabaseSeeder : IDatabaseSeeder
          var customer2 = new Customer
          {
             Id = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+            Type = CustomerType.Company,
             Code = "TECHSTART",
             Name = "TechStart Inc",
             Description = "Innovative startup",

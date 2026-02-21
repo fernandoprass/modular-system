@@ -1,13 +1,14 @@
+using IAM.Application.Contracts;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;
+using IAM.Domain.Mappers;
+using IAM.Domain.Messages;
+using IAM.Domain.Messages.Errors;
 using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
 using Isopoh.Cryptography.Argon2;
-using IAM.Application.Validators.User;
-using IAM.Domain.Messages;
-using IAM.Domain.Messages.Errors;
-using IAM.Domain.Messages.Info;
+using Myce.FluentValidator;
 using Myce.Response;
 
 namespace IAM.Application.Services;
@@ -16,15 +17,18 @@ namespace IAM.Application.Services;
 public class UserService : IUserService
 {
    private readonly IUnitOfWork _unitOfWork;
+   private readonly IUserFluentValidator _userFluentValidator;
    private readonly IUserRepository _userRepository;
    private readonly IUserQueryRepository _userQueryRepository;
 
    public UserService(
        IUnitOfWork unitOfWork,
+       IUserFluentValidator userFluentValidator,
        IUserRepository userRepository,
        IUserQueryRepository userQueryRepository)
    {
       _unitOfWork = unitOfWork;
+      _userFluentValidator = userFluentValidator;
       _userRepository = userRepository;
       _userQueryRepository = userQueryRepository;
    }
@@ -32,11 +36,6 @@ public class UserService : IUserService
    public async Task<UserDto?> GetByIdAsync(Guid id)
    {
       return await _userQueryRepository.GetByIdAsync(id);
-   }
-
-   public async Task<IEnumerable<UserDto>> GetAllAsync()
-   {
-      return await _userQueryRepository.GetAllAsync();
    }
 
    public async Task<UserDto?> GetByEmailAsync(string email)
@@ -49,29 +48,18 @@ public class UserService : IUserService
       return await _userQueryRepository.GetByCustomerIdAsync(customerId);
    }
 
-   public async Task<User> CreateAsync(User user)
+   public async Task<Result<UserDto>> CreateUserAsync(UserCreateRequest request)
    {
-      user.Id = Guid.CreateVersion7();
-      user.CreatedAt = DateTime.UtcNow;
-      await _unitOfWork.Users.AddAsync(user);
-      await _unitOfWork.SaveChangesAsync();
-      return user;
-   }
-
-   public async Task<Result<User>> CreateUserAsync(UserCreateRequest request)
-   {
-      //todo fix it to use dependency injection and not create new instance every time
-      var validate = new UserCreateValidator(_userQueryRepository).Validate(request);
-
-      if (!validate.IsValid)
+      var validator = _userFluentValidator.ValidateCreate(request);
+      if (validator.HasError)
       {
-         return Result<User>.Failure(validate.Messages);
+         return Result<UserDto>.Failure(validator.Messages);
       }
 
       var existingUser = await _userQueryRepository.GetByEmailAsync(request.Email);
       if (existingUser != null)
       {
-         return Result<User>.Failure(new UserEmailAlreadyExistError(request.Email));
+         return Result<UserDto>.Failure(new UserEmailAlreadyExistError(request.Email));
       }
 
       var user = new User
@@ -80,13 +68,23 @@ public class UserService : IUserService
          Name = request.Name,
          Email = request.Email,
          PasswordHash = Argon2.Hash(request.Password),
+         IsActive = true,
          CreatedAt = DateTime.UtcNow,
          CustomerId = request.CustomerId
       };
 
       var result = await CreateAsync(user);
 
-      return result is not null ? Result<User>.Success(result) : Result<User>.Failure(new FailedToRecordDataError());
+      return result is not null
+             ? Result<UserDto>.Success(result.ToUserDto(string.Empty)) 
+             : Result<UserDto>.Failure(new FailedToRecordDataError());
+   }
+
+   private async Task<User> CreateAsync(User user)
+   {
+      await _unitOfWork.Users.AddAsync(user);
+      await _unitOfWork.SaveChangesAsync();
+      return user;
    }
 
    public async Task<UserDto?> ValidateCredentialsAsync(string email, string password)
@@ -100,7 +98,7 @@ public class UserService : IUserService
       }
 
       // Verify password
-      var isValid = Argon2.Verify(password, user.PasswordHash);
+      var isValid = Argon2.Verify(user.PasswordHash, password);
       if (!isValid)
       {
          return null;
@@ -116,12 +114,21 @@ public class UserService : IUserService
       };
    }
 
-   public async Task<Result> UpdateAsync(User user)
+   public async Task<Result> UpdateAsync(Guid id, UserUpdateRequest user)
    {
-      user.UpdatedAt = DateTime.UtcNow;
-      _unitOfWork.Users.Update(user);
+      var userEntity = await _userRepository.GetByIdAsync(id);
+      if (userEntity == null)
+      {
+         return Result.Failure(new UserNotFoundError());
+      }
+
+      userEntity.Name = user.Name;
+      userEntity.IsActive = user.IsActive;
+      userEntity.UpdatedAt = DateTime.UtcNow;
+
+      _unitOfWork.Users.Update(userEntity);
       await _unitOfWork.SaveChangesAsync();
-      return Result.Success(new SuccessInfo());
+      return Result.Success();
    }
 
    public async Task UpdatePasswordAsync(UserUpdatePasswordRequest request)
@@ -129,6 +136,7 @@ public class UserService : IUserService
       //_userValidator.Validate(request);
 
       var user = await _userQueryRepository.GetByEmailWithPasswordAsync(request.Email);
+
       if (user == null)
       {
          throw new InvalidOperationException("User not found");
@@ -164,5 +172,12 @@ public class UserService : IUserService
    public async Task<bool> ExistsAsync(Guid id)
    {
       return await _unitOfWork.Users.ExistsAsync(id);
+   }
+
+   public async Task UpdateLastLoginAsync(Guid id)
+   {
+      var userEntity = await _userRepository.GetByIdAsync(id);
+      userEntity.LastLoginAt = DateTime.UtcNow;
+      await _unitOfWork.SaveChangesAsync();
    }
 }

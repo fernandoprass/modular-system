@@ -29,8 +29,11 @@ The `Customer` entity represents an organization or client that owns users and r
 
 ### Properties
 - **Id** (Guid): Unique identifier for the customer.
+- **Code** (string): Unique code representing the customer, often used for external reference.
+- **Types (Enum CustomerType)**: The type of customer (1- Company, 2 - Person)
 - **Name** (string): The customer's name (e.g., company name).
 - **Description** (string?): Optional description of the customer.
+- **IsActive** (bool): Informs if the customer is active.
 - **CreatedAt** (DateTime): Timestamp of creation, in UTC.
 - **UpdatedAt** (DateTime?): Optional timestamp of the last update, in UTC.
 - **Users** (ICollection<User>): Collection of users belonging to this customer.

@@ -1,3 +1,4 @@
+using IAM.Application.Contracts;
 using IAM.Application.Services;
 using IAM.Infrastructure;
 using Microsoft.EntityFrameworkCore;

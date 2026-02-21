@@ -1,7 +1,8 @@
 using IAM.API.Configure;
-using IAM.Application.Services;
 using IAM.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -22,6 +23,8 @@ DependencyInjection.RegisterRepositories(builder);
 
 DependencyInjection.RegisterServices(builder);
 
+DependencyInjection.RegisterValidators(builder);
+
 // Configure JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "your-super-secret-jwt-key-here-make-it-long-and-secure";
 var key = Encoding.UTF8.GetBytes(jwtSecret);
@@ -41,6 +44,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
        };
     });
 
+// Configure API Versioning
+builder.Services.AddApiVersioning(options =>
+{
+   options.DefaultApiVersion = new ApiVersion(1, 0);
+   options.AssumeDefaultVersionWhenUnspecified = true;
+   options.ReportApiVersions = true;
+   options.ApiVersionReader = new UrlSegmentApiVersionReader();
+});
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -58,14 +70,14 @@ app.UseAuthorization();
 app.MapControllers();
 
 //Apply migrations and seed database in development
-if (app.Environment.IsDevelopment())
-{
-    using var scope = app.Services.CreateScope();
-var db = scope.ServiceProvider.GetRequiredService<IamDbContext>();
-db.Database.Migrate();
+//if (app.Environment.IsDevelopment())
+//{
+//    using var scope = app.Services.CreateScope();
+//var db = scope.ServiceProvider.GetRequiredService<IamDbContext>();
+//db.Database.Migrate();
 
-var seeder = scope.ServiceProvider.GetRequiredService<IDatabaseSeeder>();
-await seeder.SeedAsync();
-}
+//var seeder = scope.ServiceProvider.GetRequiredService<IDatabaseSeeder>();
+//await seeder.SeedAsync();
+//}
 
 app.Run();

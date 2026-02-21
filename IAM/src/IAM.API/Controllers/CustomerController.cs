@@ -1,4 +1,4 @@
-using IAM.Application.Services;
+using IAM.Application.Contracts;
 using IAM.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Myce.Response;
@@ -6,7 +6,8 @@ using Myce.Response.Messages;
 
 namespace IAM.API.Controllers;
 
-[Route("api/[controller]")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/iam/customers")]
 public class CustomerController : BaseController
 {
    private readonly ICustomerService _customerService;

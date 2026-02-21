@@ -1,8 +1,7 @@
-using IAM.API.Controllers;
+using IAM.Application.Contracts;
 using IAM.Application.Services;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
-using IAM.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Myce.Response;
@@ -10,7 +9,8 @@ using Myce.Response.Messages;
 
 namespace IAM.API.Controllers;
 
-[Route("api/[controller]")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/iam/users")]
 public class UserController : BaseController
 {
    private readonly IUserService _userService;
@@ -47,8 +47,8 @@ public class UserController : BaseController
       return Ok(Result<IEnumerable<UserLiteDto>>.Success(users));
    }
 
-   [HttpPost("register")]
-   public async Task<IActionResult> Register([FromBody] UserCreateRequest request)
+   [HttpPost("")]
+   public async Task<IActionResult> Create([FromBody] UserCreateRequest request)
    {
       if (!ModelState.IsValid)
       {
@@ -56,9 +56,27 @@ public class UserController : BaseController
          return BadRequest(Result.Failure(new ErrorMessage("INVALID_INPUT", "Please check the provided data.")));
       }
 
-      var createdUser = await _userService.CreateUserAsync(request);
+      var user = await _userService.CreateUserAsync(request);
 
-      return OkOrNotFound(createdUser);
+      return OkOrNotFound(user);
+   }
+
+   [HttpPut("{id}")]
+   [Authorize]
+   public async Task<IActionResult> Update(Guid id, [FromBody] UserUpdateRequest user)
+   {
+      var response = await _userService.UpdateAsync(id, user);
+
+      return OkOrNotFound(response);
+   }
+
+   [HttpDelete("{id}")]
+   [Authorize]
+   public async Task<IActionResult> Delete(Guid id)
+   {
+      return await ExecuteIfExistsAsync(
+          () => _userService.ExistsAsync(id),
+          async (exists) => await _userService.DeleteAsync(id));
    }
 
    [HttpPost("login")]
@@ -77,23 +95,5 @@ public class UserController : BaseController
       }
 
       return Ok(Result<LoginResponse>.Success(response));
-   }
-
-   [HttpPut("{id}")]
-   [Authorize]
-   public async Task<IActionResult> Update(Guid id, [FromBody] User user)
-   {
-      return await ExecuteIfExistsAsync(
-          () => _userService.ExistsAsync(id),
-          async (exists) => await _userService.UpdateAsync(user));
-   }
-
-   [HttpDelete("{id}")]
-   [Authorize]
-   public async Task<IActionResult> Delete(Guid id)
-   {
-      return await ExecuteIfExistsAsync(
-          () => _userService.ExistsAsync(id),
-          async (exists) => await _userService.DeleteAsync(id));
    }
 }

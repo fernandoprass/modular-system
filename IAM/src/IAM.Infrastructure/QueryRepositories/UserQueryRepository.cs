@@ -1,5 +1,6 @@
 using IAM.Domain.DTOs;
 using IAM.Domain.DTOs.Responses;
+using IAM.Domain.Mappers;
 using IAM.Domain.QueryRepositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,16 +20,7 @@ public class UserQueryRepository : IUserQueryRepository
           .AsNoTracking()
           .Include(u => u.Customer)
           .Where(u => u.Id == id)
-          .Select(u => new UserDto
-          {
-             Id = u.Id,
-             Name = u.Name,
-             Email = u.Email,
-             CustomerId = u.CustomerId,
-             CustomerName = u.Customer.Name,
-             CreatedAt = u.CreatedAt,
-             UpdatedAt = u.UpdatedAt
-          })
+          .Select(u => u.ToUserDto(u.Customer.Name))
           .SingleOrDefaultAsync();
    }
 
@@ -38,16 +30,7 @@ public class UserQueryRepository : IUserQueryRepository
           .AsNoTracking()
           .Include(u => u.Customer)
           .Where(u => u.Email == email)
-          .Select(u => new UserDto
-          {
-             Id = u.Id,
-             Name = u.Name,
-             Email = u.Email,
-             CustomerId = u.CustomerId,
-             CustomerName = u.Customer.Name,
-             CreatedAt = u.CreatedAt,
-             UpdatedAt = u.UpdatedAt
-          })
+          .Select(u => u.ToUserDto(u.Customer.Name))
           .SingleOrDefaultAsync();
    }
 
@@ -78,39 +61,17 @@ public class UserQueryRepository : IUserQueryRepository
           .SingleOrDefaultAsync();
    }
 
-   public async Task<IEnumerable<UserDto>> GetByCustomerIdAsync(Guid customerId)
+   public async Task<IEnumerable<UserLiteDto>> GetByCustomerIdAsync(Guid customerId)
    {
       return await _context.Users
           .AsNoTracking()
-          .Include(u => u.Customer)
           .Where(u => u.CustomerId == customerId)
-          .Select(u => new UserDto
+          .Select(u => new UserLiteDto
           {
              Id = u.Id,
              Name = u.Name,
              Email = u.Email,
-             CustomerId = u.CustomerId,
-             CustomerName = u.Customer.Name,
-             CreatedAt = u.CreatedAt,
-             UpdatedAt = u.UpdatedAt
-          })
-          .ToListAsync();
-   }
-
-   public async Task<IEnumerable<UserDto>> GetAllAsync()
-   {
-      return await _context.Users
-          .AsNoTracking()
-          .Include(u => u.Customer)
-          .Select(u => new UserDto
-          {
-             Id = u.Id,
-             Name = u.Name,
-             Email = u.Email,
-             CustomerId = u.CustomerId,
-             CustomerName = u.Customer.Name,
-             CreatedAt = u.CreatedAt,
-             UpdatedAt = u.UpdatedAt
+             IsActive = u.IsActive
           })
           .ToListAsync();
    }

@@ -1,0 +1,22 @@
+meta {
+  name: delete
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{server}}/api/{{version}}/iam/users/019c80bf-46d2-79e6-bfbc-fae2aa397332
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "John Winston Ono Lennon",
+    "isActive": false
+  }
+}

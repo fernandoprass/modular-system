@@ -1,0 +1,22 @@
+meta {
+  name: update
+  type: http
+  seq: 1
+}
+
+put {
+  url: {{server}}/api/{{version}}/iam/users/019c582a-b06c-7eb7-8ffc-b21e00f7ed35
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "John Winston Ono Lennon",
+    "isActive": false
+  }
+}

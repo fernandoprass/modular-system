@@ -1,0 +1,22 @@
+meta {
+  name: get by customer
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{server}}/api/{{version}}/iam/users/by-customer/550e8400-e29b-41d4-a716-446655440000
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "User Test",
+    "isActive": false
+  }
+}

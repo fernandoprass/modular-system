@@ -10,4 +10,12 @@ namespace IAM.Domain.Messages
          AddVariable("email", email);
       }
    }
+
+   public class UserNotFoundError : ErrorMessage
+   {
+      public UserNotFoundError()
+        : base("USER_NOT_FOUND_ERROR", "User not found.")
+      {
+      }
+   }
 }

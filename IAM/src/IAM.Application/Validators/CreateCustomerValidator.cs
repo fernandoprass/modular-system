@@ -1,7 +1,7 @@
 ﻿using Myce.FluentValidator;
 using Myce.Response;
 
-namespace IAM.Application.Validators.User
+namespace IAM.Application.Validators
 {
    internal class CreateCustometerValidator 
    {

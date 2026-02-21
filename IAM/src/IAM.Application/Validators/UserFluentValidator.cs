@@ -1,20 +1,21 @@
-﻿using IAM.Domain.DTOs.Requests;
+﻿using IAM.Application.Contracts;
+using IAM.Domain.DTOs.Requests;
 using IAM.Domain.QueryRepositories;
 using Myce.FluentValidator;
 using Myce.Response;
 
-namespace IAM.Application.Validators.User
+namespace IAM.Application.Validators
 {
-   internal class UserCreateValidator 
+   public class UserFluentValidator : IUserFluentValidator
    {
       private readonly IUserQueryRepository _userQueryRepository;
 
-      public UserCreateValidator(IUserQueryRepository userQueryRepository)
+      public UserFluentValidator(IUserQueryRepository userQueryRepository)
       {
          _userQueryRepository = userQueryRepository;
       }
 
-      public Result Validate(UserCreateRequest request)
+      public Result ValidateCreate(UserCreateRequest request)
       {
          var emailExists = _userQueryRepository.GetIdByEmailAsync(request.Email);
 

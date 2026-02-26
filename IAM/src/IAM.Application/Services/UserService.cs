@@ -1,4 +1,5 @@
 using IAM.Application.Contracts;
+using IAM.Domain;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;
@@ -8,8 +9,8 @@ using IAM.Domain.Messages.Errors;
 using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
 using Isopoh.Cryptography.Argon2;
-using Myce.FluentValidator;
 using Myce.Response;
+using System.Reflection.Metadata;
 
 namespace IAM.Application.Services;
 
@@ -56,12 +57,6 @@ public class UserService : IUserService
          return Result<UserDto>.Failure(validator.Messages);
       }
 
-      var existingUser = await _userQueryRepository.GetByEmailAsync(request.Email);
-      if (existingUser != null)
-      {
-         return Result<UserDto>.Failure(new UserEmailAlreadyExistError(request.Email));
-      }
-
       var user = new User
       {
          Id = Guid.CreateVersion7(),
@@ -87,39 +82,12 @@ public class UserService : IUserService
       return user;
    }
 
-   public async Task<UserDto?> ValidateCredentialsAsync(string email, string password)
-   {
-      //_userValidator.ValidateCredentials(email, password);
-
-      var user = await _userQueryRepository.GetByEmailWithPasswordAsync(email) ;
-      if (user == null)
-      {
-         return null;
-      }
-
-      // Verify password
-      var isValid = Argon2.Verify(user.PasswordHash, password);
-      if (!isValid)
-      {
-         return null;
-      }
-
-      return new UserDto
-      {
-         Id = user.Id,
-         Name = user.Name,
-         Email = user.Email,
-         CustomerId = user.CustomerId,
-         CustomerName = user.CustomerName,
-      };
-   }
-
    public async Task<Result> UpdateAsync(Guid id, UserUpdateRequest user)
    {
       var userEntity = await _userRepository.GetByIdAsync(id);
       if (userEntity == null)
       {
-         return Result.Failure(new UserNotFoundError());
+         return Result.Failure(new NotFoundError(Const.Entity.User));
       }
 
       userEntity.Name = user.Name;

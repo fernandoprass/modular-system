@@ -1,8 +1,7 @@
+using Asp.Versioning;
 using IAM.API.Configure;
 using IAM.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -47,10 +46,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // Configure API Versioning
 builder.Services.AddApiVersioning(options =>
 {
-   options.DefaultApiVersion = new ApiVersion(1, 0);
-   options.AssumeDefaultVersionWhenUnspecified = true;
+   options.DefaultApiVersion = new ApiVersion(1);
    options.ReportApiVersions = true;
-   options.ApiVersionReader = new UrlSegmentApiVersionReader();
+   options.AssumeDefaultVersionWhenUnspecified = true;
+   options.ApiVersionReader = ApiVersionReader.Combine(
+       new UrlSegmentApiVersionReader(),
+       new HeaderApiVersionReader("X-Api-Version"));
 });
 
 builder.Services.AddAuthorization();

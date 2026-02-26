@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using IAM.Application.Contracts;
 using IAM.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +7,7 @@ using Myce.Response.Messages;
 
 namespace IAM.API.Controllers;
 
-[ApiVersion("1.0")]
+[ApiVersion(1)]
 [Route("api/v{version:apiVersion}/iam/customers")]
 public class CustomerController : BaseController
 {

@@ -1,7 +1,9 @@
+using Asp.Versioning;
 using IAM.Application.Contracts;
 using IAM.Application.Services;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
+using IAM.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Myce.Response;
@@ -9,7 +11,7 @@ using Myce.Response.Messages;
 
 namespace IAM.API.Controllers;
 
-[ApiVersion("1.0")]
+[ApiVersion(1)]
 [Route("api/v{version:apiVersion}/iam/users")]
 public class UserController : BaseController
 {
@@ -43,19 +45,13 @@ public class UserController : BaseController
    public async Task<IActionResult> GetByCustomerId(Guid customerId)
    {
       var users = await _userService.GetByCustomerIdAsync(customerId);
-      // Returns a Result with the collection
+
       return Ok(Result<IEnumerable<UserLiteDto>>.Success(users));
    }
 
    [HttpPost("")]
    public async Task<IActionResult> Create([FromBody] UserCreateRequest request)
    {
-      if (!ModelState.IsValid)
-      {
-         // Ideally, convert ModelState errors to your Result.Messages
-         return BadRequest(Result.Failure(new ErrorMessage("INVALID_INPUT", "Please check the provided data.")));
-      }
-
       var user = await _userService.CreateUserAsync(request);
 
       return OkOrNotFound(user);
@@ -80,20 +76,11 @@ public class UserController : BaseController
    }
 
    [HttpPost("login")]
-   public async Task<IActionResult> Login([FromBody] LoginRequest request)
+   public async Task<IActionResult> Login([FromBody] UserLoginRequest request)
    {
-      if (!ModelState.IsValid)
-      {
-         return BadRequest(Result.Failure(new ErrorMessage("INVALID_LOGIN_INPUT", "Email and password are required.")));
-      }
-
       var response = await _authService.LoginAsync(request);
-      if (response == null)
-      {
-         var error = Result.Failure(new ErrorMessage("UNAUTHORIZED", "Invalid email or password"));
-         return Unauthorized(error);
-      }
 
-      return Ok(Result<LoginResponse>.Success(response));
+      return response .IsValid ? OkOrNotFound(response) : Unauthorized(response);
+
    }
 }

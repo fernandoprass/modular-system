@@ -10,9 +10,11 @@ public abstract class BaseController : ControllerBase
    protected IActionResult OkOrNotFound<T>(T? value) where T : class
    {
       if (value == null)
+      {
          return NotFound(Result<T>.Failure(new NotFoundError()));
+      }
 
-      return Ok(Result<T>.Success(value));
+      return value is Result ? Ok(value) : Ok(Result<T>.Success(value));
    }
 
    protected async Task<IActionResult> ExecuteIfExistsAsync<T>(

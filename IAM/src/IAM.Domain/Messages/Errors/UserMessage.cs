@@ -2,20 +2,42 @@
 
 namespace IAM.Domain.Messages
 {
-   public class UserEmailAlreadyExistError : ErrorMessage
+   public class EmailAlreadyExistError : ErrorMessage
    {
-      public UserEmailAlreadyExistError(string email)
-        : base("USER_EMAIL_ALREADY_EXIST_ERROR", "The email '{email}' already exist.")
+      public EmailAlreadyExistError(string email)
+        : base("EmailAlreadyExistError", "The email '{email}' already exist.")
       {
          AddVariable("email", email);
       }
    }
 
-   public class UserNotFoundError : ErrorMessage
+   public class PasswordNotValidError : ErrorMessage
    {
-      public UserNotFoundError()
-        : base("USER_NOT_FOUND_ERROR", "User not found.")
-      {
-      }
+      public PasswordNotValidError() : base("EmailAlreadyExistError", "The password is not valid.") { }
+   }
+
+   public class UserPasswordMinLengthError : ErrorMessage
+   {
+      public UserPasswordMinLengthError() : base("UserPasswordMinLengthError", "Password must contain at least eight letters.") { }
+   }
+
+   public class PasswordMissingUppercaseError : ErrorMessage
+   {
+      public PasswordMissingUppercaseError() : base("PasswordMissingUppercaseError", "Password must contain at least one uppercase letter.") { }
+   }
+
+   public class PasswordMissingLowercaseError : ErrorMessage
+   {
+      public PasswordMissingLowercaseError() : base("PasswordMissingLowercaseError", "Password must contain at least one lowercase letter.") { }
+   }
+
+   public class PasswordMissingDigitError : ErrorMessage
+   {
+      public PasswordMissingDigitError() : base("PasswordMissingDigitError", "Password must contain at least one digit.") { }
+   }
+
+   public class PasswordMissingSpecialError : ErrorMessage
+   {
+      public PasswordMissingSpecialError() : base("UserPasswordMinLengthError", "Password must contain at least one special character (#?!@$%^&*-_.).") { }
    }
 }

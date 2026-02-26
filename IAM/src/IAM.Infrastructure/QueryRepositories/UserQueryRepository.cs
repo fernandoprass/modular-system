@@ -34,13 +34,13 @@ public class UserQueryRepository : IUserQueryRepository
           .SingleOrDefaultAsync();
    }
 
-   public async Task<Guid?> GetIdByEmailAsync(string email)
+   public Guid? GetIdByEmailAsync(string email)
    {
-      return await _context.Users
+      return _context.Users
           .AsNoTracking()
           .Where(u => u.Email == email)
           .Select(u => u.Id)
-          .SingleOrDefaultAsync();
+          .SingleOrDefault();
    }
 
    public async Task<UserPasswordDto?> GetByEmailWithPasswordAsync(string email)
@@ -49,15 +49,7 @@ public class UserQueryRepository : IUserQueryRepository
           .AsNoTracking()
           .Include(u => u.Customer)
           .Where(u => u.Email == email)
-          .Select(u => new UserPasswordDto
-          {
-             Id = u.Id,
-             Name = u.Name,
-             Email = u.Email,
-             CustomerId = u.CustomerId,
-             CustomerName = u.Customer.Name,
-             PasswordHash = u.PasswordHash
-          })
+          .Select(u => u.ToUserPasswordDto(u.Customer.Name))
           .SingleOrDefaultAsync();
    }
 

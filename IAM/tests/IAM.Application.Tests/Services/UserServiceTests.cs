@@ -1,20 +1,17 @@
-using IAM.Application.Services;
-using IAM.Application.Validators;
+using IAM.Application.Contracts;
 using IAM.Domain.DTOs.Requests;
-using IAM.Domain.Entities;
 using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
 using Moq;
-using Xunit;
 
-namespace IAM.Application.Tests.Services;
+namespace IAM.Application.Services.Tests;
 
 public class UserServiceTests
 {
    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
    private readonly Mock<IUserRepository> _userRepositoryMock;
    private readonly Mock<IUserQueryRepository> _userQueryRepositoryMock;
-   private readonly Mock<IUserValidator> _userValidatorMock;
+   private readonly Mock<IUserFluentValidator> _userFluentValidatorMock;
    private readonly UserService _userService;
 
    public UserServiceTests()
@@ -22,20 +19,16 @@ public class UserServiceTests
       _unitOfWorkMock = new Mock<IUnitOfWork>();
       _userRepositoryMock = new Mock<IUserRepository>();
       _userQueryRepositoryMock = new Mock<IUserQueryRepository>();
-      _userValidatorMock = new Mock<IUserValidator>();
-
-      // Setup unit of work to return mocked repositories if needed, though UserService uses _userRepository directly in constructor
-      // Actually UserService constructor takes repositories directly.
-      // Wait, let's check UserService constructor again.
-      // public UserService(IUnitOfWork unitOfWork, IUserRepository userRepository, IUserQueryRepository userQueryRepository, IUserValidator userValidator)
-      
+      _userFluentValidatorMock = new Mock<IUserFluentValidator>();
+    
       _unitOfWorkMock.Setup(u => u.Users).Returns(_userRepositoryMock.Object);
 
       _userService = new UserService(
           _unitOfWorkMock.Object,
+          _userFluentValidatorMock.Object,
           _userRepositoryMock.Object,
-          _userQueryRepositoryMock.Object,
-          _userValidatorMock.Object);
+          _userQueryRepositoryMock.Object
+          );
    }
 
    [Fact]

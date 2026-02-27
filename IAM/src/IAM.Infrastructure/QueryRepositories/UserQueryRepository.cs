@@ -20,7 +20,7 @@ public class UserQueryRepository : IUserQueryRepository
           .AsNoTracking()
           .Include(u => u.Customer)
           .Where(u => u.Id == id)
-          .Select(u => u.ToUserDto(u.Customer.Name))
+          .Select(u => u.ToUserDto())
           .SingleOrDefaultAsync();
    }
 
@@ -30,7 +30,7 @@ public class UserQueryRepository : IUserQueryRepository
           .AsNoTracking()
           .Include(u => u.Customer)
           .Where(u => u.Email == email)
-          .Select(u => u.ToUserDto(u.Customer.Name))
+          .Select(u => u.ToUserDto())
           .SingleOrDefaultAsync();
    }
 
@@ -49,7 +49,7 @@ public class UserQueryRepository : IUserQueryRepository
           .AsNoTracking()
           .Include(u => u.Customer)
           .Where(u => u.Email == email)
-          .Select(u => u.ToUserPasswordDto(u.Customer.Name))
+          .Select(u => u.ToUserPasswordDto())
           .SingleOrDefaultAsync();
    }
 

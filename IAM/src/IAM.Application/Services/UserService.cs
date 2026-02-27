@@ -71,7 +71,7 @@ public class UserService : IUserService
       var result = await CreateAsync(user);
 
       return result is not null
-             ? Result<UserDto>.Success(result.ToUserDto(string.Empty)) 
+             ? Result<UserDto>.Success(result.ToUserDto()) 
              : Result<UserDto>.Failure(new FailedToRecordDataError());
    }
 

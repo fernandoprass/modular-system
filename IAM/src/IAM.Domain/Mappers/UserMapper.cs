@@ -6,7 +6,7 @@ namespace IAM.Domain.Mappers
 {
    public static class UserMapper
    {
-      public static UserDto ToUserDto(this User user, string customerName)
+      public static UserDto ToUserDto(this User user)
       {
          return new UserDto
          {
@@ -19,7 +19,7 @@ namespace IAM.Domain.Mappers
             EmailVerifiedAt = user.EmailVerifiedAt,
             LastLoginAt = user.LastLoginAt,
             CustomerId = user.CustomerId,
-            CustomerName = customerName
+            CustomerName = user.Customer?.Name ?? string.Empty
          };
       }
 
@@ -40,7 +40,7 @@ namespace IAM.Domain.Mappers
          };
       }
 
-      public static UserPasswordDto ToUserPasswordDto(this User user, string customerName)
+      public static UserPasswordDto ToUserPasswordDto(this User user)
       {
          return new UserPasswordDto
          {
@@ -54,7 +54,7 @@ namespace IAM.Domain.Mappers
             EmailVerifiedAt = user.EmailVerifiedAt,
             LastLoginAt = user.LastLoginAt,
             CustomerId = user.CustomerId,
-            CustomerName = customerName
+            CustomerName = user.Customer?.Name ?? string.Empty
          };
       }
    }

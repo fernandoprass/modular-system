@@ -19,52 +19,47 @@ public interface IAuthService
    Task<Result<LoginResponse?>> LoginAsync(UserLoginRequest request);
 }
 
-public class AuthService : IAuthService
+public class AuthService(IUserQueryRepository userQueryRepository,
+   IUserService userService,
+   IConfiguration configuration) : IAuthService
 {
-   private readonly IUserQueryRepository _userQueryRepository;
-   private readonly IUserService _userService;
-   private readonly string _jwtSecret;
-   private readonly int _jwtExpirationHours;
-
-   public AuthService(IUserQueryRepository userQueryRepository,
-      IUserService userService,
-      IConfiguration configuration)
-   {
-      _userQueryRepository = userQueryRepository;
-      _userService = userService;
-      _jwtSecret = configuration["Jwt:Secret"] ?? "your-super-secret-jwt-key-here-make-it-long-and-secure";
-      _jwtExpirationHours = int.Parse(configuration["Jwt:ExpirationHours"] ?? "24");
-   }
+   private readonly IUserQueryRepository _userQueryRepository = userQueryRepository;
+   private readonly IUserService _userService = userService;
+   private readonly string _jwtSecret = configuration["Jwt:Secret"] ?? "your-super-secret-jwt-key-here-make-it-long-and-secure";
+   private readonly int _jwtExpirationHours = int.Parse(configuration["Jwt:ExpirationHours"] ?? "24");
 
    public async Task<Result<LoginResponse?>> LoginAsync(UserLoginRequest request)
    {
       var user = await _userQueryRepository.GetByEmailWithPasswordAsync(request.Email);
 
-      var isValid = user is null ? false : Argon2.Verify(user?.PasswordHash, request.Password);
+      var dummyHash = "$argon2id$v=19$m=65536,t=2,p=1$" 
+                      + Convert.ToBase64String(Encoding.UTF8.GetBytes("salt")) 
+                      + "$" + Convert.ToBase64String(Encoding.UTF8.GetBytes("password"));
 
-      if (!isValid)
+      var passwordHash = user?.PasswordHash ?? dummyHash;
+      var isValid = Argon2.Verify(passwordHash, request.Password);
+
+      if (user is null || !isValid)
       {
          return Result<LoginResponse?>.Failure(new UnauthorizedError());
       }
 
       var userDto = user.ToUserDto();
+      var (token, expiresAt) = GenerateJwtToken(userDto);
 
-      var token = GenerateJwtToken(userDto);
-
-      //todo: should it be merged with ValidateCredentialsAsync?
-      await _userService.UpdateLastLoginAsync(user.Id);
+      _userService.UpdateLastLoginAsync(user.Id);
 
       var response = new LoginResponse
       {
          Token = token,
-         ExpiresAt = DateTime.UtcNow.AddHours(_jwtExpirationHours),
+         ExpiresAt = expiresAt,
          User = userDto
       };
 
       return Result<LoginResponse?>.Success(response);
    }
 
-   public string GenerateJwtToken(UserDto user)
+   public (string, DateTime) GenerateJwtToken(UserDto user)
    {
       var claims = new[]
       {
@@ -77,15 +72,16 @@ public class AuthService : IAuthService
 
       var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecret));
       var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+      var expiresAt = DateTime.UtcNow.AddHours(_jwtExpirationHours);
 
       var token = new JwtSecurityToken(
           issuer: "IAM.API",
           audience: "IAM.Client",
           claims: claims,
-          expires: DateTime.UtcNow.AddHours(_jwtExpirationHours),
+          expires: expiresAt,
           signingCredentials: creds
       );
 
-      return new JwtSecurityTokenHandler().WriteToken(token);
+      return (new JwtSecurityTokenHandler().WriteToken(token), expiresAt);
    }
 }

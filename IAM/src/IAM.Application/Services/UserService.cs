@@ -82,19 +82,21 @@ public class UserService : IUserService
       return user;
    }
 
-   public async Task<Result> UpdateAsync(Guid id, UserUpdateRequest user)
+   public async Task<Result> UpdateAsync(Guid id, UserUpdateRequest request)
    {
-      var userEntity = await _userRepository.GetByIdAsync(id);
-      if (userEntity == null)
+      var user = await _userRepository.GetByIdAsync(id);
+
+      var validator = _userFluentValidator.ValidateUpdate(user?.Id, request);
+      if (validator.HasError)
       {
-         return Result.Failure(new NotFoundError(Const.Entity.User));
+         return Result<UserDto>.Failure(validator.Messages);
       }
 
-      userEntity.Name = user.Name;
-      userEntity.IsActive = user.IsActive;
-      userEntity.UpdatedAt = DateTime.UtcNow;
+      user.Name = request.Name;
+      user.IsActive = request.IsActive;
+      user.UpdatedAt = DateTime.UtcNow;
 
-      _unitOfWork.Users.Update(userEntity);
+      _unitOfWork.Users.Update(user);
       await _unitOfWork.SaveChangesAsync();
       return Result.Success();
    }

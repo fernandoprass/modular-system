@@ -36,6 +36,7 @@ public class AuthService(IUserQueryRepository userQueryRepository,
                       + Convert.ToBase64String(Encoding.UTF8.GetBytes("salt")) 
                       + "$" + Convert.ToBase64String(Encoding.UTF8.GetBytes("password"));
 
+      // Use the dummy hash for timing attack prevention even if the user is not found
       var passwordHash = user?.PasswordHash ?? dummyHash;
       var isValid = Argon2.Verify(passwordHash, request.Password);
 
@@ -47,7 +48,7 @@ public class AuthService(IUserQueryRepository userQueryRepository,
       var userDto = user.ToUserDto();
       var (token, expiresAt) = GenerateJwtToken(userDto);
 
-      _userService.UpdateLastLoginAsync(user.Id);
+      await _userService.UpdateLastLoginAsync(user.Id);
 
       var response = new LoginResponse
       {

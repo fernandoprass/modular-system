@@ -10,7 +10,7 @@ public interface IUserService
    Task<UserDto?> GetByEmailAsync(string email);
    Task<IEnumerable<UserLiteDto>> GetByCustomerIdAsync(Guid customerId);
    Task<Result<UserDto>> CreateUserAsync(UserCreateRequest request);
-   Task<Result> UpdateAsync(Guid id, UserUpdateRequest user);
+   Task<Result> UpdateAsync(Guid id, UserUpdateRequest request);
    Task UpdatePasswordAsync(UserUpdatePasswordRequest request);
    Task DeleteAsync(Guid id);
    Task<bool> ExistsAsync(Guid id);

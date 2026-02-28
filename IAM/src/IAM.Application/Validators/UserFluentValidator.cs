@@ -1,7 +1,11 @@
 ﻿using IAM.Application.Contracts;
+using IAM.Domain;
 using IAM.Domain.DTOs.Requests;
+using IAM.Domain.Entities;
 using IAM.Domain.Messages;
+using IAM.Domain.Messages.Errors;
 using IAM.Domain.QueryRepositories;
+using IAM.Domain.Repositories;
 using Myce.FluentValidator;
 using Myce.Response;
 
@@ -9,11 +13,13 @@ namespace IAM.Application.Validators
 {
    public class UserFluentValidator : IUserFluentValidator
    {
+      private readonly IUserRepository _userRepository;
       private readonly IUserQueryRepository _userQueryRepository;
 
-      public UserFluentValidator(IUserQueryRepository userQueryRepository)
+      public UserFluentValidator(IUserQueryRepository userQueryRepository, IUserRepository userRepository)
       {
          _userQueryRepository = userQueryRepository;
+         _userRepository = userRepository;
       }
 
       public Result ValidateCreate(UserCreateRequest request)
@@ -21,7 +27,7 @@ namespace IAM.Application.Validators
          Func<string, bool> isNewEmail = VerifyIfEmailExists(request.Email);
 
          var validator = new FluentValidator<UserCreateRequest>()
-             .RuleFor(x => x.Name).IsRequired().MinLength(3)
+             .RuleFor(x => x.Name).ApplyTemplate(NameRules)
              .RuleFor(x => x.Email)
                .IsRequired()
                .IsValidEmailAddress()
@@ -34,15 +40,37 @@ namespace IAM.Application.Validators
          return isValid ? Result.Success() : Result.Failure(validator.Messages);
       }
 
+      public Result ValidateUpdate(Guid? id, UserUpdateRequest request)
+      {
+         //todo should validade id here
+         var validator = new FluentValidator<UserUpdateRequest>()
+            .RuleFor(x => x.Name).ApplyTemplate(NameRules);
+
+         var isValid = validator.Validate(request);
+
+         return isValid ? Result.Success() : Result.Failure(validator.Messages);
+      }
+
       private Func<string, bool> VerifyIfEmailExists(string email)
       {
          var UserId = _userQueryRepository.GetIdByEmailAsync(email);
 
-         Func<string, bool> isNewEmail = email => !UserId.HasValue || UserId.Value == Guid.Empty;
+         Func<string, bool> isNewEmail = u => !UserId.HasValue || UserId.Value == Guid.Empty;
          return isNewEmail;
       }
 
+      private Func<string, bool> VerifyUserExists(Guid? id)
+      {
+         Func<string, bool> userExists = u => id.HasValue && id.Value != Guid.Empty;
+         return userExists;
+      }
+
       #region Templates
+      private static void NameRules<T>(RuleBuilder<T, string> rb) where T : class
+      {
+         rb.IsRequired().MinLength(3);
+      }
+
       /// <summary>
       /// Reusable template for strong password validation without Regex.
       /// </summary>

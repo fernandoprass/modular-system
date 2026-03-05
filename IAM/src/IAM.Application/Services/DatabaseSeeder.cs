@@ -50,35 +50,26 @@ public class DatabaseSeeder : IDatabaseSeeder
       // Seed users
       if (!await _unitOfWork.Users.ExistsAsync(Guid.Parse("550e8400-e29b-41d4-a716-446655440010")))
       {
-         var user1 = new User
-         {
-            Id = Guid.CreateVersion7(),
-            Name = "John Doe",
-            Email = "john.doe@acme.com",
-            PasswordHash = Argon2.Hash("password123"),
-            CustomerId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
-            CreatedAt = DateTime.UtcNow
-         };
+         var user1 = User.Create(
+            "John Doe",
+            "john.doe@acme.com",
+            Argon2.Hash("password123"),
+            Guid.Parse("550e8400-e29b-41d4-a716-446655440000")
+         );
 
-         var user2 = new User
-         {
-            Id = Guid.CreateVersion7(),
-            Name = "Jane Smith",
-            Email = "jane.smith@techstart.com",
-            PasswordHash = Argon2.Hash("password123"),
-            CustomerId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
-            CreatedAt = DateTime.UtcNow
-         };
+         var user2 =  User.Create(
+            "Jane Smith",
+            "jane.smith@techstart.com",
+            Argon2.Hash("password123"),
+            Guid.Parse("550e8400-e29b-41d4-a716-446655440001")
+         );
 
-         var user3 = new User
-         {
-            Id = Guid.CreateVersion7(),
-            Name = "Bob Johnson",
-            Email = "bob.johnson@acme.com",
-            PasswordHash = Argon2.Hash("password123"),
-            CustomerId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
-            CreatedAt = DateTime.UtcNow
-         };
+         var user3 = User.Create(
+            "Bob Johnson",
+            "bob.johnson@acme.com",
+            Argon2.Hash("password123"),
+            Guid.Parse("550e8400-e29b-41d4-a716-446655440000")
+         );
 
          await _unitOfWork.Users.AddAsync(user1);
          await _unitOfWork.Users.AddAsync(user2);

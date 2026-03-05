@@ -46,17 +46,14 @@ public class CustomerService : ICustomerService
             CreatedAt = DateTime.UtcNow
         };
 
-        var user = new User
-        {
-            Id = Guid.CreateVersion7(),
-            Name = customerCreate.User.Name,
-            Email = customerCreate.User.Email,
-            PasswordHash = Argon2.Hash(customerCreate.User.Password),
-            CustomerId = customer.Id,
-            CreatedAt = DateTime.UtcNow
-        };
+        var user = User.Create(
+         customerCreate.User.Name,
+         customerCreate.User.Email,
+         Argon2.Hash(customerCreate.User.Password),
+         customer.Id
+        );
 
-        await _unitOfWork.Customers.AddAsync(customer);
+      await _unitOfWork.Customers.AddAsync(customer);
         await _unitOfWork.Users.AddAsync(user);
         await _unitOfWork.SaveChangesAsync();
         return customer;

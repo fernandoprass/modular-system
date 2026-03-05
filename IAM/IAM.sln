@@ -6,7 +6,11 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 	ProjectSection(SolutionItems) = preProject
 		.env = .env
+		db-backup.ps1 = db-backup.ps1
+		db-setup.ps1 = db-setup.ps1
 		docker-compose.yml = docker-compose.yml
+		readme.md = readme.md
+		servers.json = servers.json
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IAM.Domain", "src\IAM.Domain\IAM.Domain.csproj", "{9868007C-56CE-44A4-998F-3EAA3F842DA0}"

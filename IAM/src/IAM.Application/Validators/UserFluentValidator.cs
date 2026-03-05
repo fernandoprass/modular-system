@@ -1,11 +1,11 @@
 ﻿using IAM.Application.Contracts;
 using IAM.Domain;
 using IAM.Domain.DTOs.Requests;
-using IAM.Domain.Entities;
 using IAM.Domain.Messages;
 using IAM.Domain.Messages.Errors;
 using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
+using Microsoft.IdentityModel.Tokens;
 using Myce.FluentValidator;
 using Myce.Response;
 
@@ -14,19 +14,30 @@ namespace IAM.Application.Validators
    public class UserFluentValidator : IUserFluentValidator
    {
       private readonly IUserRepository _userRepository;
+      private readonly ICustomerQueryRepository _customerQueryRepository;
       private readonly IUserQueryRepository _userQueryRepository;
 
-      public UserFluentValidator(IUserQueryRepository userQueryRepository, IUserRepository userRepository)
+
+      public UserFluentValidator(
+         ICustomerQueryRepository customerQueryRepository,
+         IUserQueryRepository userQueryRepository, 
+         IUserRepository userRepository)
       {
+         _customerQueryRepository = customerQueryRepository;
          _userQueryRepository = userQueryRepository;
          _userRepository = userRepository;
       }
 
-      public Result ValidateCreate(UserCreateRequest request)
+      public async Task<Result> ValidateCreateAsync(UserCreateRequest request)
       {
-         Func<string, bool> isNewEmail = VerifyIfEmailExists(request.Email);
+         var isNewEmail = await VerifyIfEmailExistsAsync(request.Email);
+
+         var customerDto = await _customerQueryRepository.GetByIdAsync(request.CustomerId);
+
+         var customerExists = await VerifyIfCustomerExistsAsync(request.CustomerId);
 
          var validator = new FluentValidator<UserCreateRequest>()
+             .RuleForValue(customerDto).IsNotNull(new NotFoundError(Const.Entity.Customer))
              .RuleFor(x => x.Name).ApplyTemplate(NameRules)
              .RuleFor(x => x.Email)
                .IsRequired()
@@ -40,7 +51,7 @@ namespace IAM.Application.Validators
          return isValid ? Result.Success() : Result.Failure(validator.Messages);
       }
 
-      public Result ValidateUpdate(Guid? id, UserUpdateRequest request)
+      public async Task<Result> ValidateUpdateAsync(Guid? id, UserUpdateRequest request)
       {
          //todo should validade id here
          var validator = new FluentValidator<UserUpdateRequest>()
@@ -51,11 +62,21 @@ namespace IAM.Application.Validators
          return isValid ? Result.Success() : Result.Failure(validator.Messages);
       }
 
-      private Func<string, bool> VerifyIfEmailExists(string email)
+      private async Task<Func<string, bool>> VerifyIfCustomerExistsAsync(Guid id)
       {
-         var UserId = _userQueryRepository.GetIdByEmailAsync(email);
+         var customer = await _customerQueryRepository.GetByIdAsync(id);
 
-         Func<string, bool> isNewEmail = u => !UserId.HasValue || UserId.Value == Guid.Empty;
+         Func<string, bool> customerExists = c => customer is not null;
+
+         return customerExists;
+      }
+
+      private async Task<Func<string, bool>> VerifyIfEmailExistsAsync(string email)
+      {
+         var userId = await _userQueryRepository.GetIdByEmailAsync(email);
+
+         Func<string, bool> isNewEmail = u => userId == Guid.Empty;
+         
          return isNewEmail;
       }
 

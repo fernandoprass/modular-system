@@ -1,16 +1,13 @@
 using IAM.Application.Contracts;
-using IAM.Domain;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;
 using IAM.Domain.Mappers;
-using IAM.Domain.Messages;
 using IAM.Domain.Messages.Errors;
 using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
 using Isopoh.Cryptography.Argon2;
 using Myce.Response;
-using System.Reflection.Metadata;
 
 namespace IAM.Application.Services;
 
@@ -51,22 +48,18 @@ public class UserService : IUserService
 
    public async Task<Result<UserDto>> CreateUserAsync(UserCreateRequest request)
    {
-      var validator = _userFluentValidator.ValidateCreate(request);
+      var validator = await _userFluentValidator.ValidateCreateAsync(request);
       if (validator.HasError)
       {
          return Result<UserDto>.Failure(validator.Messages);
       }
 
-      var user = new User
-      {
-         Id = Guid.CreateVersion7(),
-         Name = request.Name,
-         Email = request.Email,
-         PasswordHash = Argon2.Hash(request.Password),
-         IsActive = true,
-         CreatedAt = DateTime.UtcNow,
-         CustomerId = request.CustomerId
-      };
+      var user = User.Create(
+         request.Name,
+         request.Email,
+         Argon2.Hash(request.Password),
+         request.CustomerId
+      );
 
       var result = await CreateAsync(user);
 
@@ -86,7 +79,7 @@ public class UserService : IUserService
    {
       var user = await _userRepository.GetByIdAsync(id);
 
-      var validator = _userFluentValidator.ValidateUpdate(user?.Id, request);
+      var validator = await _userFluentValidator.ValidateUpdateAsync(user?.Id, request);
       if (validator.HasError)
       {
          return Result<UserDto>.Failure(validator.Messages);

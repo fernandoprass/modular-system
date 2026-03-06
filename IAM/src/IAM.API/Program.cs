@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using IAM.API.Configure;
+using IAM.API.Middlewares;
 using IAM.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add Middlewares
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 // Add DbContext
 builder.Services.AddDbContext<IamDbContext>(options =>
@@ -57,6 +62,8 @@ builder.Services.AddApiVersioning(options =>
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

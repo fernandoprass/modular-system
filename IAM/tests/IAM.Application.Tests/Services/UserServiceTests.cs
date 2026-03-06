@@ -11,7 +11,7 @@ public class UserServiceTests
    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
    private readonly Mock<IUserRepository> _userRepositoryMock;
    private readonly Mock<IUserQueryRepository> _userQueryRepositoryMock;
-   private readonly Mock<IUserFluentValidator> _userFluentValidatorMock;
+   private readonly Mock<IUserValidator> _userFluentValidatorMock;
    private readonly UserService _userService;
 
    public UserServiceTests()
@@ -19,7 +19,7 @@ public class UserServiceTests
       _unitOfWorkMock = new Mock<IUnitOfWork>();
       _userRepositoryMock = new Mock<IUserRepository>();
       _userQueryRepositoryMock = new Mock<IUserQueryRepository>();
-      _userFluentValidatorMock = new Mock<IUserFluentValidator>();
+      _userFluentValidatorMock = new Mock<IUserValidator>();
     
       _unitOfWorkMock.Setup(u => u.Users).Returns(_userRepositoryMock.Object);
 

@@ -1,5 +1,6 @@
 using IAM.Domain.DTOs;
 using IAM.Domain.DTOs.Responses;
+using IAM.Domain.Entities;
 using IAM.Domain.Mappers;
 using IAM.Domain.QueryRepositories;
 using Microsoft.EntityFrameworkCore;
@@ -24,13 +25,13 @@ public class UserQueryRepository : IUserQueryRepository
           .SingleOrDefaultAsync();
    }
 
-   public async Task<UserDto?> GetByEmailAsync(string email)
+   public async Task<User?> GetByEmailAsync(string email)
    {
       return await _context.Users
           .AsNoTracking()
           .Include(u => u.Customer)
           .Where(u => u.Email == email)
-          .Select(u => u.ToUserDto())
+          .Select(u => u)
           .SingleOrDefaultAsync();
    }
 

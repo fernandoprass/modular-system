@@ -32,14 +32,6 @@ public class UserController : BaseController
       return OkOrNotFound(user);
    }
 
-   [HttpGet("by-email/{email}")]
-   [Authorize]
-   public async Task<IActionResult> GetByEmail(string email)
-   {
-      var user = await _userService.GetByEmailAsync(email);
-      return OkOrNotFound(user);
-   }
-
    [HttpGet("by-customer/{customerId}")]
    [Authorize]
    public async Task<IActionResult> GetByCustomerId(Guid customerId)

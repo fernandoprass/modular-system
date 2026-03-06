@@ -30,7 +30,7 @@ namespace IAM.API.Configure
 
       public static void RegisterValidators(WebApplicationBuilder builder)
       {
-         builder.Services.AddScoped<IUserFluentValidator, UserFluentValidator>();
+         builder.Services.AddScoped<IUserValidator, UserValidator>();
       }
    }
 }

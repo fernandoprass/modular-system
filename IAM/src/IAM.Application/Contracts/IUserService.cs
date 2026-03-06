@@ -7,11 +7,10 @@ namespace IAM.Application.Contracts;
 public interface IUserService
 {
    Task<UserDto?> GetByIdAsync(Guid id);
-   Task<UserDto?> GetByEmailAsync(string email);
    Task<IEnumerable<UserLiteDto>> GetByCustomerIdAsync(Guid customerId);
    Task<Result<UserDto>> CreateUserAsync(UserCreateRequest request);
    Task<Result> UpdateAsync(Guid id, UserUpdateRequest request);
-   Task UpdatePasswordAsync(UserUpdatePasswordRequest request);
+   Task<Result> UpdatePasswordAsync(UserUpdatePasswordRequest request);
    Task DeleteAsync(Guid id);
    Task<bool> ExistsAsync(Guid id);
    Task UpdateLastLoginAsync(Guid id);

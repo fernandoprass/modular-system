@@ -29,4 +29,17 @@ public class User
          CustomerId = customerId
       };
    }
+
+   public void Update(string name,bool isActive)
+   {
+      Name = name;
+      IsActive = isActive;
+      UpdatedAt = DateTime.UtcNow;
+   }
+
+   public void UpdatePassword(string newPasswordHash)
+   {
+      PasswordHash = newPasswordHash;
+      UpdatedAt = DateTime.UtcNow;
+   }
 }

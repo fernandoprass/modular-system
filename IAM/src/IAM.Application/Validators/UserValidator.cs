@@ -36,14 +36,15 @@ namespace IAM.Application.Validators
       {
          //todo should validade id here
          var validator = new FluentValidator<UserUpdateRequest>()
-            .RuleFor(x => x.Name).ApplyTemplate(NameRules);
+            .RuleFor(x => x.Name).ApplyTemplate(NameRules)
+            .Custom(id is not null, new NotFoundError(Const.Entity.User));
 
          var isValid = validator.Validate(request);
 
          return isValid ? Result.Success() : Result.Failure(validator.Messages);
       }
 
-      public Result ValidateUpdatePassword(User user, UserUpdatePasswordRequest request)
+      public Result ValidateUpdatePassword(User? user, UserUpdatePasswordRequest request)
       {
          var isOldPasswordCorrect = user != null &&
                                     Argon2.Verify(request.PasswordOld, user.PasswordHash);

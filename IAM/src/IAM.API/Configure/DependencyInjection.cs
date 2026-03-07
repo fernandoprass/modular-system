@@ -1,4 +1,5 @@
 ﻿using IAM.Application.Contracts;
+using IAM.Application.Orchestrators;
 using IAM.Application.Services;
 using IAM.Application.Validators;
 using IAM.Domain.QueryRepositories;
@@ -18,6 +19,11 @@ namespace IAM.API.Configure
          builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
          builder.Services.AddScoped<IUserQueryRepository, UserQueryRepository>();
          builder.Services.AddScoped<ICustomerQueryRepository, CustomerQueryRepository>();
+      }
+
+      public static void RegisterOrchestrators(WebApplicationBuilder builder)
+      {
+         builder.Services.AddScoped<IUserOrchestrator, UserOrchestrator>();
       }
 
       public static void RegisterServices(WebApplicationBuilder builder)

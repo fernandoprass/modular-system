@@ -1,15 +1,16 @@
 using IAM.Application.Contracts;
+using IAM.Domain;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;
 using IAM.Domain.Mappers;
+using IAM.Domain.Messages.Errors;
 using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
 using Isopoh.Cryptography.Argon2;
 using Myce.Response;
 
 namespace IAM.Application.Services;
-
 
 public class UserService : IUserService
 {
@@ -42,19 +43,6 @@ public class UserService : IUserService
 
    public async Task<Result<UserDto>> CreateUserAsync(UserCreateRequest request)
    {
-      var emailIdTask = _userQueryRepository.GetIdByEmailAsync(request.Email);
-      var customerTask = _customerQueryRepository.ExistsAsync(request.CustomerId);  
-      await Task.WhenAll(emailIdTask, customerTask);
-
-      var emailExists = await emailIdTask != Guid.Empty;
-      var customerExists = await customerTask;
-
-      var validator = _userValidator.ValidateCreate(request, emailExists, customerExists);
-      if (validator.HasError)
-      {
-         return Result<UserDto>.Failure(validator.Messages);
-      }
-
       var user = User.Create(
          request.Name,
          request.Email,
@@ -102,21 +90,25 @@ public class UserService : IUserService
       return Result.Success();
    }
 
-   public async Task DeleteAsync(Guid id)
+   public async Task<Result> DeleteAsync(Guid id)
    {
+      var user = await _userRepository.GetByIdAsync(id);
+
+      if (user == null)
+      {
+         return Result.Failure(new NotFoundError(Const.Entity.User));
+      }
+
       await _unitOfWork.Users.DeleteAsync(id);
       await _unitOfWork.SaveChangesAsync();
-   }
-
-   public async Task<bool> ExistsAsync(Guid id)
-   {
-      return await _unitOfWork.Users.ExistsAsync(id);
+      return Result.Success();
    }
 
    public async Task UpdateLastLoginAsync(Guid id)
    {
-      var userEntity = await _userRepository.GetByIdAsync(id);
-      userEntity.LastLoginAt = DateTime.UtcNow;
+      var user = await _userRepository.GetByIdAsync(id);
+
+      user.UpdateLastLogin();
       await _unitOfWork.SaveChangesAsync();
    }
 }

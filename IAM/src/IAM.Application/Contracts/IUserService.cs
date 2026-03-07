@@ -11,7 +11,6 @@ public interface IUserService
    Task<Result<UserDto>> CreateUserAsync(UserCreateRequest request);
    Task<Result> UpdateAsync(Guid id, UserUpdateRequest request);
    Task<Result> UpdatePasswordAsync(UserUpdatePasswordRequest request);
-   Task DeleteAsync(Guid id);
-   Task<bool> ExistsAsync(Guid id);
+   Task<Result> DeleteAsync(Guid id);
    Task UpdateLastLoginAsync(Guid id);
 }

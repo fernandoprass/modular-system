@@ -3,11 +3,9 @@ using IAM.Application.Contracts;
 using IAM.Application.Services;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
-using IAM.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Myce.Response;
-using Myce.Response.Messages;
 
 namespace IAM.API.Controllers;
 
@@ -15,11 +13,16 @@ namespace IAM.API.Controllers;
 [Route("api/v{version:apiVersion}/iam/users")]
 public class UserController : BaseController
 {
+   private readonly IUserOrchestrator _userOrchestrator;
    private readonly IUserService _userService;
    private readonly IAuthService _authService;
 
-   public UserController(IUserService userService, IAuthService authService)
+   public UserController(
+      IUserOrchestrator userOrchestrator,
+      IUserService userService, 
+      IAuthService authService)
    {
+      _userOrchestrator = userOrchestrator;
       _userService = userService;
       _authService = authService;
    }
@@ -44,7 +47,7 @@ public class UserController : BaseController
    [HttpPost("")]
    public async Task<IActionResult> Create([FromBody] UserCreateRequest request)
    {
-      var user = await _userService.CreateUserAsync(request);
+      var user = await _userOrchestrator.RegisterUserAsync(request);
 
       return OkOrNotFound(user);
    }
@@ -62,9 +65,9 @@ public class UserController : BaseController
    [Authorize]
    public async Task<IActionResult> Delete(Guid id)
    {
-      return await ExecuteIfExistsAsync(
-          () => _userService.ExistsAsync(id),
-          async (exists) => await _userService.DeleteAsync(id));
+      var response = await _userService.DeleteAsync(id);
+
+      return OkOrNotFound(response);
    }
 
    [HttpPost("login")]

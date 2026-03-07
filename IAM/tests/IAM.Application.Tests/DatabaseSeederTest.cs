@@ -22,7 +22,7 @@ public class DatabaseSeederTest
         services.AddScoped<Domain.Repositories.ICustomerRepository, Infrastructure.Repositories.CustomerRepository>();
         services.AddScoped<Domain.Repositories.IUserRepository, Infrastructure.Repositories.UserRepository>();
         services.AddScoped<Domain.QueryRepositories.ICustomerQueryRepository, Infrastructure.QueryRepositories.CustomerQueryRepository>();
-        services.AddScoped<Domain.Repositories.IUserQueryRepository, Infrastructure.Repositories.UserQueryRepository>();
+        services.AddScoped<Domain.QueryRepositories.IUserQueryRepository, Infrastructure.QueryRepositories.UserQueryRepository>();
 
         // Register services
         services.AddScoped<ICustomerService,CustomerService>();

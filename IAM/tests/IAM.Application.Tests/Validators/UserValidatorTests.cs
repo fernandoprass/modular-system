@@ -4,9 +4,9 @@ using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
 using Moq;
 
-namespace IAM.Application.Validator.Tests;
+namespace IAM.Application.Validators.Tests;
 
-public class UserFluentValidatorTests
+public class UserValidatorTests
 {
 }
 

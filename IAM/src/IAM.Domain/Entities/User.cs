@@ -42,4 +42,9 @@ public class User
       PasswordHash = newPasswordHash;
       UpdatedAt = DateTime.UtcNow;
    }
+
+   public void UpdateLastLogin()
+   {
+      LastLoginAt = DateTime.UtcNow;
+   }
 }

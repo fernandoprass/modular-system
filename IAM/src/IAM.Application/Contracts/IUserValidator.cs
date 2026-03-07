@@ -10,6 +10,6 @@ namespace IAM.Application.Contracts
 
       Result ValidateUpdate(Guid? id, UserUpdateRequest request);
 
-      Result ValidateUpdatePassword(User user, UserUpdatePasswordRequest request);
+      Result ValidateUpdatePassword(User? user, UserUpdatePasswordRequest request);
    }
 }

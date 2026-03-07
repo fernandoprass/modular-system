@@ -25,6 +25,8 @@ builder.Services.AddDbContext<IamDbContext>(options =>
 
 DependencyInjection.RegisterRepositories(builder);
 
+DependencyInjection.RegisterOrchestrators(builder);
+
 DependencyInjection.RegisterServices(builder);
 
 DependencyInjection.RegisterValidators(builder);

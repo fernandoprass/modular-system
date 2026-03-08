@@ -11,14 +11,19 @@ namespace IAM.Domain.Messages
       }
    }
 
+   public class ForbiddenCustomerError : ErrorMessage
+   {
+      public ForbiddenCustomerError() : base("ForbiddenCustomerError", "The informing customer is different from the logged-in customer.") { }
+   }
+
    public class PasswordNotValidError : ErrorMessage
    {
       public PasswordNotValidError() : base("EmailAlreadyExistError", "The password is not valid.") { }
    }
 
-   public class UserPasswordMinLengthError : ErrorMessage
+   public class PasswordMinLengthError : ErrorMessage
    {
-      public UserPasswordMinLengthError() : base("UserPasswordMinLengthError", "Password must contain at least eight letters.") { }
+      public PasswordMinLengthError() : base("PasswordMinLengthError", "Password must contain at least eight letters.") { }
    }
 
    public class PasswordMissingUppercaseError : ErrorMessage

@@ -7,6 +7,8 @@ namespace IAM.API.Controllers;
 [ApiController]
 public abstract class BaseController : ControllerBase
 {
+   protected Guid GetCustomerIdFromLogedUser() => Guid.Parse(User.FindFirst("CustomerId")?.Value);
+
    protected IActionResult OkOrNotFound<T>(T? value) where T : class
    {
       if (value == null)

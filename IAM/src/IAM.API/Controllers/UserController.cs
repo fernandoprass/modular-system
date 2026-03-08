@@ -47,6 +47,8 @@ public class UserController : BaseController
    [HttpPost("")]
    public async Task<IActionResult> Create([FromBody] UserCreateRequest request)
    {
+      var operatorCustomerId = GetCustomerIdFromLogedUser()
+         ;
       var user = await _userOrchestrator.RegisterUserAsync(request);
 
       return OkOrNotFound(user);

@@ -34,7 +34,6 @@ namespace IAM.Application.Validators
 
       public Result ValidateUpdate(Guid? id, UserUpdateRequest request)
       {
-         //todo should validade id here
          var validator = new FluentValidator<UserUpdateRequest>()
             .RuleFor(x => x.Name).ApplyTemplate(NameRules)
             .Custom(id is not null, new NotFoundError(Const.Entity.User));
@@ -74,7 +73,7 @@ namespace IAM.Application.Validators
       private static void PasswordRules<T>(RuleBuilder<T, string> rb) where T : class
       {
          // 1. Has minimum 8 characters in length
-         rb.MinLength(8, new UserPasswordMinLengthError());
+         rb.MinLength(8, new PasswordMinLengthError());
 
          // 2. At least one uppercase English letter
          rb.Custom(pwd => !string.IsNullOrEmpty(pwd) && pwd.Any(char.IsUpper), new PasswordMissingUppercaseError());

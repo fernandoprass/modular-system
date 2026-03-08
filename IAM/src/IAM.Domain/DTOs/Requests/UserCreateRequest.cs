@@ -6,4 +6,12 @@ public sealed record UserCreateRequest
     public string Email { get; init; } = string.Empty;
     public string Password { get; init; } = string.Empty;
     public Guid CustomerId { get; init; }
+
+   public UserCreateRequest(string nome, string email, string password, Guid customerId )
+   {
+      Name = nome;
+      Email = email;
+      Password = password;
+      CustomerId = customerId;
+   }
 }

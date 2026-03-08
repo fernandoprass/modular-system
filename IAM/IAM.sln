@@ -32,6 +32,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8EC462FD-D
 		docs\folder-structure.md = docs\folder-structure.md
 		docs\libraries.md = docs\libraries.md
 		docs\migrations.md = docs\migrations.md
+		user-validations.md = user-validations.md
 	EndProjectSection
 EndProject
 Global

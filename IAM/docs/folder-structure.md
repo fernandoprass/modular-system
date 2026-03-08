@@ -16,6 +16,13 @@ The IAM module is organized into the following layers:
 ### `src/`
 Contains the source code, divided into projects:
 
+- **`IAM.API/`**: The outermost layer, containing the Web API controllers and configuration. This layer depends on all inner layers and exposes endpoints for client interactions.
+  - `Configure/`: Dependency injection configuratios.
+  - `Controllers/`: API controllers like `UserController`, `CustomerController`.
+  - `Middlewares/`: Custom middleware for error handling, logging, etc.
+  - `Program.cs`: Application entry point with ASP.NET Core setup.
+  - `appsettings.json`: Configuration files.
+
 - **`IAM.Domain/`**: The innermost layer containing domain entities, value objects, and interfaces. This layer is independent of any external frameworks and represents the core business rules and data structures.
   - `Customer.cs`, `User.cs`: Domain entities.
   - `DTOs/`: Data Transfer Objects for requests and responses.
@@ -23,19 +30,16 @@ Contains the source code, divided into projects:
   - `QueryRepositories/`: Interfaces for read-only queries (e.g., `IUserQueryRepository`).
 
 - **`IAM.Application/`**: Contains application logic, services, and use cases. This layer orchestrates business operations and depends only on the Domain layer.
+  - `Contracts/`: Interfaces for services and repositories.
   - `Services/`: Business services like `UserService`, `AuthService`.
   - `Orchestrators/`: (Currently empty) For complex workflows.
+  - `Validators/`: Validation logic for entities and operations.
 
 - **`IAM.Infrastructure/`**: Handles external concerns like databases, APIs, and third-party services. This layer implements interfaces defined in Domain and Core.
   - `IamDbContext.cs`: Entity Framework DbContext for database interactions.
   - `Migrations/`: Database migration files.
   - `Repositories/`: Implementations of repository interfaces.
   - `QueryRepositories/`: Implementations for query operations.
-
-- **`IAM.API/`**: The outermost layer, containing the Web API controllers and configuration. This layer depends on all inner layers and exposes endpoints for client interactions.
-  - `Controllers/`: API controllers like `UserController`, `CustomerController`.
-  - `Program.cs`: Application entry point with ASP.NET Core setup.
-  - `appsettings.json`: Configuration files.
 
 ### `tests/`
 - **`IAM.Application.Tests/`**: Unit tests for the Application layer, ensuring business logic correctness.
@@ -50,7 +54,99 @@ Dependencies flow inward:
 - Core uses Domain abstractions.
 - API uses Core services.
 
-This structure ensures that changes in outer layers (e.g., switching databases) don't affect inner layers, promoting flexibility and testability.
+### Summary of the Flow
+Controller receives the request and identifies the Operator.
+
+Orchestrator gathers data from QueryRepositories (e.g., checks if the Tenant exists).
+
+Validator checks the DTO against the gathered data and business rules.
+
+UserService invokes the Domain Entity to modify state (e.g., hashing a password).
+
+Unit of Work saves the changes to the database.
+
+This chain ensures that no class is overloaded with responsibility, making the software easier to document, test, and maintain.
+
+### The Request Chain and Class Responsibilities: an example using User Management
+The execution flow for a typical request, such as creating a user or updating a password, follows this sequence:
+
+#### 1. UserController (The Entry Point)
+The Controller is responsible for handling HTTP communication. It defines the API endpoints, handles routing, and extracts data from the request (Body, Query, or Identity Claims).
+
+Purpose: To map HTTP requests to specific application actions.
+
+Role: It should remain "thin," performing no business logic. Its main job is to extract the Operator's Context (like the operatorCustomerId from the JWT) and **pass the DTO to the Orchestrator or Service**.
+
+#### 2. UserOrchestrator (The Coordinator)
+The Orchestrator acts as a "Maestro" for operations that cross domain boundaries. For example, creating a user requires checking if a Customer exists and if the User's email is unique.
+
+Purpose: To coordinate logic between different domains (User and Customer) and enforce high-level security rules, such as ForbiddenCustomerError.
+
+Role: It fetches necessary data from various repositories to prepare a "complete picture" for validation.
+
+#### 3. UserService (The Domain Manager)
+The Service manages the lifecycle of the primary entity. Once the Orchestrator has validated the cross-domain requirements, the Service performs the specific entity actions.
+
+Purpose: To encapsulate application logic specific to the User entity.
+
+Role: It interacts with the Unit of Work to persist changes. It calls the User domain entity methods (like UpdatePassword) to ensure state changes are handled correctly according to Domain-Driven Design (DDD) principles.
+
+#### 4. UserValidator (The Logic Filter)
+The Validator is a pure, stateless class that evaluates the validity of a request against the current state of the system.
+
+Purpose: To centralize business rules and prevent invalid data from reaching the database.
+
+Role: It receives the request DTO and "facts" provided by the Orchestrator (e.g., emailExists, customerExists) and returns a Result object containing success or failure messages.
+
+#### 5. Repositories and Unit of Work (The Data Access)
+These classes handle the actual communication with the database. We distinguish between QueryRepositories (optimized for read operations) and Repositories (for write operations).
+
+Purpose: To abstract the persistence mechanism (EF Core/SQL).
+
+Role: The Repository performs the CRUD operations, while the Unit of Work ensures that all changes in a single transaction are committed together.
+
+
+sequenceDiagram
+    title: Multi-Tenant User Registration Orchestration
+    participant Client
+    participant Client
+    participant UserController
+    participant UserOrchestrator
+    participant UserValidator
+    participant QueryRepo as QueryRepositories
+    participant UserService
+    participant Domain as User Entity
+    participant UoW as UnitOfWork
+
+    Client->>UserController: POST /api/user (DTO + JWT)
+    
+    rect rgb(240, 240, 240)
+    Note over UserController: Extract Operator Context
+    UserController->>UserOrchestrator: RegisterUserAsync(Request, OperatorId)
+    end
+
+    rect rgb(230, 245, 255)
+    Note over UserOrchestrator: Cross-Domain Logic
+    UserOrchestrator->>UserOrchestrator: Security Check (ForbiddenCustomerError)
+    UserOrchestrator->>QueryRepo: Fetch Customer & Email status
+    QueryRepo-->>UserOrchestrator: Return Facts
+    
+    UserOrchestrator->>UserValidator: ValidateCreate(Request, Facts)
+    UserValidator-->>UserOrchestrator: Result (Success/Failure)
+    end
+
+    rect rgb(240, 255, 240)
+    Note over UserService: Domain Management
+    UserOrchestrator->>UserService: CreateUserAsync(Request)
+    UserService->>Domain: User.Create(...)
+    UserService->>UoW: Users.AddAsync(user)
+    UserService->>UoW: SaveChangesAsync()
+    UoW-->>UserService: Commit
+    end
+
+    UserService-->>UserOrchestrator: Result<UserDto>
+    UserOrchestrator-->>UserController: Result<UserDto>
+    UserController-->>Client: 201 Created / 400 BadRequest
 
 ## Shared Module
 - `src/Shared/`: Common utilities as a NuGet package.

@@ -25,7 +25,7 @@ namespace IAM.Application.Orchestrators
          _userValidator = userValidator;
       }
 
-      public async Task<Result<UserDto>> RegisterUserAsync(UserCreateRequest request)
+      public async Task<Result<UserDto>> RegisterUserAsync(UserCreateRequest request, Guid operatorCustomerId)
       {
          var emailIdTask = _userQueryRepository.GetIdByEmailAsync(request.Email);
          var customerTask = _customerQueryRepository.GetByIdAsync(request.CustomerId);

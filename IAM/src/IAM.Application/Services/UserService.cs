@@ -4,7 +4,9 @@ using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;
 using IAM.Domain.Mappers;
+using IAM.Domain.Messages;
 using IAM.Domain.Messages.Errors;
+using IAM.Domain.Messages.Info;
 using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
 using Isopoh.Cryptography.Argon2;
@@ -41,14 +43,27 @@ public class UserService : IUserService
       return await _userQueryRepository.GetByCustomerIdAsync(customerId);
    }
 
-   public async Task<Result<UserDto>> CreateUserAsync(UserCreateRequest request)
+   public async Task<Result<UserDto>> CreateUserAsync(UserCreateRequest request,
+                                                      Guid operatorCustomerId,
+                                                      bool customerExists,
+                                                      bool emailExists)
    {
+      if (request.CustomerId != operatorCustomerId)
+      {
+         return Result<UserDto>.Failure(new ForbiddenCustomerError());
+      }
+
+      var validation = _userValidator.ValidateCreate(request, customerExists, emailExists);
+      if (validation.HasError)
+      {
+         return Result<UserDto>.Failure(validation.Messages);
+      }
+
       var user = User.Create(
-         request.Name,
-         request.Email,
-         Argon2.Hash(request.Password),
-         request.CustomerId
-      );
+          request.Name,
+          request.Email,
+          Argon2.Hash(request.Password),
+          request.CustomerId);
 
       await _unitOfWork.Users.AddAsync(user);
       await _unitOfWork.SaveChangesAsync();
@@ -70,7 +85,7 @@ public class UserService : IUserService
 
       _unitOfWork.Users.Update(user);
       await _unitOfWork.SaveChangesAsync();
-      return Result.Success();
+      return Result.Success(new SuccessInfo());
    }
 
    public async Task<Result> UpdatePasswordAsync(UserUpdatePasswordRequest request)
@@ -87,7 +102,7 @@ public class UserService : IUserService
 
       _unitOfWork.Users.Update(user);
       await _unitOfWork.SaveChangesAsync();
-      return Result.Success();
+      return Result.Success(new SuccessInfo());
    }
 
    public async Task<Result> DeleteAsync(Guid id)
@@ -101,7 +116,7 @@ public class UserService : IUserService
 
       await _unitOfWork.Users.DeleteAsync(id);
       await _unitOfWork.SaveChangesAsync();
-      return Result.Success();
+      return Result.Success(new SuccessInfo());
    }
 
    public async Task UpdateLastLoginAsync(Guid id)

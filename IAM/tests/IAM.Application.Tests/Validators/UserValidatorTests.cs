@@ -1,4 +1,5 @@
-﻿using IAM.Domain;
+﻿using IAM.Application.Validators;
+using IAM.Domain;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.Entities;
 using IAM.Domain.Messages;
@@ -6,7 +7,7 @@ using IAM.Domain.Messages.Errors;
 using Isopoh.Cryptography.Argon2;
 
 
-namespace IAM.Application.Validators.Tests;
+namespace IAM.Application.Tests.Validators;
 
 public class UserValidatorTests
 {
@@ -76,9 +77,9 @@ public class UserValidatorTests
    [Fact]
    public void ValidateUpdatePassword_ShouldBeSuccess_WhenCredentialsAreValid()
    {
-      var rawPassword = "Old#Password123";
-      var user = User.Create("User Test", "test@email.com", Argon2.Hash(rawPassword), Guid.NewGuid());
-      var request = new UserUpdatePasswordRequest(user.Email, rawPassword, "New#StrongPass88");
+      var oldPassword = "Old#Password123";
+      var user = User.Create("User Test", "test@email.com", Argon2.Hash(oldPassword), Guid.NewGuid());
+      var request = new UserUpdatePasswordRequest(user.Email, oldPassword, "New#StrongPass88");
 
       var result = _validator.ValidateUpdatePassword(user, request);
 

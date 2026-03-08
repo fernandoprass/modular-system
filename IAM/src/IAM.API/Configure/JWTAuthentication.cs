@@ -1,0 +1,30 @@
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
+namespace IAM.API.Configure
+{
+   public static class JWTAuthentication
+   {
+      public static void Configure(WebApplicationBuilder builder)
+      {
+         var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "your-super-secret-jwt-key-here-make-it-long-and-secure";
+         var key = Encoding.UTF8.GetBytes(jwtSecret);
+
+         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+             .AddJwtBearer(options =>
+             {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                   ValidateIssuer = true,
+                   ValidateAudience = true,
+                   ValidateLifetime = true,
+                   ValidateIssuerSigningKey = true,
+                   ValidIssuer = "IAM.API",
+                   ValidAudience = "IAM.Client",
+                   IssuerSigningKey = new SymmetricSecurityKey(key)
+                };
+             });
+      }
+   }
+}

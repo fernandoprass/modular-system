@@ -1,8 +1,10 @@
 using Asp.Versioning;
 using IAM.Application.Contracts;
+using IAM.Application.Extensions;
 using IAM.Application.Services;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
+using IAM.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Myce.Response;
@@ -41,15 +43,14 @@ public class UserController : BaseController
    {
       var users = await _userService.GetByCustomerIdAsync(customerId);
 
-      return Ok(Result<IEnumerable<UserLiteDto>>.Success(users));
+      return OkOrNotFound(users);
    }
 
    [HttpPost("")]
    public async Task<IActionResult> Create([FromBody] UserCreateRequest request)
    {
-      var operatorCustomerId = GetCustomerIdFromLogedUser()
-         ;
-      var user = await _userOrchestrator.RegisterUserAsync(request);
+      var operatorCustomerId = User.GetCustomerId();
+      var user = await _userOrchestrator.RegisterUserAsync(request, operatorCustomerId);
 
       return OkOrNotFound(user);
    }

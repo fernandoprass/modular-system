@@ -14,18 +14,18 @@ namespace IAM.Application.Validators
    {
       public UserValidator() { }
 
-      public Result ValidateCreate(UserCreateRequest request, bool emailAlreadyExists, bool customerExists)
+      public Result ValidateCreate(UserCreateRequest request, bool customerExists, bool emailAlreadyExists)
       {
          var validator = new FluentValidator<UserCreateRequest>()
             .RuleFor(x => x.Name).ApplyTemplate(NameRules)
             .RuleFor(x => x.Email)
                   .IsRequired()
                   .IsValidEmailAddress()
-                  .Custom(_ => !emailAlreadyExists, new EmailAlreadyExistError(request.Email))
             .RuleFor(x => x.Password).ApplyTemplate(PasswordRules)
             .RuleFor(x => x.CustomerId)
                   .IsRequired()
-                  .Custom(_ => customerExists, new NotFoundError(Const.Entity.Customer));
+            .RuleForValue(emailAlreadyExists).IsFalse(new EmailAlreadyExistError(request.Email))
+            .RuleForValue(customerExists).IsTrue(new NotFoundError(Const.Entity.Customer));
 
          var isValid = validator.Validate(request);
 

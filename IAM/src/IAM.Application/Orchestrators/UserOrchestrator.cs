@@ -27,21 +27,13 @@ namespace IAM.Application.Orchestrators
 
       public async Task<Result<UserDto>> RegisterUserAsync(UserCreateRequest request, Guid operatorCustomerId)
       {
-         var emailIdTask = _userQueryRepository.GetIdByEmailAsync(request.Email);
-         var customerTask = _customerQueryRepository.GetByIdAsync(request.CustomerId);
+         var userId = await _userQueryRepository.GetIdByEmailAsync(request.Email);
+         var customerDto = await _customerQueryRepository.GetByIdAsync(request.CustomerId);
 
-         await Task.WhenAll(emailIdTask, customerTask);
+         var emailExists =  userId != Guid.Empty;
+         var customerExists = customerDto is not null;
 
-         var emailExists = await emailIdTask != Guid.Empty;
-         var customer = await customerTask;
-
-         var validation = _userValidator.ValidateCreate(request, emailExists, customer is not null);
-         if (validation.HasError)
-         {
-            return Result<UserDto>.Failure(validation.Messages);
-         }
-
-         return await _userService.CreateUserAsync(request);
+         return await _userService.CreateUserAsync(request, operatorCustomerId, customerExists, emailExists);
       }
    }
 }

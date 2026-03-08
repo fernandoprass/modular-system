@@ -1,11 +1,9 @@
 using Asp.Versioning;
 using IAM.API.Configure;
 using IAM.API.Middlewares;
+using IAM.Application.Services;
 using IAM.Infrastructure;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,24 +29,7 @@ DependencyInjection.RegisterServices(builder);
 
 DependencyInjection.RegisterValidators(builder);
 
-// Configure JWT Authentication
-var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "your-super-secret-jwt-key-here-make-it-long-and-secure";
-var key = Encoding.UTF8.GetBytes(jwtSecret);
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-       options.TokenValidationParameters = new TokenValidationParameters
-       {
-          ValidateIssuer = true,
-          ValidateAudience = true,
-          ValidateLifetime = true,
-          ValidateIssuerSigningKey = true,
-          ValidIssuer = "IAM.API",
-          ValidAudience = "IAM.Client",
-          IssuerSigningKey = new SymmetricSecurityKey(key)
-       };
-    });
+JWTAuthentication.Configure(builder);
 
 // Configure API Versioning
 builder.Services.AddApiVersioning(options =>
@@ -80,14 +61,19 @@ app.UseAuthorization();
 app.MapControllers();
 
 //Apply migrations and seed database in development
-//if (app.Environment.IsDevelopment())
-//{
-//    using var scope = app.Services.CreateScope();
-//var db = scope.ServiceProvider.GetRequiredService<IamDbContext>();
-//db.Database.Migrate();
-
-//var seeder = scope.ServiceProvider.GetRequiredService<IDatabaseSeeder>();
-//await seeder.SeedAsync();
-//}
+//await PopulateDatabase(app);
 
 app.Run();
+
+static async Task PopulateDatabase(WebApplication app)
+{
+   if (app.Environment.IsDevelopment())
+   {
+      using var scope = app.Services.CreateScope();
+      var db = scope.ServiceProvider.GetRequiredService<IamDbContext>();
+      db.Database.Migrate();
+
+      var seeder = scope.ServiceProvider.GetRequiredService<IDatabaseSeeder>();
+      await seeder.SeedAsync();
+   }
+}

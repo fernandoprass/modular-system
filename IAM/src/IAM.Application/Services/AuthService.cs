@@ -38,9 +38,9 @@ public class AuthService(IUserQueryRepository userQueryRepository,
 
       // Use the dummy hash for timing attack prevention even if the user is not found
       var passwordHash = user?.PasswordHash ?? dummyHash;
-      var isValid = Argon2.Verify(passwordHash, request.Password);
+      var isPasswordCorrect = Argon2.Verify(passwordHash, request.Password);
 
-      if (user is null || !isValid)
+      if (user is null || user.IsActive|| !isPasswordCorrect)
       {
          return Result<LoginResponse?>.Failure(new UnauthorizedError());
       }
@@ -50,12 +50,7 @@ public class AuthService(IUserQueryRepository userQueryRepository,
 
       await _userService.UpdateLastLoginAsync(user.Id);
 
-      var response = new LoginResponse
-      {
-         Token = token,
-         ExpiresAt = expiresAt,
-         User = userDto
-      };
+      var response = new LoginResponse(token, expiresAt, userDto);
 
       return Result<LoginResponse?>.Success(response);
    }

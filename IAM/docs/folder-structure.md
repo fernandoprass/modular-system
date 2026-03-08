@@ -31,8 +31,9 @@ Contains the source code, divided into projects:
 
 - **`IAM.Application/`**: Contains application logic, services, and use cases. This layer orchestrates business operations and depends only on the Domain layer.
   - `Contracts/`: Interfaces for services and repositories.
+  - `Extensions/` : Extension methods for service registration and other utilities. 
   - `Services/`: Business services like `UserService`, `AuthService`.
-  - `Orchestrators/`: (Currently empty) For complex workflows.
+  - `Orchestrators/`: For services that coordinate multiple domain entities or operations across domains (e.g., `UserOrchestrator`).
   - `Validators/`: Validation logic for entities and operations.
 
 - **`IAM.Infrastructure/`**: Handles external concerns like databases, APIs, and third-party services. This layer implements interfaces defined in Domain and Core.
@@ -105,7 +106,7 @@ Purpose: To abstract the persistence mechanism (EF Core/SQL).
 
 Role: The Repository performs the CRUD operations, while the Unit of Work ensures that all changes in a single transaction are committed together.
 
-
+```mermaid
 sequenceDiagram
     title: Multi-Tenant User Registration Orchestration
     participant Client
@@ -147,6 +148,7 @@ sequenceDiagram
     UserService-->>UserOrchestrator: Result<UserDto>
     UserOrchestrator-->>UserController: Result<UserDto>
     UserController-->>Client: 201 Created / 400 BadRequest
+```
 
 ## Shared Module
 - `src/Shared/`: Common utilities as a NuGet package.

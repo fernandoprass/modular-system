@@ -4,7 +4,7 @@ using IAM.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace IAM.API.Testing;
+namespace IAM.Application.Services.Tests;
 
 public class DatabaseSeederTest
 {

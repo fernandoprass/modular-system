@@ -6,7 +6,7 @@ namespace IAM.Application.Contracts
 {
    public interface IUserValidator
    {
-      Result ValidateCreate(UserCreateRequest request, bool emailAlreadyExists, bool customerExists);
+      Result ValidateCreate(UserCreateRequest request, bool customerExists, bool emailAlreadyExists);
 
       Result ValidateUpdate(Guid? id, UserUpdateRequest request);
 

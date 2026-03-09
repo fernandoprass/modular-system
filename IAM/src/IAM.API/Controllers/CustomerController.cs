@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using IAM.Application.Contracts;
+using IAM.Domain.DTOs.Requests;
 using IAM.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Myce.Response;
@@ -35,32 +36,21 @@ public class CustomerController : BaseController
    [HttpPost]
    public async Task<IActionResult> Create([FromBody] CustomerCreateRequest customer)
    {
-      if (!ModelState.IsValid)
-      {
-         // Consistent error envelope even for validation failures
-         var errorResult = Result.Failure(new ErrorMessage("INVALID_CUSTOMER_DATA", "The customer data is invalid."));
-         return BadRequest(errorResult);
-      }
-
-      var createdCustomer = await _customerService.CreateAsync(customer);
-      var result = Result<Customer>.Success(createdCustomer);
-
-      return CreatedAtAction(nameof(GetById), new { id = createdCustomer.Id }, result);
+      var result = await _customerService.CreateAsync(customer);
+      return OkOrNotFound(result);
    }
 
    [HttpPut("{id}")]
-   public async Task<IActionResult> Update(Guid id, [FromBody] Customer customer)
+   public async Task<IActionResult> Update(Guid id, [FromBody] CustomerUpdateRequest customer)
    {
-      return await ExecuteIfExistsAsync(
-          () => _customerService.ExistsAsync(id),
-          async (exists) => await _customerService.UpdateAsync(customer));
+      var result = await _customerService.UpdateAsync(id, customer);
+      return OkOrNotFound(result);
    }
 
    [HttpDelete("{id}")]
    public async Task<IActionResult> Delete(Guid id)
    {
-      return await ExecuteIfExistsAsync(
-          () => _customerService.ExistsAsync(id),
-          async (exists) => await _customerService.DeleteAsync(id));
+      var result = await _customerService.DeleteAsync(id);
+      return OkOrNotFound(result);
    }
 }

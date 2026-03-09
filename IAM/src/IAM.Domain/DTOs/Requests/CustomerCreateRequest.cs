@@ -1,4 +1,4 @@
-using IAM.Domain.DTOs.Requests;
+namespace IAM.Domain.DTOs.Requests;
 
 public sealed record CustomerCreateRequest
 (

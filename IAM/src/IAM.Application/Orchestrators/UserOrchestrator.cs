@@ -11,7 +11,6 @@ namespace IAM.Application.Orchestrators
       private readonly IUserService _userService;
       private readonly ICustomerQueryRepository _customerQueryRepository;
       private readonly IUserQueryRepository _userQueryRepository;
-      private readonly IUserValidator _userValidator;
 
       public UserOrchestrator(
          IUserService userService,
@@ -22,7 +21,6 @@ namespace IAM.Application.Orchestrators
          _userService = userService;
          _customerQueryRepository = customerQueryRepository;
          _userQueryRepository = userQueryRepository;
-         _userValidator = userValidator;
       }
 
       public async Task<Result<UserDto>> RegisterUserAsync(UserCreateRequest request, Guid operatorCustomerId)
@@ -33,7 +31,13 @@ namespace IAM.Application.Orchestrators
          var emailExists =  userId != Guid.Empty;
          var customerExists = customerDto is not null;
 
-         return await _userService.CreateUserAsync(request, operatorCustomerId, customerExists, emailExists);
+         var result = await _userService.CreateUserAsync(request, operatorCustomerId, customerExists, emailExists);
+
+         if (result.IsValid) { 
+            result.Data.CustomerName = customerDto.Name; 
+         }
+         
+         return result;
       }
    }
 }

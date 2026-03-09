@@ -13,4 +13,13 @@ public class Customer
 
     // Navigation property
     public ICollection<User> Users { get; set; } = new List<User>();
+
+    public void Update(string name, string code, string? description, bool isActive)
+    {
+        Name = name;
+        Code = code;
+        Description = description;
+        IsActive = isActive;
+        UpdatedAt = DateTime.UtcNow;
+    }
 }

@@ -37,6 +37,7 @@ namespace IAM.API.Configure
       public static void RegisterValidators(WebApplicationBuilder builder)
       {
          builder.Services.AddScoped<IUserValidator, UserValidator>();
+         builder.Services.AddScoped<ICustomerValidator, CustomerValidator>();
       }
    }
 }

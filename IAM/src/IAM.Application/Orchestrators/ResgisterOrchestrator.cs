@@ -6,13 +6,13 @@ using Myce.Response;
 
 namespace IAM.Application.Orchestrators
 {
-   public class UserOrchestrator : IUserOrchestrator
+   public class ResgisterOrchestrator : IRegisterOrchestrator
    {
       private readonly IUserService _userService;
       private readonly ICustomerQueryRepository _customerQueryRepository;
       private readonly IUserQueryRepository _userQueryRepository;
 
-      public UserOrchestrator(
+      public ResgisterOrchestrator(
          IUserService userService,
          ICustomerQueryRepository customerQueryRepository,
          IUserQueryRepository userQueryRepository,

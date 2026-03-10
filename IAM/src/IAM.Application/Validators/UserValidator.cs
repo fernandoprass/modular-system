@@ -46,7 +46,7 @@ namespace IAM.Application.Validators
       public Result ValidateUpdatePassword(User? user, UserUpdatePasswordRequest request)
       {
          var isOldPasswordCorrect = user != null &&
-                                    Argon2.Verify(request.PasswordOld, user.PasswordHash);
+                                    Argon2.Verify(user.PasswordHash, request.PasswordOld);
 
          var validator = new FluentValidator<UserUpdatePasswordRequest>()
             .RuleForValue(user).IsNotNull(new NotFoundError(Const.Entity.User))

@@ -61,18 +61,26 @@ app.UseAuthorization();
 app.MapControllers();
 
 //Apply migrations and seed database in development
+//await MigrateDatabase(app);
 //await PopulateDatabase(app);
 
 app.Run();
 
-static async Task PopulateDatabase(WebApplication app)
+static async Task MigrateDatabase(WebApplication app)
 {
    if (app.Environment.IsDevelopment())
    {
       using var scope = app.Services.CreateScope();
       var db = scope.ServiceProvider.GetRequiredService<IamDbContext>();
       db.Database.Migrate();
+   }
+}
 
+static async Task PopulateDatabase(WebApplication app)
+{
+   if (app.Environment.IsDevelopment())
+   {
+      using var scope = app.Services.CreateScope();
       var seeder = scope.ServiceProvider.GetRequiredService<IDatabaseSeeder>();
       await seeder.SeedAsync();
    }

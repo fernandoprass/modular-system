@@ -40,7 +40,8 @@ public class AuthService(IUserQueryRepository userQueryRepository,
       var passwordHash = user?.PasswordHash ?? dummyHash;
       var isPasswordCorrect = Argon2.Verify(passwordHash, request.Password);
 
-      if (user is null || user.IsActive|| !isPasswordCorrect)
+
+      if (user is null || !user.IsActive|| !isPasswordCorrect)
       {
          return Result<LoginResponse?>.Failure(new UnauthorizedError());
       }

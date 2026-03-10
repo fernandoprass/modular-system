@@ -33,7 +33,7 @@ Contains the source code, divided into projects:
   - `Contracts/`: Interfaces for services and repositories.
   - `Extensions/` : Extension methods for service registration and other utilities. 
   - `Services/`: Business services like `UserService`, `AuthService`.
-  - `Orchestrators/`: For services that coordinate multiple domain entities or operations across domains (e.g., `UserOrchestrator`).
+  - `Orchestrators/`: For services that coordinate multiple domain entities or operations across domains (e.g., `RegisterOrchestrator`).
   - `Validators/`: Validation logic for entities and operations.
 
 - **`IAM.Infrastructure/`**: Handles external concerns like databases, APIs, and third-party services. This layer implements interfaces defined in Domain and Core.
@@ -78,7 +78,7 @@ Purpose: To map HTTP requests to specific application actions.
 
 Role: It should remain "thin," performing no business logic. Its main job is to extract the Operator's Context (like the operatorCustomerId from the JWT) and **pass the DTO to the Orchestrator or Service**.
 
-#### 2. UserOrchestrator (The Coordinator)
+#### 2. RegisterOrchestrator (The Coordinator)
 The Orchestrator acts as a "Maestro" for operations that cross domain boundaries. For example, creating a user requires checking if a Customer exists and if the User's email is unique.
 
 Purpose: To coordinate logic between different domains (User and Customer) and enforce high-level security rules, such as ForbiddenCustomerError.
@@ -112,7 +112,7 @@ sequenceDiagram
     participant Client
     participant Client
     participant UserController
-    participant UserOrchestrator
+    participant RegisterOrchestrator
     participant UserValidator
     participant QueryRepo as QueryRepositories
     participant UserService
@@ -123,30 +123,30 @@ sequenceDiagram
     
     rect rgb(240, 240, 240)
     Note over UserController: Extract Operator Context
-    UserController->>UserOrchestrator: RegisterUserAsync(Request, OperatorId)
+    UserController->>RegisterOrchestrator: RegisterUserAsync(Request, OperatorId)
     end
 
     rect rgb(230, 245, 255)
-    Note over UserOrchestrator: Cross-Domain Logic
-    UserOrchestrator->>UserOrchestrator: Security Check (ForbiddenCustomerError)
-    UserOrchestrator->>QueryRepo: Fetch Customer & Email status
-    QueryRepo-->>UserOrchestrator: Return Facts
+    Note over RegisterOrchestrator: Cross-Domain Logic
+    RegisterOrchestrator->>RegisterOrchestrator: Security Check (ForbiddenCustomerError)
+    RegisterOrchestrator->>QueryRepo: Fetch Customer & Email status
+    QueryRepo-->>RegisterOrchestrator: Return Facts
     
-    UserOrchestrator->>UserValidator: ValidateCreate(Request, Facts)
-    UserValidator-->>UserOrchestrator: Result (Success/Failure)
+    RegisterOrchestrator->>UserValidator: ValidateCreate(Request, Facts)
+    UserValidator-->>RegisterOrchestrator: Result (Success/Failure)
     end
 
     rect rgb(240, 255, 240)
     Note over UserService: Domain Management
-    UserOrchestrator->>UserService: CreateUserAsync(Request)
+    RegisterOrchestrator->>UserService: CreateUserAsync(Request)
     UserService->>Domain: User.Create(...)
     UserService->>UoW: Users.AddAsync(user)
     UserService->>UoW: SaveChangesAsync()
     UoW-->>UserService: Commit
     end
 
-    UserService-->>UserOrchestrator: Result<UserDto>
-    UserOrchestrator-->>UserController: Result<UserDto>
+    UserService-->>RegisterOrchestrator: Result<UserDto>
+    RegisterOrchestrator-->>UserController: Result<UserDto>
     UserController-->>Client: 201 Created / 400 BadRequest
 ```
 

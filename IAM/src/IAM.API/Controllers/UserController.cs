@@ -15,12 +15,12 @@ namespace IAM.API.Controllers;
 [Route("api/v{version:apiVersion}/iam/users")]
 public class UserController : BaseController
 {
-   private readonly IUserOrchestrator _userOrchestrator;
+   private readonly IRegisterOrchestrator _userOrchestrator;
    private readonly IUserService _userService;
    private readonly IAuthService _authService;
 
    public UserController(
-      IUserOrchestrator userOrchestrator,
+      IRegisterOrchestrator userOrchestrator,
       IUserService userService, 
       IAuthService authService)
    {

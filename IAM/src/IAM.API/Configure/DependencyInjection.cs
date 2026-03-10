@@ -23,7 +23,7 @@ namespace IAM.API.Configure
 
       public static void RegisterOrchestrators(WebApplicationBuilder builder)
       {
-         builder.Services.AddScoped<IUserOrchestrator, UserOrchestrator>();
+         builder.Services.AddScoped<IRegisterOrchestrator, ResgisterOrchestrator>();
       }
 
       public static void RegisterServices(WebApplicationBuilder builder)

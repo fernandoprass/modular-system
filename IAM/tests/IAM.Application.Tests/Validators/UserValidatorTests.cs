@@ -84,6 +84,7 @@ public class UserValidatorTests
       var result = _validator.ValidateUpdatePassword(user, request);
 
       Assert.True(result.IsValid);
+      Assert.Empty(result.Messages);
    }
 
    [Fact]

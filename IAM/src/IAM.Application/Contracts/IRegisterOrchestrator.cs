@@ -4,7 +4,7 @@ using Myce.Response;
 
 namespace IAM.Application.Contracts;
 
-public interface IUserOrchestrator
+public interface IRegisterOrchestrator
 {
    Task<Result<UserDto>> RegisterUserAsync(UserCreateRequest request, Guid operatorCustomerId);
 }

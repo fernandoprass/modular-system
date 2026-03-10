@@ -1,13 +1,10 @@
 using IAM.Application.Contracts;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
-using IAM.Domain.Entities;
-using IAM.Domain.QueryRepositories;
-using IAM.Domain.Repositories;
-using IAM.Domain.Mappers;
 using IAM.Domain.Messages.Errors;
 using IAM.Domain.Messages.Info;
-using Isopoh.Cryptography.Argon2;
+using IAM.Domain.QueryRepositories;
+using IAM.Domain.Repositories;
 using Myce.Response;
 
 namespace IAM.Application.Services;
@@ -43,37 +40,6 @@ public class CustomerService : ICustomerService
         return await _customerQueryRepository.GetByNameAsync(name);
     }
 
-    public async Task<Result<CustomerDto>> CreateAsync(CustomerCreateRequest customerCreate)
-    {
-        var validation = _customerValidator.ValidateCreate(customerCreate);
-        if (validation.HasError)
-        {
-            return Result<CustomerDto>.Failure(validation.Messages);
-        }
-
-        var customer = new Customer
-        {
-            Id = Guid.CreateVersion7(),
-            Type = customerCreate.Type,
-            Name = customerCreate.Type == CustomerType.Company ? customerCreate.Name : customerCreate.Name,
-            Code = customerCreate.Code,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        var user = User.Create(
-         customerCreate.User.Name,
-         customerCreate.User.Email,
-         Argon2.Hash(customerCreate.User.Password),
-         customer.Id
-        );
-
-        await _unitOfWork.Customers.AddAsync(customer);
-        await _unitOfWork.Users.AddAsync(user);
-        await _unitOfWork.SaveChangesAsync();
-        
-        return Result<CustomerDto>.Success(customer.ToCustomerDto());
-    }
-
     public async Task<Result> UpdateAsync(Guid id, CustomerUpdateRequest request)
     {
         var validation = _customerValidator.ValidateUpdate(id, request);
@@ -88,7 +54,7 @@ public class CustomerService : ICustomerService
             return Result.Failure(new NotFoundError("Customer"));
         }
 
-        customer.Update(request.Name, request.Code, request.Description, request.IsActive);
+        customer.Update(request.Code, request.Name, request.Description, request.IsActive);
         
         _unitOfWork.Customers.Update(customer);
         await _unitOfWork.SaveChangesAsync();

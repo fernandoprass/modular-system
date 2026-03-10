@@ -22,13 +22,11 @@ public class UserServiceTests
 
    public UserServiceTests()
    {
-      // No NSubstitute, você cria o mock diretamente como a interface
       _unitOfWork = Substitute.For<IUnitOfWork>();
       _userValidator = Substitute.For<IUserValidator>();
       _userRepository = Substitute.For<IUserRepository>();
       _userQueryRepository = Substitute.For<IUserQueryRepository>();
 
-      // Configura a propriedade Users do Unit of Work para retornar o repositório mockado
       _unitOfWork.Users.Returns(_userRepository);
 
       _sut = new UserService(
@@ -81,7 +79,6 @@ public class UserServiceTests
 
       result.IsValid.Should().BeTrue();
 
-      // Verificação: Recebeu uma chamada de AddAsync e uma de SaveChanges
       await _unitOfWork.Users.Received(1).AddAsync(Arg.Any<User>());
       await _unitOfWork.Received(1).SaveChangesAsync();
    }

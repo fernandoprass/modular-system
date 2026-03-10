@@ -13,10 +13,14 @@ namespace IAM.API.Controllers;
 public class CustomerController : BaseController
 {
    private readonly ICustomerService _customerService;
+   private readonly IRegisterOrchestrator _registerOrchestrator;
 
-   public CustomerController(ICustomerService customerService)
+   public CustomerController(
+      ICustomerService customerService,
+      IRegisterOrchestrator registerOrchestrator)
    {
       _customerService = customerService;
+      _registerOrchestrator = registerOrchestrator;
    }
 
    [HttpGet("{id}")]
@@ -36,7 +40,7 @@ public class CustomerController : BaseController
    [HttpPost]
    public async Task<IActionResult> Create([FromBody] CustomerCreateRequest customer)
    {
-      var result = await _customerService.CreateAsync(customer);
+      var result = await _registerOrchestrator.RegisterCustomerAsync(customer);
       return OkOrNotFound(result);
    }
 

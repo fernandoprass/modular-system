@@ -3,11 +3,8 @@ using IAM.Application.Contracts;
 using IAM.Application.Extensions;
 using IAM.Application.Services;
 using IAM.Domain.DTOs.Requests;
-using IAM.Domain.DTOs.Responses;
-using IAM.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Myce.Response;
 
 namespace IAM.API.Controllers;
 
@@ -15,16 +12,16 @@ namespace IAM.API.Controllers;
 [Route("api/v{version:apiVersion}/iam/users")]
 public class UserController : BaseController
 {
-   private readonly IRegisterOrchestrator _userOrchestrator;
+   private readonly IRegisterOrchestrator _registerOrchestrator;
    private readonly IUserService _userService;
    private readonly IAuthService _authService;
 
    public UserController(
-      IRegisterOrchestrator userOrchestrator,
+      IRegisterOrchestrator registerOrchestrator,
       IUserService userService, 
       IAuthService authService)
    {
-      _userOrchestrator = userOrchestrator;
+      _registerOrchestrator = registerOrchestrator;
       _userService = userService;
       _authService = authService;
    }
@@ -50,7 +47,7 @@ public class UserController : BaseController
    public async Task<IActionResult> Create([FromBody] UserCreateRequest request)
    {
       var operatorCustomerId = User.GetCustomerId();
-      var user = await _userOrchestrator.RegisterUserAsync(request, operatorCustomerId);
+      var user = await _registerOrchestrator.RegisterUserAsync(request, operatorCustomerId);
 
       return OkOrNotFound(user);
    }

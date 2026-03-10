@@ -60,4 +60,9 @@ public class CustomerQueryRepository : ICustomerQueryRepository
             })
             .ToListAsync();
     }
+
+    public async Task<bool> ExistsByCodeAsync(string code)
+    {
+        return await _context.Customers.AnyAsync(c => c.Code == code);
+    }
 }

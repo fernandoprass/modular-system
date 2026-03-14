@@ -2,19 +2,23 @@ using Myce.Response.Messages;
 
 namespace IAM.Domain.Messages.Errors;
 
-public class DuplicateCodeError : ErrorMessage
+public class DuplicateCustomerCodeError : ErrorMessage
 {
-    public DuplicateCodeError(string code)
+    public DuplicateCustomerCodeError(string code)
         : base("DuplicateCodeError", "The customer code '{code}' already exists.")
     {
         AddVariable("code", code);
     }
 }
 
-public class InvalidCodeFormatError : ErrorMessage
+public class InvalidCustomerCodeFormatError : ErrorMessage
 {
-    public InvalidCodeFormatError()
-        : base("InvalidCodeFormatError", "For Person customers, the code must be exactly 10 alphanumeric digits.")
-    {
-    }
+    public InvalidCustomerCodeFormatError()
+        : base("InvalidCodeFormatError", "Code must contain only letters and number.") { }
+}
+
+public class InvalidCustomerTypeError : ErrorMessage
+{
+   public InvalidCustomerTypeError()
+       : base("InvalidCustomerTypeError", "Invalid Type, use 1 for a Company and 2 for a Person.") { }
 }

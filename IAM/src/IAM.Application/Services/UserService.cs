@@ -45,9 +45,10 @@ public class UserService : IUserService
 
    public async Task<Result<UserDto>> CreateUserAsync(UserCreateRequest request,
                                                       Guid operatorCustomerId,
-                                                      bool customerExists,
-                                                      bool emailExists)
+                                                      bool customerExists)
    {
+      bool emailExists = await EmailExistsAsync(request.Email);
+
       if (request.CustomerId != operatorCustomerId)
       {
          return Result<UserDto>.Failure(new ForbiddenCustomerError());
@@ -125,5 +126,20 @@ public class UserService : IUserService
 
       user.UpdateLastLogin();
       await _unitOfWork.SaveChangesAsync();
+   }
+
+   public async Task<Result> ValidateUserForNewCustomerAsync(CustomerUserCreateRequest request)
+   {
+      bool emailExists = await EmailExistsAsync(request.Email);
+
+      return _userValidator.ValidateCreateForNewCustomer(request, emailExists);
+   }
+
+   private async Task<bool> EmailExistsAsync(string email)
+   {
+      var userId = await _userQueryRepository.GetIdByEmailAsync(email);
+
+      var emailExists = userId != Guid.Empty;
+      return emailExists;
    }
 }

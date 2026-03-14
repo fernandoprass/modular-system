@@ -3,7 +3,6 @@ using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;
 using IAM.Domain.Mappers;
-using IAM.Domain.Messages.Errors;
 using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
 using Isopoh.Cryptography.Argon2;
@@ -13,35 +12,34 @@ namespace IAM.Application.Orchestrators
 {
    public class ResgisterOrchestrator : IRegisterOrchestrator
    {
-      private readonly IUserService _userService;
+      private readonly ICustomerService _customerService;
       private readonly ICustomerQueryRepository _customerQueryRepository;
+      private readonly IUserService _userService;
       private readonly IUserQueryRepository _userQueryRepository;
       private readonly IUnitOfWork _unitOfWork;
-      private readonly ICustomerValidator _customerValidator;
+      
 
       public ResgisterOrchestrator(
-         IUserService userService,
+         ICustomerService customerService,
          ICustomerQueryRepository customerQueryRepository,
+         IUserService userService,
          IUserQueryRepository userQueryRepository,
-         IUnitOfWork unitOfWork,
-         ICustomerValidator customerValidator)
+         IUnitOfWork unitOfWork)
       {
-         _userService = userService;
+         _customerService = customerService;
          _customerQueryRepository = customerQueryRepository;
+         _userService = userService;
          _userQueryRepository = userQueryRepository;
-         _unitOfWork = unitOfWork;
-         _customerValidator = customerValidator;
+         _unitOfWork = unitOfWork;  
       }
 
       public async Task<Result<UserDto>> RegisterUserAsync(UserCreateRequest request, Guid operatorCustomerId)
       {
-         var userId = await _userQueryRepository.GetIdByEmailAsync(request.Email);
          var customerDto = await _customerQueryRepository.GetByIdAsync(request.CustomerId);
 
-         var emailExists =  userId != Guid.Empty;
          var customerExists = customerDto is not null;
 
-         var result = await _userService.CreateUserAsync(request, operatorCustomerId, customerExists, emailExists);
+         var result = await _userService.CreateUserAsync(request, operatorCustomerId, customerExists);
 
          if (result.IsValid) { 
             result.Data.CustomerName = customerDto.Name; 
@@ -50,29 +48,22 @@ namespace IAM.Application.Orchestrators
          return result;
       }
       public async Task<Result<CustomerDto>> RegisterCustomerAsync(CustomerCreateRequest customerCreate)
-      {
-         //todo generate a random code for customer if type is person, and validate it doesn't exist in database
-         var validation = _customerValidator.ValidateCreate(customerCreate);
-         if (validation.HasError)
-         {
-            return Result<CustomerDto>.Failure(validation.Messages);
-         }
+      {   
+         var customerValidateResult = await _customerService.ValidateCreateCustomerAsync(customerCreate);
+         var userValidateResult = await _userService.ValidateUserForNewCustomerAsync(customerCreate.User);
 
-         if (customerCreate.Type == CustomerType.Company)
-         {
-            var codeExists = await _customerQueryRepository.ExistsByCodeAsync(customerCreate.Code);
-            if (codeExists)
-            {
-               return Result<CustomerDto>.Failure(new DuplicateCodeError(customerCreate.Code));
-            }
-         }
+         var result = Result.Merge(customerValidateResult, userValidateResult);
 
          var customer = Customer.Create(
             customerCreate.Type,
-            customerCreate.Code,
+            customerCreate.Type.Equals(CustomerType.Company) ? customerCreate.Code : _customerService.GetRandomCode(),
             customerCreate.Type.Equals(CustomerType.Company) ? customerCreate.Name : customerCreate.User.Name,
             customerCreate.Description
          );
+
+         if (result.HasError) { 
+            return Result<CustomerDto>.Failure(result.Messages); 
+         }
 
          var user = User.Create(
           customerCreate.User.Name,

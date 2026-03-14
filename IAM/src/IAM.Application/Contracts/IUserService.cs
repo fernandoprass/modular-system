@@ -1,6 +1,5 @@
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
-using IAM.Domain.Entities;
 using Myce.Response;
 
 namespace IAM.Application.Contracts;
@@ -11,10 +10,10 @@ public interface IUserService
    Task<IEnumerable<UserLiteDto>> GetByCustomerIdAsync(Guid customerId);
    Task<Result<UserDto>> CreateUserAsync(UserCreateRequest request,
                                          Guid operatorCustomerId,
-                                         bool customer,
-                                         bool emailExists);
+                                         bool customerExists);
    Task<Result> UpdateAsync(Guid id, UserUpdateRequest request);
    Task<Result> UpdatePasswordAsync(UserUpdatePasswordRequest request);
    Task<Result> DeleteAsync(Guid id);
    Task UpdateLastLoginAsync(Guid id);
+   Task<Result> ValidateUserForNewCustomerAsync(CustomerUserCreateRequest request);
 }

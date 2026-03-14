@@ -8,18 +8,19 @@ namespace IAM.Application.Validators;
 
 public class CustomerValidator : ICustomerValidator
 {
-   public Result ValidateCreate(CustomerCreateRequest request)
+   private static void CodeRules<T>(RuleBuilder<T, string> rb) where T : class
+                           => rb.IsRequired().MinLength(3).IsAlphaNumeric();
+
+   public Result ValidateCreate(CustomerCreateRequest request, bool codeExists)
    {
-      var isPersonWithInvalidCode = request.Type == CustomerType.Person && 
-                                    (string.IsNullOrEmpty(request.Code) || request.Code.Length != 10 || !request.Code.All(char.IsLetterOrDigit));
+      //todo use especif RuleFor when implemented in Myce
+      bool isValidType = Enum.IsDefined(typeof(CustomerType), request.Type);
 
       var validator = new FluentValidator<CustomerCreateRequest>()
-          .RuleFor(x => x.Name).ApplyTemplate(TemplateRulesValidator.NameRules)
-          .RuleFor(x => x.Code).IsRequired().MinLength(3)
-          .RuleFor(x => x.User.Name).ApplyTemplate(TemplateRulesValidator.NameRules)
-          .RuleFor(x => x.User.Email).IsRequired().IsValidEmailAddress()
-          .RuleFor(x => x.User.Password).ApplyTemplate(TemplateRulesValidator.PasswordRules)
-          .RuleForValue(isPersonWithInvalidCode).IsFalse(new InvalidCodeFormatError());
+          .RuleFor(x => x.Type).Custom(isValidType, new InvalidCustomerTypeError())
+          .RuleFor(x => x.Name).ApplyTemplate(ValidatorTemplate.NameRules)
+          .RuleFor(x => x.Code).ApplyTemplate(CodeRules)
+          .RuleForValue(codeExists).IsFalse(new DuplicateCustomerCodeError(request.Code));
 
       var isValid = validator.Validate(request);
 
@@ -29,7 +30,7 @@ public class CustomerValidator : ICustomerValidator
     public Result ValidateUpdate(Guid id, CustomerUpdateRequest request)
     {
         var validator = new FluentValidator<CustomerUpdateRequest>()
-            .RuleFor(x => x.Name).ApplyTemplate(TemplateRulesValidator.NameRules)
+            .RuleFor(x => x.Name).ApplyTemplate(ValidatorTemplate.NameRules)
             .RuleFor(x => x.Code).IsRequired().MinLength(3);
 
         var isValid = validator.Validate(request);

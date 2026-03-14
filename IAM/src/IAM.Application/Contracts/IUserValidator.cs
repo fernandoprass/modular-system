@@ -8,6 +8,8 @@ namespace IAM.Application.Contracts
    {
       Result ValidateCreate(UserCreateRequest request, bool customerExists, bool emailAlreadyExists);
 
+      Result ValidateCreateForNewCustomer(CustomerUserCreateRequest request, bool emailAlreadyExists);
+
       Result ValidateUpdate(Guid? id, UserUpdateRequest request);
 
       Result ValidateUpdatePassword(User? user, UserUpdatePasswordRequest request);

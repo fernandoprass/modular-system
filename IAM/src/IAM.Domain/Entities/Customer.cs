@@ -28,9 +28,14 @@ public class Customer
       };
    }
 
-   public void Update(string code, string name, string? description, bool isActive)
+   public void Update(string code)
    {
       Code = code;
+      UpdatedAt = DateTime.UtcNow;
+   }
+
+   public void Update(string name, string? description, bool isActive)
+   {
       Name = name;
       Description = description;
       IsActive = isActive;

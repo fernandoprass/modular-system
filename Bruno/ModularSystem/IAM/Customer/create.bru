@@ -1,0 +1,29 @@
+meta {
+  name: create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{server}}/api/{{version}}/iam/customers/
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "type": 2,
+    "name": "Customer Person",
+    "code": "",
+    "description": "that is the description",
+    "user": {
+      "name": "Person Name",
+      "email": "person@customer.com",
+      "password": "Password.1"
+    }
+  }
+}

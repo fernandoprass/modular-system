@@ -1,10 +1,10 @@
 using Asp.Versioning;
 using IAM.Application.Contracts;
+using IAM.Application.Extensions;
+using IAM.Domain;
 using IAM.Domain.DTOs.Requests;
-using IAM.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Myce.Response;
-using Myce.Response.Messages;
 
 namespace IAM.API.Controllers;
 
@@ -24,13 +24,15 @@ public class CustomerController : BaseController
    }
 
    [HttpGet("{id}")]
+   [Authorize]
    public async Task<IActionResult> GetById(Guid id)
    {
       var customer = await _customerService.GetByIdAsync(id);
       return OkOrNotFound(customer);
    }
 
-   [HttpGet("by-name/{name}")]
+   [HttpGet()]
+   [Authorize]
    public async Task<IActionResult> GetByName(string name)
    {
       var customer = await _customerService.GetByNameAsync(name);
@@ -45,13 +47,25 @@ public class CustomerController : BaseController
    }
 
    [HttpPut("{id}")]
+   [Authorize]
    public async Task<IActionResult> Update(Guid id, [FromBody] CustomerUpdateRequest customer)
    {
-      var result = await _customerService.UpdateAsync(id, customer);
+      var operatorCustomerId = User.GetCustomerId();
+      var result = await _customerService.UpdateAsync(id, customer, operatorCustomerId);
+      return OkOrNotFound(result);
+   }
+
+   [HttpPatch("{id}/code")]
+   [Authorize]
+   public async Task<IActionResult> UpdateCode(Guid id, [FromBody] CustomerUpdateCodeRequest customer)
+   {
+      var operatorCustomerId = User.GetCustomerId();
+      var result = await _customerService.UpdateCodeAsync(id, customer, operatorCustomerId);
       return OkOrNotFound(result);
    }
 
    [HttpDelete("{id}")]
+   [Authorize]
    public async Task<IActionResult> Delete(Guid id)
    {
       var result = await _customerService.DeleteAsync(id);

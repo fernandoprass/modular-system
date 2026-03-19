@@ -2,6 +2,7 @@ using Asp.Versioning;
 using IAM.Application.Contracts;
 using IAM.Application.Extensions;
 using IAM.Application.Services;
+using IAM.Domain;
 using IAM.Domain.DTOs.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -44,6 +45,7 @@ public class UserController : BaseController
    }
 
    [HttpPost("")]
+   [Authorize]
    public async Task<IActionResult> Create([FromBody] UserCreateRequest request)
    {
       var operatorCustomerId = User.GetCustomerId();

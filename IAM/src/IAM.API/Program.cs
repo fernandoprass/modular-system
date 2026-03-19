@@ -21,6 +21,7 @@ builder.Services.AddDbContext<IamDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("IAM")).
     UseSnakeCaseNamingConvention());
 
+
 DependencyInjection.RegisterRepositories(builder);
 
 DependencyInjection.RegisterOrchestrators(builder);
@@ -30,6 +31,7 @@ DependencyInjection.RegisterServices(builder);
 DependencyInjection.RegisterValidators(builder);
 
 JWTAuthentication.Configure(builder);
+
 
 // Configure API Versioning
 builder.Services.AddApiVersioning(options =>

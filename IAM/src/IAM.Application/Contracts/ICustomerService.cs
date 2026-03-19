@@ -9,8 +9,9 @@ public interface ICustomerService
 {
    Task<CustomerDto?> GetByIdAsync(Guid id);
    string GetRandomCode();
-   Task<CustomerDto?> GetByNameAsync(string name);
-   Task<Result> UpdateAsync(Guid id, CustomerUpdateRequest request);
+   Task<IEnumerable<CustomerDto>> GetByNameAsync(string name);
+   Task<Result> UpdateAsync(Guid id, CustomerUpdateRequest request, Guid operatorCustomerId);
+   Task<Result> UpdateCodeAsync(Guid id, CustomerUpdateCodeRequest request, Guid operatorCustomerId);
    Task<Result> DeleteAsync(Guid id);
    Task<bool> ExistsAsync(Guid id);
    Task<Result> ValidateCreateCustomerAsync(CustomerCreateRequest request);

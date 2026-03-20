@@ -13,6 +13,6 @@ public interface IUserService
    Task<Result> UpdateAsync(Guid id, UserUpdateRequest request);
    Task<Result> UpdatePasswordAsync(UserUpdatePasswordRequest request);
    Task<Result> DeleteAsync(Guid id);
-   Task UpdateLastLoginAsync(Guid id);
+   Task<Result> UpdateLastLoginAsync(Guid id);
    Task<Result> ValidateUserForNewCustomerAsync(CustomerUserCreateRequest request);
 }

@@ -5,7 +5,6 @@ using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;
 using IAM.Domain.Interfaces;
 using IAM.Domain.Mappers;
-using IAM.Domain.Messages;
 using IAM.Domain.Messages.Errors;
 using IAM.Domain.Messages.Info;
 using IAM.Domain.QueryRepositories;
@@ -15,10 +14,9 @@ using Myce.Response;
 
 namespace IAM.Application.Services;
 
-public class UserService : IUserService
+public class UserService : BaseService, IUserService
 {
    private readonly IUnitOfWork _unitOfWork;
-   private readonly IUserContext _userContext;
    private readonly IUserValidator _userValidator;
    private readonly IUserRepository _userRepository;
    private readonly IUserQueryRepository _userQueryRepository;
@@ -28,10 +26,9 @@ public class UserService : IUserService
        IUserContext userContext,
        IUserValidator userValidator,
        IUserRepository userRepository,
-       IUserQueryRepository userQueryRepository)
+       IUserQueryRepository userQueryRepository) : base(userContext)
    {
       _unitOfWork = unitOfWork;
-      _userContext = userContext;
       _userValidator = userValidator;
       _userRepository = userRepository;
       _userQueryRepository = userQueryRepository;
@@ -50,46 +47,45 @@ public class UserService : IUserService
    public async Task<Result<UserDto>> CreateUserAsync(UserCreateRequest request,
                                                       bool customerExists)
    {
-      bool emailExists = await EmailExistsAsync(request.Email);
-
-      if (request.CustomerId != _userContext.UserId)
+      return await ExecuteIfUserOwnsAsync(request.CustomerId, async () =>
       {
-         return Result<UserDto>.Failure(new ForbiddenCustomerError());
-      }
+         bool emailExists = await EmailExistsAsync(request.Email);
 
-      var validation = _userValidator.ValidateCreate(request, customerExists, emailExists);
-      if (validation.HasError)
-      {
-         return Result<UserDto>.Failure(validation.Messages);
-      }
+         var validation = _userValidator.ValidateCreate(request, customerExists, emailExists);
+         if (validation.HasError)
+         {
+            return Result<UserDto>.Failure(validation.Messages);
+         }
 
-      var user = User.Create(
-          request.Name,
-          request.Email,
-          Argon2.Hash(request.Password),
-          request.CustomerId);
+         var user = User.Create(
+             request.Name,
+             request.Email,
+             Argon2.Hash(request.Password),
+             request.CustomerId);
 
-      await _unitOfWork.Users.AddAsync(user);
-      await _unitOfWork.SaveChangesAsync();
+         await _unitOfWork.Users.AddAsync(user);
+         await _unitOfWork.SaveChangesAsync();
 
-      return Result<UserDto>.Success(user.ToUserDto());
+         return Result<UserDto>.Success(user.ToUserDto());
+      });
    }
 
    public async Task<Result> UpdateAsync(Guid id, UserUpdateRequest request)
    {
-      var user = await _userRepository.GetByIdAsync(id);
-
-      var validator = _userValidator.ValidateUpdate(user?.Id, request);
-      if (validator.HasError)
+      return await ExecuteIfUserOwnsAsync(id, async () =>
       {
-         return Result.Failure(validator.Messages);
-      }
+         var user = await _userRepository.GetByIdAsync(id);
 
-      user.Update(request.Name, request.IsActive);
+         var validator = _userValidator.ValidateUpdate(user?.Id, request);
+         if (validator.HasError)
+         {
+            return Result.Failure(validator.Messages);
+         }
 
-      _unitOfWork.Users.Update(user);
-      await _unitOfWork.SaveChangesAsync();
-      return Result.Success(new SuccessInfo());
+         user.Update(request.Name, request.IsActive);
+
+         return await CommitUpdateAsync(user);
+      });
    }
 
    public async Task<Result> UpdatePasswordAsync(UserUpdatePasswordRequest request)
@@ -104,9 +100,7 @@ public class UserService : IUserService
       
       user.UpdatePassword(Argon2.Hash(request.PasswordNew));
 
-      _unitOfWork.Users.Update(user);
-      await _unitOfWork.SaveChangesAsync();
-      return Result.Success(new SuccessInfo());
+      return await CommitUpdateAsync(user);
    }
 
    public async Task<Result> DeleteAsync(Guid id)
@@ -118,17 +112,21 @@ public class UserService : IUserService
          return Result.Failure(new NotFoundError(Const.Entity.User));
       }
 
-      await _unitOfWork.Users.DeleteAsync(id);
-      await _unitOfWork.SaveChangesAsync();
-      return Result.Success(new SuccessInfo());
+      return await ExecuteIfUserOwnsAsync(user.CustomerId, async () =>
+      {
+         await _unitOfWork.Users.DeleteAsync(id);
+         await _unitOfWork.SaveChangesAsync();
+         return Result.Success(new SuccessInfo());
+      });
    }
 
-   public async Task UpdateLastLoginAsync(Guid id)
+   public async Task<Result> UpdateLastLoginAsync(Guid id)
    {
       var user = await _userRepository.GetByIdAsync(id);
 
       user.UpdateLastLogin();
-      await _unitOfWork.SaveChangesAsync();
+
+      return await CommitUpdateAsync(user);
    }
 
    public async Task<Result> ValidateUserForNewCustomerAsync(CustomerUserCreateRequest request)
@@ -144,5 +142,13 @@ public class UserService : IUserService
 
       var emailExists = userId != Guid.Empty;
       return emailExists;
+   }
+
+   private async Task<Result> CommitUpdateAsync(User user)
+   {
+      _unitOfWork.Users.Update(user);
+      await _unitOfWork.SaveChangesAsync();
+
+      return Result.Success(new SuccessInfo());
    }
 }

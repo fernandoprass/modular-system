@@ -7,5 +7,5 @@ namespace IAM.Application.Contracts;
 public interface IRegisterOrchestrator
 {
    Task<Result<CustomerDto>> RegisterCustomerAsync(CustomerCreateRequest customerCreate); 
-   Task<Result<UserDto>> RegisterUserAsync(UserCreateRequest request, Guid operatorCustomerId);
+   Task<Result<UserDto>> RegisterUserAsync(UserCreateRequest request);
 }

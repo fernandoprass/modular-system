@@ -3,6 +3,7 @@ using IAM.Domain;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;
+using IAM.Domain.Interfaces;
 using IAM.Domain.Mappers;
 using IAM.Domain.Messages;
 using IAM.Domain.Messages.Errors;
@@ -17,17 +18,20 @@ namespace IAM.Application.Services;
 public class UserService : IUserService
 {
    private readonly IUnitOfWork _unitOfWork;
+   private readonly IUserContext _userContext;
    private readonly IUserValidator _userValidator;
    private readonly IUserRepository _userRepository;
    private readonly IUserQueryRepository _userQueryRepository;
 
    public UserService(
        IUnitOfWork unitOfWork,
+       IUserContext userContext,
        IUserValidator userValidator,
        IUserRepository userRepository,
        IUserQueryRepository userQueryRepository)
    {
       _unitOfWork = unitOfWork;
+      _userContext = userContext;
       _userValidator = userValidator;
       _userRepository = userRepository;
       _userQueryRepository = userQueryRepository;
@@ -44,12 +48,11 @@ public class UserService : IUserService
    }
 
    public async Task<Result<UserDto>> CreateUserAsync(UserCreateRequest request,
-                                                      Guid operatorCustomerId,
                                                       bool customerExists)
    {
       bool emailExists = await EmailExistsAsync(request.Email);
 
-      if (request.CustomerId != operatorCustomerId)
+      if (request.CustomerId != _userContext.UserId)
       {
          return Result<UserDto>.Failure(new ForbiddenCustomerError());
       }

@@ -1,0 +1,17 @@
+meta {
+  name: code
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{server}}/api/{{version}}/iam/customers/550e8400-e29b-41d4-a716-446655440000/code
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "code": "ABC.123"
+  }
+}

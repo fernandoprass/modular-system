@@ -1,5 +1,6 @@
 using IAM.Application.Contracts;
 using IAM.Domain.DTOs.Requests;
+using IAM.Domain.Interfaces;
 using IAM.Domain.Messages.Errors;
 using Myce.FluentValidator;
 using Myce.Response;

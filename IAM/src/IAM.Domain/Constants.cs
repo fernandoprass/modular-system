@@ -7,11 +7,6 @@
          public const string CustomerId = "customerId";
       }
 
-      public static class Handler 
-      {
-         public const string OwnerOnly = "OwnerOnly";
-      }
-
       public static class Customer
       {
          public const byte RandomCodeSize = 10;

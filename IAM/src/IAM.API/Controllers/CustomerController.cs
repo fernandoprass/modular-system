@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using IAM.Application.Contracts;
 using IAM.Application.Extensions;
-using IAM.Domain;
 using IAM.Domain.DTOs.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -50,8 +49,7 @@ public class CustomerController : BaseController
    [Authorize]
    public async Task<IActionResult> Update(Guid id, [FromBody] CustomerUpdateRequest customer)
    {
-      var operatorCustomerId = User.GetCustomerId();
-      var result = await _customerService.UpdateAsync(id, customer, operatorCustomerId);
+      var result = await _customerService.UpdateAsync(id, customer);
       return OkOrNotFound(result);
    }
 
@@ -59,8 +57,7 @@ public class CustomerController : BaseController
    [Authorize]
    public async Task<IActionResult> UpdateCode(Guid id, [FromBody] CustomerUpdateCodeRequest customer)
    {
-      var operatorCustomerId = User.GetCustomerId();
-      var result = await _customerService.UpdateCodeAsync(id, customer, operatorCustomerId);
+      var result = await _customerService.UpdateCodeAsync(id, customer);
       return OkOrNotFound(result);
    }
 

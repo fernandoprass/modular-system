@@ -15,7 +15,6 @@ namespace IAM.Application.Orchestrators
       private readonly ICustomerService _customerService;
       private readonly ICustomerQueryRepository _customerQueryRepository;
       private readonly IUserService _userService;
-      private readonly IUserQueryRepository _userQueryRepository;
       private readonly IUnitOfWork _unitOfWork;
       
 
@@ -23,25 +22,23 @@ namespace IAM.Application.Orchestrators
          ICustomerService customerService,
          ICustomerQueryRepository customerQueryRepository,
          IUserService userService,
-         IUserQueryRepository userQueryRepository,
          IUnitOfWork unitOfWork)
       {
          _customerService = customerService;
          _customerQueryRepository = customerQueryRepository;
          _userService = userService;
-         _userQueryRepository = userQueryRepository;
          _unitOfWork = unitOfWork;  
       }
 
-      public async Task<Result<UserDto>> RegisterUserAsync(UserCreateRequest request, Guid operatorCustomerId)
+      public async Task<Result<UserDto>> RegisterUserAsync(UserCreateRequest request)
       {
          var customerDto = await _customerQueryRepository.GetByIdAsync(request.CustomerId);
 
          var customerExists = customerDto is not null;
 
-         var result = await _userService.CreateUserAsync(request, operatorCustomerId, customerExists);
+         var result = await _userService.CreateUserAsync(request, customerExists);
 
-         if (result.IsValid) { 
+         if (result.IsSuccess) { 
             result.Data.CustomerName = customerDto.Name; 
          }
          

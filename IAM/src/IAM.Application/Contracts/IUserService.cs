@@ -9,7 +9,6 @@ public interface IUserService
    Task<UserDto?> GetByIdAsync(Guid id);
    Task<IEnumerable<UserLiteDto>> GetByCustomerIdAsync(Guid customerId);
    Task<Result<UserDto>> CreateUserAsync(UserCreateRequest request,
-                                         Guid operatorCustomerId,
                                          bool customerExists);
    Task<Result> UpdateAsync(Guid id, UserUpdateRequest request);
    Task<Result> UpdatePasswordAsync(UserUpdatePasswordRequest request);

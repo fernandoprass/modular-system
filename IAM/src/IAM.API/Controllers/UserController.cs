@@ -2,7 +2,6 @@ using Asp.Versioning;
 using IAM.Application.Contracts;
 using IAM.Application.Extensions;
 using IAM.Application.Services;
-using IAM.Domain;
 using IAM.Domain.DTOs.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -48,8 +47,7 @@ public class UserController : BaseController
    [Authorize]
    public async Task<IActionResult> Create([FromBody] UserCreateRequest request)
    {
-      var operatorCustomerId = User.GetCustomerId();
-      var user = await _registerOrchestrator.RegisterUserAsync(request, operatorCustomerId);
+      var user = await _registerOrchestrator.RegisterUserAsync(request);
 
       return OkOrNotFound(user);
    }

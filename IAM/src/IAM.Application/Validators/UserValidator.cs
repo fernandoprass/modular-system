@@ -22,7 +22,7 @@ namespace IAM.Application.Validators
                .RuleFor(x => x.Password).ApplyTemplate(ValidatorTemplate.PasswordRules)
                .RuleFor(x => x.CustomerId).IsRequired()
                .RuleForValue(emailAlreadyExists).IsFalse(new EmailAlreadyExistError(request.Email))
-               .RuleForValue(customerExists).IsFalse(new NotFoundError(Const.Entity.Customer));
+               .RuleForValue(customerExists).IsTrue(new NotFoundError(Const.Entity.Customer));
 
          var isValid = validator.Validate(request);
 
@@ -60,7 +60,7 @@ namespace IAM.Application.Validators
 
          var validator = new FluentValidator<UserUpdatePasswordRequest>()
             .RuleForValue(user).IsNotNull(new NotFoundError(Const.Entity.User))
-            .RuleFor(x => x.Email).IsRequired().IsValidEmailAddress()
+            .RuleFor(x => x.Email).ApplyTemplate(ValidatorTemplate.EmailRules)
             .RuleFor(x => x.PasswordOld).IsRequired()
             .RuleForValue(isOldPasswordCorrect).IsTrue(new PasswordNotValidError())
             .RuleFor(x => x.PasswordNew).ApplyTemplate(ValidatorTemplate.PasswordRules);

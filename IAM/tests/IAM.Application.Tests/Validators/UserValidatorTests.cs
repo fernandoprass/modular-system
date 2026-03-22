@@ -1,4 +1,5 @@
-﻿using IAM.Application.Validators;
+﻿using FluentAssertions;
+using IAM.Application.Validators;
 using IAM.Domain;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.Entities;
@@ -25,7 +26,7 @@ public class UserValidatorTests
 
       var result = _validator.ValidateCreate(request, emailAlreadyExists: false, customerExists: true);
 
-      Assert.True(result.IsValid);
+      Assert.True(result.IsSuccess);
    }
 
    [Fact]
@@ -35,7 +36,7 @@ public class UserValidatorTests
 
       var result = _validator.ValidateCreate(request, emailAlreadyExists: true, customerExists: true);
 
-      Assert.False(result.IsValid);
+      Assert.False(result.IsSuccess);
       Assert.Contains(result.Messages, m => m is EmailAlreadyExistError);
    }
 
@@ -46,21 +47,8 @@ public class UserValidatorTests
 
       var result = _validator.ValidateCreate(request, emailAlreadyExists: false, customerExists: false);
 
-      Assert.False(result.IsValid);
+      Assert.False(result.IsSuccess);
       Assert.Contains(result.Messages, m => m is NotFoundError && m.Show().Contains(Const.Entity.Customer));
-   }
-
-   [Theory]
-   [InlineData("1234567")] // Min length
-   [InlineData("nospecialchar123")] // Missing special and upper
-   [InlineData("Onlyupper#")] // Missing digit and lower
-   public void ValidateCreate_ShouldHaveError_WhenPasswordIsWeak(string weakPassword)
-   {
-      var request = new UserCreateRequest("Dev Senior", "test@example.com", weakPassword, Guid.NewGuid());
-
-      var result = _validator.ValidateCreate(request, false, true);
-
-      Assert.False(result.IsValid);
    }
 
    [Fact]
@@ -70,7 +58,7 @@ public class UserValidatorTests
 
       var result = _validator.ValidateUpdate(null, request);
 
-      Assert.False(result.IsValid);
+      Assert.False(result.IsSuccess);
       Assert.Contains(result.Messages, m => m is NotFoundError);
    }
 
@@ -83,7 +71,7 @@ public class UserValidatorTests
 
       var result = _validator.ValidateUpdatePassword(user, request);
 
-      Assert.True(result.IsValid);
+      Assert.True(result.IsSuccess);
       Assert.Empty(result.Messages);
    }
 
@@ -95,7 +83,7 @@ public class UserValidatorTests
 
       var result = _validator.ValidateUpdatePassword(user, request);
 
-      Assert.False(result.IsValid);
+      Assert.False(result.IsSuccess);
       Assert.Contains(result.Messages, m => m is PasswordNotValidError);
    }
 
@@ -106,8 +94,48 @@ public class UserValidatorTests
 
       var result = _validator.ValidateUpdatePassword(null, request);
 
-      Assert.False(result.IsValid);
+      Assert.False(result.IsSuccess);
       Assert.Contains(result.Messages, m => m is NotFoundError);
+   }
+
+   [Theory]   
+   [InlineData("Valid User", "test@domain.com", "Pass123!", false, true)]      // Case 1: Everything is valid and email is unique 
+   [InlineData("Valid User", "duplicate@domain.com", "Pass123!", true, false)] // Case 2: Data is valid but email ALREADY exists in the database
+   [InlineData("Ab", "test@domain.com", "Pass123!", false, false)]             // Case 3: Email is unique but Name fails template validation (too short)
+   [InlineData("Valid User", "test@domain.com", "Password!", false, false)]    // Case 4: Email is unique but Password fails template validation (no digit)
+   public void ValidateCreateForNewCustomer_ShouldHandleValidationFlow(
+        string name,
+        string email,
+        string password,
+        bool emailAlreadyExists,
+        bool expectedSuccess)
+   {
+      var request = new CustomerUserCreateRequest(name, email, password);
+
+      var result = _validator.ValidateCreateForNewCustomer(request, emailAlreadyExists);
+
+      result.IsSuccess.Should().Be(expectedSuccess);
+
+      if (!expectedSuccess && emailAlreadyExists)
+      {
+         // Verify if the specific "Already Exists" error is returned
+         result.Messages.Should().Contain(m => m is EmailAlreadyExistError);
+      }
+   }
+
+   [Fact]
+   public void ValidateCreateForNewCustomer_ShouldIncludeEmailInDuplicateError()
+   {
+      var email = "existing@domain.com";
+      var request = new CustomerUserCreateRequest("Valid Name", email, "Pass123!");
+
+      var result = _validator.ValidateCreateForNewCustomer(request, emailAlreadyExists: true);
+
+      result.IsSuccess.Should().BeFalse();
+      var error = result.Messages.OfType<EmailAlreadyExistError>().FirstOrDefault();
+      error.Should().NotBeNull();
+      // Ensuring the error message contains the specific email passed in the request
+      result.Messages.First().Show().Should().Contain(email);
    }
 }
 

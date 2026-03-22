@@ -1,6 +1,5 @@
 using IAM.Application.Contracts;
 using IAM.Domain.DTOs.Requests;
-using IAM.Domain.Interfaces;
 using IAM.Domain.Messages.Errors;
 using Myce.FluentValidator;
 using Myce.Response;
@@ -14,12 +13,10 @@ public class CustomerValidator : ICustomerValidator
 
    public Result ValidateCreate(CustomerCreateRequest request, bool codeExists)
    {
-      bool isValidType = Enum.IsDefined(typeof(CustomerType), request.Type);
-
       var validator = new FluentValidator<CustomerCreateRequest>()
           .RuleFor(x => x.Type).IsInEnum(new InvalidCustomerTypeError())
           .RuleFor(x => x.Name).ApplyTemplate(ValidatorTemplate.NameRules)
-          .RuleFor(x => x.Code).ApplyTemplate(CodeRules).If(x => x.Type.Equals(CustomerType.Company))
+          .RuleFor(x => x.Code).If(x => x.Type.Equals(CustomerType.Company), x => x.ApplyTemplate(CodeRules))
           .RuleForValue(codeExists).IsFalse(new DuplicateCustomerCodeError(request.Code));
 
       var isValid = validator.Validate(request);

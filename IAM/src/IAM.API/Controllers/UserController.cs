@@ -1,6 +1,5 @@
 using Asp.Versioning;
 using IAM.Application.Contracts;
-using IAM.Application.Extensions;
 using IAM.Application.Services;
 using IAM.Domain.DTOs.Requests;
 using Microsoft.AspNetCore.Authorization;

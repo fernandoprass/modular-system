@@ -6,6 +6,6 @@ namespace IAM.Application.Contracts;
 public interface ICustomerValidator
 {
    Result ValidateCreate(CustomerCreateRequest request, bool codeExists);
-   Result ValidateUpdate(CustomerUpdateRequest request);
+   Result ValidateUpdate(CustomerUpdateRequest request, bool customerExists);
    Result ValidateUpdateCode(CustomerUpdateCodeRequest request, bool newCodeExists);
 }

@@ -5,13 +5,17 @@ meta {
 }
 
 patch {
-  url: {{server}}/api/{{version}}/iam/customers/550e8400-e29b-41d4-a716-446655440000/code
+  url: {{server}}/api/{{version}}/iam/customers/b0000000-0000-0000-0000-000000000001/code
   body: json
-  auth: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
 }
 
 body:json {
   {
-    "code": "ABC.123"
+    "code": "BEATLES"
   }
 }

@@ -30,7 +30,10 @@ namespace IAM.Application.Tests.Validators
           bool codeExists,
           bool expectedSuccess)
       {
-         var request = new CustomerCreateRequest(type, name, code, "description", null);
+         //just to provid a user, validation is done in UserValidator
+         var user = new CustomerUserCreateRequest(string.Empty, string.Empty, string.Empty);
+
+         var request = new CustomerCreateRequest(type, name, code, "description", user);
 
          var result = _validator.ValidateCreate(request, codeExists);
 
@@ -47,14 +50,15 @@ namespace IAM.Application.Tests.Validators
       #region ValidateUpdate Tests
 
       [Theory]
-      [InlineData("Valid Name", true)]
-      [InlineData("", false)]
-      [InlineData("Ab", false)] // Assuming min length 3 in NameRules
-      public void ValidateUpdate_ShouldValidateName(string name, bool expectedSuccess)
+      [InlineData("Valid Name", true, true)]
+      [InlineData("Valid Name", false, false)]
+      [InlineData("", true, false)]
+      [InlineData("Ab", true, false)] // Assuming min length 3 in NameRules
+      public void ValidateUpdate_ShouldValidateName(string name, bool customerExists, bool expectedSuccess)
       {
-         var request = new CustomerUpdateRequest(name, string.Empty, true);
+         var request = new CustomerUpdateRequest(name, string.Empty, IsActive : true);
 
-         var result = _validator.ValidateUpdate(request);
+         var result = _validator.ValidateUpdate(request, customerExists);
 
          result.IsSuccess.Should().Be(expectedSuccess);
       }

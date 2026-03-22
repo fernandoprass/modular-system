@@ -22,8 +22,8 @@ public class DatabaseSeederTest
       services.AddScoped<IUnitOfWork, Infrastructure.Repositories.UnitOfWork>();
 
       // Register repositories
-      services.AddScoped<Domain.Repositories.ICustomerRepository, Infrastructure.Repositories.CustomerRepository>();
-      services.AddScoped<Domain.Repositories.IUserRepository, Infrastructure.Repositories.UserRepository>();
+      services.AddScoped<ICustomerRepository, Infrastructure.Repositories.CustomerRepository>();
+      services.AddScoped<IUserRepository, Infrastructure.Repositories.UserRepository>();
 
       // Register Seeder
       services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();

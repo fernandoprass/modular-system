@@ -4,7 +4,6 @@ using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Interfaces;
 using IAM.Domain.Messages;
-using IAM.Domain.Messages.Errors;
 using IAM.Domain.Messages.Info;
 using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
@@ -12,26 +11,24 @@ using Myce.Response;
 
 namespace IAM.Application.Services;
 
-public class CustomerService : ICustomerService
+public class CustomerService : BaseService, ICustomerService
 {
    private readonly ICustomerQueryRepository _customerQueryRepository;
    private readonly ICustomerRepository _customerRepository;
    private readonly ICustomerValidator _customerValidator;   
    private readonly IUnitOfWork _unitOfWork;
-   private readonly IUserContext _userContext;
 
    public CustomerService(
        ICustomerQueryRepository customerQueryRepository,
        ICustomerRepository customerRepository,
        ICustomerValidator customerValidator,
        IUnitOfWork unitOfWork,
-       IUserContext userContext)
+       IUserContext userContext) : base(userContext)
    {
       _customerQueryRepository = customerQueryRepository;
       _customerRepository = customerRepository;
       _customerValidator = customerValidator;
-      _unitOfWork = unitOfWork;
-      _userContext = userContext;      
+      _unitOfWork = unitOfWork;  
    }
    public async Task<Result> ValidateCreateCustomerAsync(CustomerCreateRequest request)
    {
@@ -66,73 +63,48 @@ public class CustomerService : ICustomerService
 
    public async Task<Result> UpdateAsync(Guid id, CustomerUpdateRequest request)
    {
-      if (id != _userContext.CustomerId)
+      return await ExecuteIfUserOwnsAsync(id, async () =>
       {
-         return Result.Failure(new ForbiddenCustomerError());
-      }
+         var customer = await _customerRepository.GetByIdAsync(id);
+         var customerExists = customer is not null;
 
-      var validation = _customerValidator.ValidateUpdate(request);
-      if (validation.HasError)
-      {
-         return Result.Failure(validation.Messages);
-      }
+         var validation = _customerValidator.ValidateUpdate(request, customerExists);
+         if (validation.HasError)
+         {
+            return Result.Failure(validation.Messages);
+         }
 
-      var customer = await _unitOfWork.Customers.GetByIdAsync(id);
-      if (customer == null)
-      {
-         return Result.Failure(new NotFoundError(Const.Entity.Customer));
-      }
+         customer.Update(request.Name, request.Description, request.IsActive);
 
-      customer.Update(request.Name, request.Description, request.IsActive);
-
-      _unitOfWork.Customers.Update(customer);
-      await _unitOfWork.SaveChangesAsync();
-
-      return Result.Success(new SuccessInfo());
+         return await CommitUpdateAsync(customer);
+      });
    }
 
    public async Task<Result> UpdateCodeAsync(Guid id, CustomerUpdateCodeRequest request)
    {
-      if (id != _userContext.CustomerId)
+      return await ExecuteIfUserOwnsAsync(id, async () =>
       {
-         return Result.Failure(new ForbiddenCustomerError());
-      }
+         var customer = await _customerRepository.GetByCodeAsync(request.Code);
+         var newCodeExists = customer is not null;
 
-      var customer = await _customerRepository.GetByCodeAsync(request.Code);
-      var newCodeExists = customer is null;
+         var validation = _customerValidator.ValidateUpdateCode(request, newCodeExists);
+         if (validation.HasError)
+         {
+            return Result.Failure(validation.Messages);
+         }
+         
+         customer = await _customerRepository.GetByIdAsync(id);
+         customer.Update(request.Code);
 
-      customer = await _customerRepository.GetByIdAsync(id);
+         return await CommitUpdateAsync(customer);
+      });
+   }
 
-      var validation = _customerValidator.ValidateUpdateCode(request, newCodeExists);
-      if (validation.HasError)
-      {
-         return Result.Failure(validation.Messages);
-      }
-
-      customer.Update(request.Code);
-
+   private async Task<Result> CommitUpdateAsync(Domain.Entities.Customer customer)
+   {
       _unitOfWork.Customers.Update(customer);
       await _unitOfWork.SaveChangesAsync();
 
       return Result.Success(new SuccessInfo());
-   }
-
-   public async Task<Result> DeleteAsync(Guid id)
-   {
-      var customer = await _unitOfWork.Customers.GetByIdAsync(id);
-      if (customer == null)
-      {
-         return Result.Failure(new NotFoundError(Const.Entity.Customer));
-      }
-
-      await _unitOfWork.Customers.DeleteAsync(id);
-      await _unitOfWork.SaveChangesAsync();
-
-      return Result.Success(new SuccessInfo());
-   }
-
-   public async Task<bool> ExistsAsync(Guid id)
-   {
-      return await _unitOfWork.Customers.ExistsAsync(id);
    }
 }

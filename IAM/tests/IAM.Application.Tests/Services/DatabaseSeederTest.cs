@@ -1,9 +1,10 @@
+using IAM.Application.Services;
 using IAM.Domain.Repositories;
 using IAM.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace IAM.Application.Services.Tests;
+namespace IAM.Application.Tests.Services;
 
 public class DatabaseSeederTest
 {

@@ -20,5 +20,5 @@ public class InvalidCustomerCodeFormatError : ErrorMessage
 public class InvalidCustomerTypeError : ErrorMessage
 {
    public InvalidCustomerTypeError()
-       : base("InvalidCustomerTypeError", "Invalid Type, use 1 for a Company and 2 for a Person.") { }
+       : base("InvalidCustomerTypeError", "Invalid Type, inform 1 for a Company and 2 for an Individual.") { }
 }

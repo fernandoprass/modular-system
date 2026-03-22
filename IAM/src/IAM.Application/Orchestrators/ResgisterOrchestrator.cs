@@ -1,8 +1,13 @@
 ﻿using IAM.Application.Contracts;
+using IAM.Application.Services;
+using IAM.Domain;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;
+using IAM.Domain.Interfaces;
 using IAM.Domain.Mappers;
+using IAM.Domain.Messages.Errors;
+using IAM.Domain.Messages.Info;
 using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
 using Isopoh.Cryptography.Argon2;
@@ -10,22 +15,25 @@ using Myce.Response;
 
 namespace IAM.Application.Orchestrators
 {
-   public class ResgisterOrchestrator : IRegisterOrchestrator
+   public class ResgisterOrchestrator : BaseService, IRegisterOrchestrator
    {
       private readonly ICustomerService _customerService;
       private readonly ICustomerQueryRepository _customerQueryRepository;
+      private readonly IUserRepository _userRepository;
       private readonly IUserService _userService;
       private readonly IUnitOfWork _unitOfWork;
       
-
       public ResgisterOrchestrator(
          ICustomerService customerService,
          ICustomerQueryRepository customerQueryRepository,
+         IUserContext userContext,
+         IUserRepository userRepository,
          IUserService userService,
-         IUnitOfWork unitOfWork)
+         IUnitOfWork unitOfWork) : base (userContext)
       {
          _customerService = customerService;
          _customerQueryRepository = customerQueryRepository;
+         _userRepository = userRepository;
          _userService = userService;
          _unitOfWork = unitOfWork;  
       }
@@ -74,6 +82,30 @@ namespace IAM.Application.Orchestrators
          await _unitOfWork.SaveChangesAsync();
 
          return Result<CustomerDto>.Success(customer.ToCustomerDto());
+      }
+
+      public async Task<Result> DeleteCustomerAsync(Guid id)
+      {
+         return await ExecuteIfUserOwnsAsync(id, async () =>
+         {
+            var customer = await _unitOfWork.Customers.GetByIdAsync(id);
+            if (customer == null)
+            {
+               return Result.Failure(new NotFoundError(Const.Entity.Customer));
+            }
+
+            await _unitOfWork.Customers.DeleteAsync(id);
+
+            var users = await _userRepository.GetByCustomerIdAsync(id);
+            foreach(var user in users)
+            {
+               await _unitOfWork.Users.DeleteAsync(user.Id);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return Result.Success(new SuccessInfo());
+         });
       }
    }
 }

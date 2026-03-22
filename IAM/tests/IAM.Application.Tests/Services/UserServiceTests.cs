@@ -3,6 +3,7 @@ using IAM.Application.Contracts;
 using IAM.Application.Services;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.Entities;
+using IAM.Domain.Interfaces;
 using IAM.Domain.Messages;
 using IAM.Domain.Messages.Errors;
 using IAM.Domain.QueryRepositories;
@@ -14,56 +15,58 @@ namespace IAM.Application.Tests.Services;
 
 public class UserServiceTests
 {
-   private readonly IUnitOfWork _unitOfWork;
-   private readonly IUserValidator _userValidator;
-   private readonly IUserRepository _userRepository;
-   private readonly IUserQueryRepository _userQueryRepository;
-   private readonly UserService _sut;
+   private readonly IUnitOfWork _unitOfWorkMock;
+   private readonly IUserValidator _userValidatorMock;
+   private readonly IUserContext _userContextMock;
+   private readonly IUserRepository _userRepositoryMock;
+   private readonly IUserQueryRepository _userQueryRepositoryMock;
+   private readonly UserService _userService;
 
    public UserServiceTests()
    {
-      _unitOfWork = Substitute.For<IUnitOfWork>();
-      _userValidator = Substitute.For<IUserValidator>();
-      _userRepository = Substitute.For<IUserRepository>();
-      _userQueryRepository = Substitute.For<IUserQueryRepository>();
+      _unitOfWorkMock = Substitute.For<IUnitOfWork>();
+      _userContextMock = Substitute.For<IUserContext>();
+      _userValidatorMock = Substitute.For<IUserValidator>();
+      _userRepositoryMock = Substitute.For<IUserRepository>();
+      _userQueryRepositoryMock = Substitute.For<IUserQueryRepository>();
+      
+      _unitOfWorkMock.Users.Returns(_userRepositoryMock);
+      _userContextMock.CustomerId.Returns(Guid.CreateVersion7());
 
-      _unitOfWork.Users.Returns(_userRepository);
-
-      _sut = new UserService(
-          _unitOfWork,
-          _userValidator,
-          _userRepository,
-          _userQueryRepository);
+      _userService = new UserService(
+          _unitOfWorkMock,
+          _userContextMock,
+          _userValidatorMock,
+          _userRepositoryMock,
+          _userQueryRepositoryMock);
    }
 
    [Fact]
    public async Task CreateUserAsync_ShouldReturnForbiddenCustomerError_WhenOperatorIdDoesNotMatch()
    {
       var request = new UserCreateRequest(string.Empty, "test@test.com" , string.Empty, Guid.NewGuid());
-      var differentOperatorId = Guid.NewGuid();
 
-      var result = await _sut.CreateUserAsync(request, differentOperatorId, true, false);
+      var result = await _userService.CreateUserAsync(request, true);
 
-      result.IsValid.Should().BeFalse();
+      result.IsSuccess.Should().BeFalse();
       result.Messages.Should().ContainSingle(m => m is ForbiddenCustomerError);
 
-      await _unitOfWork.DidNotReceive().SaveChangesAsync();
+      await _unitOfWorkMock.DidNotReceive().SaveChangesAsync();
    }
 
    [Fact]
    public async Task CreateUserAsync_ShouldReturnValidationErrors_WhenValidatorFails()
    {
-      var customerId = Guid.NewGuid();
-      var request = new UserCreateRequest("John Smith", "test@test.com", string.Empty, customerId);
+      var request = new UserCreateRequest("John Smith", "test@test.com", string.Empty, _userContextMock.CustomerId);
 
-      _userValidator.ValidateCreate(request, true, true)
+      _userValidatorMock.ValidateCreate(request, true, true)
           .Returns(Result.Failure(new EmailAlreadyExistError(request.Email)));
 
-      var result = await _sut.CreateUserAsync(request, customerId, true, true);
+      var result = await _userService.CreateUserAsync(request, true);
 
-      result.IsValid.Should().BeFalse();
+      result.IsSuccess.Should().BeFalse();
       result.Messages.Should().Contain(m => m is EmailAlreadyExistError);
-      await _unitOfWork.DidNotReceive().SaveChangesAsync();
+      await _unitOfWorkMock.DidNotReceive().SaveChangesAsync();
    }
 
    [Fact]
@@ -72,28 +75,28 @@ public class UserServiceTests
       var customerId = Guid.NewGuid();
       var request = new UserCreateRequest("John Doe", "new@test.com", "SecurePassword123", customerId);
 
-      _userValidator.ValidateCreate(request, true, false)
+      _userValidatorMock.ValidateCreate(request, true, false)
           .Returns(Result.Success());
 
-      var result = await _sut.CreateUserAsync(request, customerId, true, false);
+      var result = await _userService.CreateUserAsync(request, true);
 
-      result.IsValid.Should().BeTrue();
+      result.IsSuccess.Should().BeTrue();
 
-      await _unitOfWork.Users.Received(1).AddAsync(Arg.Any<User>());
-      await _unitOfWork.Received(1).SaveChangesAsync();
+      await _unitOfWorkMock.Users.Received(1).AddAsync(Arg.Any<User>());
+      await _unitOfWorkMock.Received(1).SaveChangesAsync();
    }
 
    [Fact]
    public async Task DeleteAsync_ShouldReturnNotFoundError_WhenUserDoesNotExist()
    {
       var userId = Guid.NewGuid();
-      _userRepository.GetByIdAsync(userId).Returns((User)null);
+      _userRepositoryMock.GetByIdAsync(userId).Returns((User)null);
 
-      var result = await _sut.DeleteAsync(userId);
+      var result = await _userService.DeleteAsync(userId);
 
-      result.IsValid.Should().BeFalse();
+      result.IsSuccess.Should().BeFalse();
       result.Messages.Should().ContainSingle(m => m is NotFoundError);
 
-      await _unitOfWork.Users.DidNotReceive().DeleteAsync(Arg.Any<Guid>());
+      await _unitOfWorkMock.Users.DidNotReceive().DeleteAsync(Arg.Any<Guid>());
    }
 }

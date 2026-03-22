@@ -8,4 +8,5 @@ public interface IRegisterOrchestrator
 {
    Task<Result<CustomerDto>> RegisterCustomerAsync(CustomerCreateRequest customerCreate); 
    Task<Result<UserDto>> RegisterUserAsync(UserCreateRequest request);
+   Task<Result> DeleteCustomerAsync(Guid id);
 }

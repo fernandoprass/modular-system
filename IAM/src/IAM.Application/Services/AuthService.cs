@@ -1,4 +1,5 @@
 using IAM.Application.Contracts;
+using IAM.Domain;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Mappers;
@@ -62,8 +63,8 @@ public class AuthService(IUserQueryRepository userQueryRepository,
       {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim("name", user.Name),
-            new Claim("customerId", user.CustomerId.ToString()),
+            new Claim(JwtRegisteredClaimNames.Name, user.Name),
+            new Claim(Const.Security.Claim.CustomerId, user.CustomerId.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
@@ -72,8 +73,8 @@ public class AuthService(IUserQueryRepository userQueryRepository,
       var expiresAt = DateTime.UtcNow.AddHours(_jwtExpirationHours);
 
       var token = new JwtSecurityToken(
-          issuer: "IAM.API",
-          audience: "IAM.Client",
+          issuer: Const.Security.Claim.Issuer,
+          audience: Const.Security.Claim.Audience,
           claims: claims,
           expires: expiresAt,
           signingCredentials: creds

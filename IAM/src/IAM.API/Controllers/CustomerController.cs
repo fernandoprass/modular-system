@@ -65,7 +65,7 @@ public class CustomerController : BaseController
    [Authorize]
    public async Task<IActionResult> Delete(Guid id)
    {
-      var result = await _customerService.DeleteAsync(id);
+      var result = await _registerOrchestrator.DeleteCustomerAsync(id);
       return OkOrNotFound(result);
    }
 }

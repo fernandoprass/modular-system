@@ -1,5 +1,5 @@
 public enum CustomerType : byte
 {
     Company = 1,
-    Person = 2,
+    Individual = 2,
 }

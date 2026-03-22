@@ -1,5 +1,7 @@
+using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;
 using IAM.Domain.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace IAM.Infrastructure.Repositories;
 
@@ -9,7 +11,16 @@ public class UserRepository : BaseRepository<User>, IUserRepository
     {
     }
 
-    public void Update(User user)
+   public async Task<IEnumerable<User>> GetByCustomerIdAsync(Guid customerId)
+   {
+      return await _context.Users
+                    .Where(u => u.CustomerId == customerId)
+                  //  .Select(u => u)
+                    .ToListAsync();
+
+   }
+
+   public void Update(User user)
     {
         _dbSet.Update(user);
     }

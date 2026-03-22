@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using IAM.Domain;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -20,8 +21,8 @@ namespace IAM.API.Configure
                    ValidateAudience = true,
                    ValidateLifetime = true,
                    ValidateIssuerSigningKey = true,
-                   ValidIssuer = "IAM.API",
-                   ValidAudience = "IAM.Client",
+                   ValidIssuer = Const.Security.Claim.Issuer,
+                   ValidAudience = Const.Security.Claim.Audience,
                    IssuerSigningKey = new SymmetricSecurityKey(key)
                 };
              });

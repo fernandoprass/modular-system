@@ -8,6 +8,7 @@ using IAM.Domain.Messages;
 using IAM.Domain.Messages.Errors;
 using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
+using IAM.Infrastructure.QueryRepositories;
 using Myce.Response;
 using NSubstitute;
 
@@ -59,7 +60,10 @@ public class UserServiceTests
    {
       var request = new UserCreateRequest("John Smith", "test@test.com", string.Empty, _userContextMock.CustomerId);
 
-      _userValidatorMock.ValidateCreate(request, true, true)
+
+      _userQueryRepositoryMock.GetIdByEmailAsync(request.Email).Returns(Guid.NewGuid());
+
+      _userValidatorMock.ValidateCreate(request,customerExists: true, emailAlreadyExists: true)
           .Returns(Result.Failure(new EmailAlreadyExistError(request.Email)));
 
       var result = await _userService.CreateUserAsync(request, true);
@@ -72,11 +76,11 @@ public class UserServiceTests
    [Fact]
    public async Task CreateUserAsync_ShouldSaveUser_WhenRequestIsValid()
    {
-      var customerId = Guid.NewGuid();
-      var request = new UserCreateRequest("John Doe", "new@test.com", "SecurePassword123", customerId);
+      var request = new UserCreateRequest("John Doe", "new@test.com", "SecurePassword123", _userContextMock.CustomerId);
 
-      _userValidatorMock.ValidateCreate(request, true, false)
-          .Returns(Result.Success());
+      _userQueryRepositoryMock.GetIdByEmailAsync(request.Email).Returns(Guid.Empty);
+
+      _userValidatorMock.ValidateCreate(request, customerExists: true, emailAlreadyExists: false).Returns(Result.Success());
 
       var result = await _userService.CreateUserAsync(request, true);
 

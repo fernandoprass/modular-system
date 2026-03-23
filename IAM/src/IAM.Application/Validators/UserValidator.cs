@@ -60,7 +60,6 @@ namespace IAM.Application.Validators
 
          var validator = new FluentValidator<UserUpdatePasswordRequest>()
             .RuleForValue(user).IsNotNull(new NotFoundError(Const.Entity.User))
-            .RuleFor(x => x.Email).ApplyTemplate(ValidatorTemplate.EmailRules)
             .RuleFor(x => x.PasswordOld).IsRequired()
             .RuleForValue(isOldPasswordCorrect).IsTrue(new PasswordNotValidError())
             .RuleFor(x => x.PasswordNew).ApplyTemplate(ValidatorTemplate.PasswordRules);

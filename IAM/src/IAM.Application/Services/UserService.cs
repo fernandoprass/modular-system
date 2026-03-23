@@ -72,10 +72,9 @@ public class UserService : BaseService, IUserService
 
    public async Task<Result> UpdateAsync(Guid id, UserUpdateRequest request)
    {
-      return await ExecuteIfUserOwnsAsync(id, async () =>
-      {
-         var user = await _userRepository.GetByIdAsync(id);
-
+      var user = await _userRepository.GetByIdAsync(id);
+      return await ExecuteIfUserOwnsAsync(user?.CustomerId, async () =>
+      {    
          var validator = _userValidator.ValidateUpdate(user?.Id, request);
          if (validator.HasError)
          {
@@ -88,13 +87,13 @@ public class UserService : BaseService, IUserService
       });
    }
 
-   public async Task<Result> UpdatePasswordAsync(UserUpdatePasswordRequest request)
+   public async Task<Result> UpdatePasswordAsync(Guid id, UserUpdatePasswordRequest request)
    {
-      var user = await _userQueryRepository.GetByEmailAsync(request.Email);
+      var user = await _userRepository.GetByIdAsync(id);
 
       var validator = _userValidator.ValidateUpdatePassword(user, request);
       if (validator.HasError)
-      {
+      {//todo validate the logged in user is the same as the user being updated  
          return Result.Failure(validator.Messages);
       }
       
@@ -107,13 +106,13 @@ public class UserService : BaseService, IUserService
    {
       var user = await _userRepository.GetByIdAsync(id);
 
-      if (user == null)
+      return await ExecuteIfUserOwnsAsync(user?.CustomerId, async () =>
       {
-         return Result.Failure(new NotFoundError(Const.Entity.User));
-      }
+         if (user == null)
+         {
+            return Result.Failure(new NotFoundError(Const.Entity.User));
+         }
 
-      return await ExecuteIfUserOwnsAsync(user.CustomerId, async () =>
-      {
          await _unitOfWork.Users.DeleteAsync(id);
          await _unitOfWork.SaveChangesAsync();
          return Result.Success(new SuccessInfo());

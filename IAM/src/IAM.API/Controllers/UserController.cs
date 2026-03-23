@@ -60,6 +60,14 @@ public class UserController : BaseController
       return OkOrNotFound(response);
    }
 
+   [HttpPatch("{id}/password")]
+   [Authorize]
+   public async Task<IActionResult> UpdatePassword(Guid id, [FromBody] UserUpdatePasswordRequest request)
+   {
+      var result = await _userService.UpdatePasswordAsync(id, request);
+      return OkOrNotFound(result);
+   }
+
    [HttpDelete("{id}")]
    [Authorize]
    public async Task<IActionResult> Delete(Guid id)

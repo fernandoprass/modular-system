@@ -93,7 +93,7 @@ public class UserService : BaseService, IUserService
 
       var validator = _userValidator.ValidateUpdatePassword(user, request);
       if (validator.HasError)
-      {//todo validate the logged in user is the same as the user being updated  
+      {//todo validate the logged in user is the same as the user being updated and update tests
          return Result.Failure(validator.Messages);
       }
       

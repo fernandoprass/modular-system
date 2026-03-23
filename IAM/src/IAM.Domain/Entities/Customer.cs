@@ -1,15 +1,15 @@
 namespace IAM.Domain.Entities;
 
-public class Customer
+public class Customer : Entity
 {
-   public Guid Id { get; set; }
+   //public Guid Id { get; set; }
    public CustomerType Type { get; set; }
    public string Code { get; set; }
    public string Name { get; set; }
    public string? Description { get; set; }
    public bool IsActive { get; set; } = true;
-   public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-   public DateTime? UpdatedAt { get; set; }
+   //public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+   //public DateTime? UpdatedAt { get; set; }
 
    // Navigation property
    public ICollection<User> Users { get; set; } = new List<User>();

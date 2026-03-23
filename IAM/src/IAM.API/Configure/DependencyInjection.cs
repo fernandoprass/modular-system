@@ -16,11 +16,13 @@ namespace IAM.API.Configure
    {
       public static void RegisterRepositories(WebApplicationBuilder builder)
       {
-         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-         builder.Services.AddScoped<IUserRepository, UserRepository>();
          builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
-         builder.Services.AddScoped<IUserQueryRepository, UserQueryRepository>();
          builder.Services.AddScoped<ICustomerQueryRepository, CustomerQueryRepository>();
+         builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+         builder.Services.AddScoped<IRoleQueryRepository, RoleQueryRepository>();
+         builder.Services.AddScoped<IUserRepository, UserRepository>();
+         builder.Services.AddScoped<IUserQueryRepository, UserQueryRepository>();
+         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
       }
 
       public static void RegisterOrchestrators(WebApplicationBuilder builder)
@@ -30,16 +32,20 @@ namespace IAM.API.Configure
 
       public static void RegisterServices(WebApplicationBuilder builder)
       {
+         builder.Services.AddScoped<IAuthService, AuthService>(); 
          builder.Services.AddScoped<ICustomerService, CustomerService>();
-         builder.Services.AddScoped<IUserService, UserService>();
-         builder.Services.AddScoped<IAuthService, AuthService>();
          builder.Services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
+         builder.Services.AddScoped<IRoleService, RoleService>();
+         builder.Services.AddScoped<IUserService, UserService>();
+         
+         
       }
 
       public static void RegisterValidators(WebApplicationBuilder builder)
       {
-         builder.Services.AddScoped<IUserValidator, UserValidator>();
          builder.Services.AddScoped<ICustomerValidator, CustomerValidator>();
+         builder.Services.AddScoped<IUserValidator, UserValidator>();
+         builder.Services.AddScoped<IRoleValidator, RoleValidator>();
       }
    }
 }

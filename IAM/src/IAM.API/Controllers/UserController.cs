@@ -65,6 +65,7 @@ public class UserController : BaseController
    public async Task<IActionResult> UpdatePassword(Guid id, [FromBody] UserUpdatePasswordRequest request)
    {
       var result = await _userService.UpdatePasswordAsync(id, request);
+
       return OkOrNotFound(result);
    }
 

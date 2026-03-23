@@ -1,4 +1,3 @@
-using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;
 using IAM.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -15,9 +14,7 @@ public class UserRepository : BaseRepository<User>, IUserRepository
    {
       return await _context.Users
                     .Where(u => u.CustomerId == customerId)
-                  //  .Select(u => u)
                     .ToListAsync();
-
    }
 
    public void Update(User user)

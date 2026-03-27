@@ -30,7 +30,7 @@ Run the following command from the root solution directory to apply migrations:
 
 ## 6. Add new migrations after model changes
 After making changes to your entity models, create a new migration with the following command from the root solution directory:
-`dotnet ef migrations add YourMigrationName --project src/IAM.Infrastructure --startup-project src/IAM.API -o Migrations`
+`dotnet ef migrations add IamDbContext --project src/IAM.Infrastructure --startup-project src/IAM.API -o Migrations`
 Then apply the new migration:
 `dotnet ef database update --project src/IAM.Infrastructure --startup-project src/IAM.API`
 

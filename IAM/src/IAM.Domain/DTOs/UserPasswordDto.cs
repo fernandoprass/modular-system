@@ -9,6 +9,7 @@
       public string CustomerName { get; init; } = string.Empty;
       public string PasswordHash { get; init; } = string.Empty;
       public bool IsActive { get; init; }
+      public bool IsSuperUser { get; init; }
       public DateTime CreatedAt { get; init; }
       public DateTime? UpdatedAt { get; init; }
       public DateTime? EmailVerifiedAt { get; set; }

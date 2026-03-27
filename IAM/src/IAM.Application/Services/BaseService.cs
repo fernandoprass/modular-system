@@ -15,7 +15,7 @@ namespace IAM.Application.Services
 
       protected async Task<Result> ExecuteIfUserOwnsAsync(Guid? resourceCustomerId, Func<Task<Result>> actionAsync)
       {
-         if (!resourceCustomerId.HasValue || resourceCustomerId != _userContext.CustomerId)
+         if (!IsUserAlllowedToAccess(resourceCustomerId))
          {
             return Result.Failure(new ForbiddenCustomerError());
          }
@@ -25,7 +25,7 @@ namespace IAM.Application.Services
 
       protected async Task<TResult> ExecuteIfUserOwnsAsync<TResult>(Guid? resourceCustomerId, Func<Task<TResult>> actionAsync) where TResult : Result
       {
-         if (resourceCustomerId != _userContext.CustomerId)
+         if (!IsUserAlllowedToAccess(resourceCustomerId))
          {
             var result = (TResult)Activator.CreateInstance(typeof(TResult))!;
 
@@ -35,6 +35,12 @@ namespace IAM.Application.Services
          }
 
          return await actionAsync();
+      }
+
+      private bool IsUserAlllowedToAccess(Guid? resourceCustomerId)
+      {
+         return _userContext.IsSuperUser ||
+                (resourceCustomerId.HasValue && resourceCustomerId == _userContext.CustomerId);
       }
    }
 }

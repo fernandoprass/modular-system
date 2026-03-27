@@ -5,5 +5,6 @@ public interface IUserContext
 {
    Guid CustomerId { get; }
    bool IsAuthenticated { get; } 
+   bool IsSuperUser { get; }
    Guid UserId { get; }
 }

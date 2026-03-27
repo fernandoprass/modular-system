@@ -83,7 +83,7 @@ public class UserController : BaseController
    {
       var response = await _authService.LoginAsync(request);
 
-      return response .IsValid ? OkOrNotFound(response) : Unauthorized(response);
+      return response.IsSuccess ? OkOrNotFound(response) : Unauthorized(response);
 
    }
 }

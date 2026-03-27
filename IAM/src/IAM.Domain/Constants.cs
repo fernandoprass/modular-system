@@ -25,7 +25,7 @@ namespace IAM.Domain
          public static class Claim
          {
             public const string CustomerId = "customerId";
-            public const string IsSuperUser = "isSuperUser";
+            public const string IsSystemAdmin = "isSystemAdmin";
             public const string Issuer = "IAM.API";
             public const string Audience = "IAM.Client";
          }

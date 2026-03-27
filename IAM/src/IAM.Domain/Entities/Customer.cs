@@ -8,6 +8,8 @@ public class Customer : Entity
    public string Name { get; set; }
    public string? Description { get; set; }
    public bool IsActive { get; set; } = true;
+   public bool IsMaster { get; set; } = false;
+
    //public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
    //public DateTime? UpdatedAt { get; set; }
 
@@ -24,6 +26,7 @@ public class Customer : Entity
          Name = name,
          Description = description,
          IsActive = true,
+         IsMaster = false,
          CreatedAt = DateTime.UtcNow
       };
    }

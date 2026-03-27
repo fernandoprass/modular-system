@@ -21,131 +21,64 @@ public class DatabaseSeeder : IDatabaseSeeder
 
    public async Task SeedAsync()
    {
-      await SeedBeatlesAsync();
-      await SeedRollingStonesAsync();
-      await SeedGunsAndRosesAsync();
-      await SeedMetallicaAsync();
+      await SeedAdminCustomerAsync();
+      await SeedScientistsCustomerAsync();
 
       await _unitOfWork.SaveChangesAsync();
    }
 
-   private async Task SeedBeatlesAsync()
+   private async Task SeedAdminCustomerAsync()
    {
-      var bandId = Guid.Parse("b0000000-0000-0000-0000-000000000001");
-
-      if (await _unitOfWork.Customers.ExistsAsync(bandId)) return;
+      var customerId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+      if (await _unitOfWork.Customers.ExistsAsync(customerId)) return;
 
       await _unitOfWork.Customers.AddAsync(new Customer
       {
-         Id = bandId,
-         Name = "The Beatles",
-         Code = "BEATLES",
+         Id = customerId,
+         Name = "SaaS Internal Administration",
+         Code = "SAASADMIN",
          Type = CustomerType.Company,
-         Description = "The Fab Four from Liverpool",
+         Description = "Internal system management and support",
+         IsMaster = true, // Following our Master Customer rule
          CreatedAt = DateTime.UtcNow
       });
 
-      var members = new[]
-      {
-            ("John Lennon", "john@beatles.com"),
-            ("Paul McCartney", "paul@beatles.com"),
-            ("George Harrison", "george@beatles.com"),
-            ("Ringo Starr", "ringo@beatles.com")
-        };
+      var passwordHash = Argon2.Hash(DefaultPassword);
 
-      foreach (var (name, email) in members)
-      {
-         await _unitOfWork.Users.AddAsync(User.Create(name, email, Argon2.Hash(DefaultPassword), bandId));
-      }
+      var superUser = User.Create("System Root", "admin@saas.com", passwordHash, customerId);
+      superUser.IsSystemAdmin = true;
+      await _unitOfWork.Users.AddAsync(superUser);
+      await _unitOfWork.Users.AddAsync(User.Create("Internal Support", "support@saas.com", passwordHash, customerId));
    }
 
-   private async Task SeedRollingStonesAsync()
+   private async Task SeedScientistsCustomerAsync()
    {
-      var bandId = Guid.Parse("b0000000-0000-0000-0000-000000000002");
-
-      if (await _unitOfWork.Customers.ExistsAsync(bandId)) return;
+      var customerId = Guid.Parse("00000000-0000-0000-0000-000000000002");
+      if (await _unitOfWork.Customers.ExistsAsync(customerId)) return;
 
       await _unitOfWork.Customers.AddAsync(new Customer
       {
-         Id = bandId,
-         Name = "The Rolling Stones",
-         Code = "STONES",
+         Id = customerId,
+         Name = "Computing Pioneers Society",
+         Code = "SCIENTISTS",
          Type = CustomerType.Company,
-         Description = "The World's Greatest Rock and Roll Band",
+         Description = "Foundation of modern Computer Science",
          CreatedAt = DateTime.UtcNow
       });
 
+      var passwordHash = Argon2.Hash(DefaultPassword);
       var members = new[]
       {
-            ("Mick Jagger", "mick@stones.com"),
-            ("Keith Richards", "keith@stones.com"),
-            ("Ronnie Wood", "ronnie@stones.com"),
-            ("Charlie Watts", "charlie@stones.com")
+            ("Alan Turing", "alan.turing@enigma.org"),
+            ("Ada Lovelace", "ada.lovelace@analytical.org"),
+            ("Grace Hopper", "grace.hopper@cobol.org"),
+            ("John von Neumann", "john.vonneumann@architecture.org"),
+            ("Claude Shannon", "claude.shannon@entropy.org")
         };
 
       foreach (var (name, email) in members)
       {
-         await _unitOfWork.Users.AddAsync(User.Create(name, email, Argon2.Hash(DefaultPassword), bandId));
-      }
-   }
-
-   private async Task SeedGunsAndRosesAsync()
-   {
-      var bandId = Guid.Parse("b0000000-0000-0000-0000-000000000003");
-
-      if (await _unitOfWork.Customers.ExistsAsync(bandId)) return;
-
-      await _unitOfWork.Customers.AddAsync(new Customer
-      {
-         Id = bandId,
-         Name = "Guns N' Roses",
-         Code = "GNR",
-         Type = CustomerType.Company,
-         Description = "The Most Dangerous Band in the World",
-         CreatedAt = DateTime.UtcNow
-      });
-
-      var members = new[]
-      {
-            ("Axl Rose", "axl@gnr.com"),
-            ("Slash", "slash@gnr.com"),
-            ("Duff McKagan", "duff@gnr.com"),
-            ("Izzy Stradlin", "izzy@gnr.com")
-        };
-
-      foreach (var (name, email) in members)
-      {
-         await _unitOfWork.Users.AddAsync(User.Create(name, email, Argon2.Hash(DefaultPassword), bandId));
-      }
-   }
-
-   private async Task SeedMetallicaAsync()
-   {
-      var bandId = Guid.Parse("b0000000-0000-0000-0000-000000000004");
-
-      if (await _unitOfWork.Customers.ExistsAsync(bandId)) return;
-
-      await _unitOfWork.Customers.AddAsync(new Customer
-      {
-         Id = bandId,
-         Name = "Metallica",
-         Code = "METALLICA",
-         Type = CustomerType.Company,
-         Description = "Thrash Metal Legends",
-         CreatedAt = DateTime.UtcNow
-      });
-
-      var members = new[]
-      {
-            ("James Hetfield", "james@metallica.com"),
-            ("Lars Ulrich", "lars@metallica.com"),
-            ("Kirk Hammett", "kirk@metallica.com"),
-            ("Robert Trujillo", "robert@metallica.com")
-        };
-
-      foreach (var (name, email) in members)
-      {
-         await _unitOfWork.Users.AddAsync(User.Create(name, email, Argon2.Hash(DefaultPassword), bandId));
+         await _unitOfWork.Users.AddAsync(User.Create(name, email, passwordHash, customerId));
       }
    }
 }

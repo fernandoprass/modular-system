@@ -39,7 +39,7 @@ namespace IAM.Application.Services
 
       private bool IsUserAlllowedToAccess(Guid? resourceCustomerId)
       {
-         return _userContext.IsSuperUser ||
+         return _userContext.IsSystemAdmin ||
                 (resourceCustomerId.HasValue && resourceCustomerId == _userContext.CustomerId);
       }
    }

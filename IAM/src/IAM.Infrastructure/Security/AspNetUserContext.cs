@@ -16,7 +16,7 @@ public class AspNetUserContext : IUserContext
 
    public Guid CustomerId => GetCustomerId();
    public bool IsAuthenticated => _accessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;
-   public bool IsSuperUser => GetIsSuperUser();
+   public bool IsSystemAdmin => GetIsSystemAdmin();
    public Guid UserId => GetUserId();
 
    private Guid GetCustomerId()
@@ -25,10 +25,10 @@ public class AspNetUserContext : IUserContext
       return Guid.TryParse(value, out var id) ? id : Guid.Empty;
    }
 
-   private bool GetIsSuperUser()
+   private bool GetIsSystemAdmin()
    {
-      var value = _accessor.HttpContext?.User.FindFirst(Const.Security.Claim.IsSuperUser)?.Value;
-      return Boolean.TryParse(value, out var isSuperUser) ? isSuperUser : false;
+      var value = _accessor.HttpContext?.User.FindFirst(Const.Security.Claim.IsSystemAdmin)?.Value;
+      return Boolean.TryParse(value, out var isSystemAdmin) ? isSystemAdmin : false;
    }
 
    private Guid GetUserId()

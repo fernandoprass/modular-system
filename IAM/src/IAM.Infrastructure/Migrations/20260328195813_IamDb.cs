@@ -6,23 +6,31 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace IAM.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class IamDbContextUpdateUser : Migration
+    public partial class IamDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<bool>(
-                name: "is_super_user",
-                table: "users",
-                type: "boolean",
-                nullable: false,
-                defaultValue: false);
-
-            migrationBuilder.AddColumn<DateTime>(
-                name: "password_expires_at",
-                table: "users",
-                type: "timestamp with time zone",
-                nullable: true);
+            migrationBuilder.CreateTable(
+                name: "customers",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    type = table.Column<byte>(type: "smallint", nullable: false),
+                    code = table.Column<string>(type: "character varying(25)", maxLength: 25, nullable: false),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
+                    is_active = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
+                    is_master = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: false),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_customers", x => x.id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "features",
@@ -33,7 +41,9 @@ namespace IAM.Infrastructure.Migrations
                     description = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: false),
                     group = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: false),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -49,11 +59,42 @@ namespace IAM.Infrastructure.Migrations
                     customer_id = table.Column<Guid>(type: "uuid", nullable: true),
                     is_default = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: false),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_roles", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "users",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    password_hash = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    is_active = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
+                    is_system_admin = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    customer_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    email_verified_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    last_login_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    password_expires_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    created_by = table.Column<Guid>(type: "uuid", nullable: false),
+                    updated_by = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_users", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_users_customers_customer_id",
+                        column: x => x.customer_id,
+                        principalTable: "customers",
+                        principalColumn: "id");
                 });
 
             migrationBuilder.CreateTable(
@@ -125,6 +166,17 @@ namespace IAM.Infrastructure.Migrations
                 name: "ix_user_roles_role_id",
                 table: "user_roles",
                 column: "role_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_customer_id",
+                table: "users",
+                column: "customer_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_email",
+                table: "users",
+                column: "email",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -142,13 +194,11 @@ namespace IAM.Infrastructure.Migrations
             migrationBuilder.DropTable(
                 name: "roles");
 
-            migrationBuilder.DropColumn(
-                name: "is_super_user",
-                table: "users");
+            migrationBuilder.DropTable(
+                name: "users");
 
-            migrationBuilder.DropColumn(
-                name: "password_expires_at",
-                table: "users");
+            migrationBuilder.DropTable(
+                name: "customers");
         }
     }
 }

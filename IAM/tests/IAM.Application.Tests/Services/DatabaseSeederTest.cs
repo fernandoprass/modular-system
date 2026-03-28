@@ -9,7 +9,7 @@ namespace IAM.Application.Tests.Services;
 public class DatabaseSeederTest
 {
    [Fact]
-   public async Task SeedAsync_ShouldCreateRockBandsAndMembers()
+   public async Task SeedAsync_ShouldCreateCustomersAndUsers()
    {
       // Arrange
       var services = new ServiceCollection();
@@ -38,22 +38,20 @@ public class DatabaseSeederTest
       // Assert
       var dbContext = scope.ServiceProvider.GetRequiredService<IamDbContext>();
 
-      // 4 Bands: Beatles, Rolling Stones, Guns, Metallica
+      // 2 customers
       var customers = await dbContext.Customers.ToListAsync();
-      Assert.Equal(4, customers.Count);
+      Assert.Equal(2, customers.Count);
 
-      // 16 members (4 per band)
+      // 7 members
       var users = await dbContext.Users.ToListAsync();
-      Assert.Equal(16, users.Count);
+      Assert.Equal(7, users.Count);
 
-      // Verify Bands (Customers)
-      Assert.Contains(customers, c => c.Code == "BEATLES");
-      Assert.Contains(customers, c => c.Code == "STONES");
-      Assert.Contains(customers, c => c.Code == "GNR");
-      Assert.Contains(customers, c => c.Code == "METALLICA");
+      // Verify Customers
+      Assert.Contains(customers, c => c.Code == "SAASADMIN");
+      Assert.Contains(customers, c => c.Code == "SCIENTISTS");
 
       // Verify Specific Members (Users)
-      Assert.Contains(users, u => u.Email == "john@beatles.com");
+      Assert.Contains(users, u => u.Email == "admin@saas.com");
       Assert.Contains(users, u => u.Email == "mick@stones.com");
       Assert.Contains(users, u => u.Email == "slash@gnr.com");
       Assert.Contains(users, u => u.Email == "james@metallica.com");

@@ -22,6 +22,7 @@ public class User : Entity
 
    public static User Create(string name, string email, string passwordHash, Guid customerId)
    {
+      var id = Guid.CreateVersion7();
       return new User
       {
          Id = Guid.CreateVersion7(),

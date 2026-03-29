@@ -14,25 +14,17 @@ using Myce.Response;
 
 namespace IAM.Application.Services;
 
-public class UserService : BaseService, IUserService
+public class UserService(
+    IUnitOfWork unitOfWork,
+    IUserContext userContext,
+    IUserValidator userValidator,
+    IUserRepository userRepository,
+    IUserQueryRepository userQueryRepository) : BaseService(userContext), IUserService
 {
-   private readonly IUnitOfWork _unitOfWork;
-   private readonly IUserValidator _userValidator;
-   private readonly IUserRepository _userRepository;
-   private readonly IUserQueryRepository _userQueryRepository;
-
-   public UserService(
-       IUnitOfWork unitOfWork,
-       IUserContext userContext,
-       IUserValidator userValidator,
-       IUserRepository userRepository,
-       IUserQueryRepository userQueryRepository) : base(userContext)
-   {
-      _unitOfWork = unitOfWork;
-      _userValidator = userValidator;
-      _userRepository = userRepository;
-      _userQueryRepository = userQueryRepository;
-   }
+   private readonly IUnitOfWork _unitOfWork = unitOfWork;
+   private readonly IUserValidator _userValidator = userValidator;
+   private readonly IUserRepository _userRepository = userRepository;
+   private readonly IUserQueryRepository _userQueryRepository = userQueryRepository;
 
    public async Task<UserDto?> GetByIdAsync(Guid id)
    {

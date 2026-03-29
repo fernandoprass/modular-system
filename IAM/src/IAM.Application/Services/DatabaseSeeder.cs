@@ -22,7 +22,7 @@ public class DatabaseSeeder : IDatabaseSeeder
    public async Task SeedAsync()
    {
       await SeedAdminCustomerAsync();
-      await SeedScientistsCustomerAsync();
+     // await SeedScientistsCustomerAsync();
 
       await _unitOfWork.SaveChangesAsync();
    }
@@ -32,7 +32,7 @@ public class DatabaseSeeder : IDatabaseSeeder
       var customerId = Guid.Parse("00000000-0000-0000-0000-000000000001");
       if (await _unitOfWork.Customers.ExistsAsync(customerId)) return;
 
-      await _unitOfWork.Customers.AddAsync(new Customer
+      var customer = new Customer
       {
          Id = customerId,
          Name = "SaaS Internal Administration",
@@ -41,12 +41,15 @@ public class DatabaseSeeder : IDatabaseSeeder
          Description = "Internal system management and support",
          IsMaster = true, // Following our Master Customer rule
          CreatedAt = DateTime.UtcNow
-      });
+      };
 
       var passwordHash = Argon2.Hash(DefaultPassword);
 
       var superUser = User.Create("System Root", "admin@saas.com", passwordHash, customerId);
       superUser.IsSystemAdmin = true;
+      customer.CreatedBy = superUser.Id;
+
+      await _unitOfWork.Customers.AddAsync(customer);
       await _unitOfWork.Users.AddAsync(superUser);
       await _unitOfWork.Users.AddAsync(User.Create("Internal Support", "support@saas.com", passwordHash, customerId));
    }
@@ -56,7 +59,7 @@ public class DatabaseSeeder : IDatabaseSeeder
       var customerId = Guid.Parse("00000000-0000-0000-0000-000000000002");
       if (await _unitOfWork.Customers.ExistsAsync(customerId)) return;
 
-      await _unitOfWork.Customers.AddAsync(new Customer
+      var customer = new Customer
       {
          Id = customerId,
          Name = "Computing Pioneers Society",
@@ -64,7 +67,9 @@ public class DatabaseSeeder : IDatabaseSeeder
          Type = CustomerType.Company,
          Description = "Foundation of modern Computer Science",
          CreatedAt = DateTime.UtcNow
-      });
+      };
+
+      await _unitOfWork.Customers.AddAsync(customer);
 
       var passwordHash = Argon2.Hash(DefaultPassword);
       var members = new[]

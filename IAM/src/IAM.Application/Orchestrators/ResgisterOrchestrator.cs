@@ -15,28 +15,19 @@ using Myce.Response;
 
 namespace IAM.Application.Orchestrators
 {
-   public class ResgisterOrchestrator : BaseService, IRegisterOrchestrator
+   public class ResgisterOrchestrator(
+      ICustomerService customerService,
+      ICustomerQueryRepository customerQueryRepository,
+      IUserContext userContext,
+      IUserRepository userRepository,
+      IUserService userService,
+      IUnitOfWork unitOfWork) : BaseService(userContext), IRegisterOrchestrator
    {
-      private readonly ICustomerService _customerService;
-      private readonly ICustomerQueryRepository _customerQueryRepository;
-      private readonly IUserRepository _userRepository;
-      private readonly IUserService _userService;
-      private readonly IUnitOfWork _unitOfWork;
-      
-      public ResgisterOrchestrator(
-         ICustomerService customerService,
-         ICustomerQueryRepository customerQueryRepository,
-         IUserContext userContext,
-         IUserRepository userRepository,
-         IUserService userService,
-         IUnitOfWork unitOfWork) : base (userContext)
-      {
-         _customerService = customerService;
-         _customerQueryRepository = customerQueryRepository;
-         _userRepository = userRepository;
-         _userService = userService;
-         _unitOfWork = unitOfWork;  
-      }
+      private readonly ICustomerService _customerService = customerService;
+      private readonly ICustomerQueryRepository _customerQueryRepository = customerQueryRepository;
+      private readonly IUserRepository _userRepository = userRepository;
+      private readonly IUserService _userService = userService;
+      private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
       public async Task<Result<UserDto>> RegisterUserAsync(UserCreateRequest request)
       {
@@ -76,6 +67,8 @@ namespace IAM.Application.Orchestrators
           Argon2.Hash(customerCreate.User.Password),
           customer.Id
          );
+
+         customer.CreatedBy = user.Id;
 
          await _unitOfWork.Customers.AddAsync(customer);
          await _unitOfWork.Users.AddAsync(user);

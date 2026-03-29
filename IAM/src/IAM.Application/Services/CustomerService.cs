@@ -3,7 +3,6 @@ using IAM.Domain;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Interfaces;
-using IAM.Domain.Messages;
 using IAM.Domain.Messages.Info;
 using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
@@ -11,25 +10,18 @@ using Myce.Response;
 
 namespace IAM.Application.Services;
 
-public class CustomerService : BaseService, ICustomerService
+public class CustomerService(
+    ICustomerQueryRepository customerQueryRepository,
+    ICustomerRepository customerRepository,
+    ICustomerValidator customerValidator,
+    IUnitOfWork unitOfWork,
+    IUserContext userContext) : BaseService(userContext), ICustomerService
 {
-   private readonly ICustomerQueryRepository _customerQueryRepository;
-   private readonly ICustomerRepository _customerRepository;
-   private readonly ICustomerValidator _customerValidator;   
-   private readonly IUnitOfWork _unitOfWork;
+   private readonly ICustomerQueryRepository _customerQueryRepository = customerQueryRepository;
+   private readonly ICustomerRepository _customerRepository = customerRepository;
+   private readonly ICustomerValidator _customerValidator = customerValidator;   
+   private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-   public CustomerService(
-       ICustomerQueryRepository customerQueryRepository,
-       ICustomerRepository customerRepository,
-       ICustomerValidator customerValidator,
-       IUnitOfWork unitOfWork,
-       IUserContext userContext) : base(userContext)
-   {
-      _customerQueryRepository = customerQueryRepository;
-      _customerRepository = customerRepository;
-      _customerValidator = customerValidator;
-      _unitOfWork = unitOfWork;  
-   }
    public async Task<Result> ValidateCreateCustomerAsync(CustomerCreateRequest request)
    {
       var codeExists = await _customerQueryRepository.ExistsByCodeAsync(request.Code);

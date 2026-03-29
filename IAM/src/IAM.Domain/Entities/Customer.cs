@@ -2,16 +2,12 @@ namespace IAM.Domain.Entities;
 
 public class Customer : Entity
 {
-   //public Guid Id { get; set; }
    public CustomerType Type { get; set; }
    public string Code { get; set; }
    public string Name { get; set; }
    public string? Description { get; set; }
    public bool IsActive { get; set; } = true;
    public bool IsMaster { get; set; } = false;
-
-   //public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-   //public DateTime? UpdatedAt { get; set; }
 
    // Navigation property
    public ICollection<User> Users { get; set; } = new List<User>();
@@ -26,15 +22,13 @@ public class Customer : Entity
          Name = name,
          Description = description,
          IsActive = true,
-         IsMaster = false,
-         CreatedAt = DateTime.UtcNow
+         IsMaster = false
       };
    }
 
    public void Update(string code)
    {
       Code = code;
-      UpdatedAt = DateTime.UtcNow;
    }
 
    public void Update(string name, string? description, bool isActive)
@@ -42,6 +36,5 @@ public class Customer : Entity
       Name = name;
       Description = description;
       IsActive = isActive;
-      UpdatedAt = DateTime.UtcNow;
    }
 }

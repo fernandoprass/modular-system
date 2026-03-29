@@ -27,7 +27,7 @@ namespace IAM.Application.Services
       {
          if (!IsUserAlllowedToAccess(resourceCustomerId))
          {
-            var result = (TResult)Activator.CreateInstance(typeof(TResult))!;
+            var result = Activator.CreateInstance<TResult>()!;
 
             result.AddMessage(new ForbiddenCustomerError());
 

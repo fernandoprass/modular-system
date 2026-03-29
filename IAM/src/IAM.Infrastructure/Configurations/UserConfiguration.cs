@@ -26,6 +26,6 @@ public class UserConfiguration : BaseConfiguration<User>
       builder.HasOne(u => u.Customer)
              .WithMany(c => c.Users)
              .HasForeignKey(u => u.CustomerId)
-             .OnDelete(DeleteBehavior.Cascade);
+             .OnDelete(DeleteBehavior.NoAction);
    }
 }

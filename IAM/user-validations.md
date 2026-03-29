@@ -23,6 +23,6 @@ The following errors represent the business and security constraints enforced du
 -   **Description**: Triggered when a `Customer` has a whitelist of allowed email domains (e.g., `@company.com`) and the provided email address does not match.
 -   **Impact**: Enforces corporate governance by preventing the use of personal or unauthorized email providers for business accounts.
 
-### 46 **EmailAlreadyRegisteredInTenantError**
+### 6 **EmailAlreadyRegisteredInTenantError**
 -   **Description**: Indicates that the email address is already associated with a user account within the specific context of the current `CustomerId`.
 -   **Impact**: Supports multi-tenancy by allowing the same email to exist in the global database while ensuring uniqueness within each individual client.

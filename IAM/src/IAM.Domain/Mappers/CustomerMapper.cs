@@ -8,12 +8,13 @@ public static class CustomerMapper
    public static CustomerDto ToCustomerDto(this Customer customer)
    {
       return new CustomerDto
-      {
-         Id = customer.Id,
-         Name = customer.Name,
-         Description = customer.Description,
-         CreatedAt = customer.CreatedAt,
-         UpdatedAt = customer.UpdatedAt
-      };
+      (
+         Id : customer.Id,
+         Type : customer.Type,
+         Code : customer.Code,
+         Name : customer.Name,
+         Description : customer.Description,
+         IsActive : customer.IsActive
+      );
    }
 }

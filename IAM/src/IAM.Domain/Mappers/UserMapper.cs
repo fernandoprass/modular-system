@@ -16,7 +16,6 @@ namespace IAM.Domain.Mappers
             IsActive = user.IsActive,
             IsSystemAdmin = user.IsSystemAdmin,
             CreatedAt = user.CreatedAt,
-            UpdatedAt = user.UpdatedAt,
             EmailVerifiedAt = user.EmailVerifiedAt,
             LastLoginAt = user.LastLoginAt,
             CustomerId = user.CustomerId,
@@ -34,7 +33,6 @@ namespace IAM.Domain.Mappers
             IsActive = user.IsActive,
             IsSystemAdmin = user.IsSystemAdmin,
             CreatedAt = user.CreatedAt,
-            UpdatedAt = user.UpdatedAt,
             EmailVerifiedAt = user.EmailVerifiedAt,
             LastLoginAt = user.LastLoginAt,
             CustomerId = user.CustomerId,
@@ -53,11 +51,11 @@ namespace IAM.Domain.Mappers
             IsActive = user.IsActive,
             IsSystemAdmin = user.IsSystemAdmin,
             CreatedAt = user.CreatedAt,
-            UpdatedAt = user.UpdatedAt,
             EmailVerifiedAt = user.EmailVerifiedAt,
             LastLoginAt = user.LastLoginAt,
             CustomerId = user.CustomerId,
-            CustomerName = user.Customer?.Name ?? string.Empty
+            CustomerName = user.Customer?.Name ?? string.Empty,
+            CustomerIsActive = user.Customer?.IsActive ?? false
          };
       }
    }

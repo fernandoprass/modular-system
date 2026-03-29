@@ -1,15 +1,12 @@
 namespace IAM.Domain.Entities;
 public class User : Entity
 {
-   //public Guid Id { get; set; }
    public string Name { get; set; } = string.Empty;
    public string Email { get; set; } = string.Empty;
    public string PasswordHash { get; set; } = string.Empty;
    public bool IsActive { get; set; } = true;
    public bool IsSystemAdmin { get; set; } = false;
    public Guid CustomerId { get; set; }
-   //public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-   //public DateTime? UpdatedAt { get; set; }
    public DateTime? EmailVerifiedAt { get; set; }
    public DateTime? LastLoginAt { get; set; }
    public DateTime? PasswordExpiresAt { get; set; }
@@ -32,7 +29,6 @@ public class User : Entity
          PasswordExpiresAt = DateTime.UtcNow.AddDays(Const.Security.User.PasswordExpireTime),
          IsActive = true,
          IsSystemAdmin = false,
-         CreatedAt = DateTime.UtcNow,
          CustomerId = customerId
       };
    }
@@ -41,7 +37,6 @@ public class User : Entity
    {
       Name = name;
       IsActive = isActive;
-      UpdatedAt = DateTime.UtcNow;
    }
 
    public void UpdatePassword(string newPasswordHash)

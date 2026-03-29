@@ -7,11 +7,11 @@
       public string Email { get; init; } = string.Empty;
       public Guid CustomerId { get; init; }
       public string CustomerName { get; init; } = string.Empty;
+      public bool CustomerIsActive { get; init; }
       public string PasswordHash { get; init; } = string.Empty;
       public bool IsActive { get; init; }
       public bool IsSystemAdmin { get; init; }
       public DateTime CreatedAt { get; init; }
-      public DateTime? UpdatedAt { get; init; }
       public DateTime? EmailVerifiedAt { get; set; }
       public DateTime? LastLoginAt { get; set; }
    }

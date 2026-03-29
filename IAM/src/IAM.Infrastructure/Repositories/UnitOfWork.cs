@@ -48,7 +48,7 @@ public class UnitOfWork : IUnitOfWork
             }
             else
             {
-               entry.Entity.CreatedBy = userId;
+               entry.Entity.CreatedBy = entry.Entity.CreatedBy == Guid.Empty ? userId : entry.Entity.CreatedBy;
             }
          }
 

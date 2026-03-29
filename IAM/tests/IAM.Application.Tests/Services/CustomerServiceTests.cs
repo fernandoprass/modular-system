@@ -67,7 +67,8 @@ public class CustomerServiceTests
    public async Task GetByIdAsync_WhenCustomerExists_ReturnsCustomerDto()
    {
       var id = Guid.NewGuid();
-      var expected = new CustomerDto { Id = id, Name = "Test" };
+      var expected = new CustomerDto(Id: id, Type: CustomerType.Company, Code: "ABC", Name: "Test", Description: null, IsActive: true);
+
       _customerQueryRepository.GetByIdAsync(id).Returns(expected);
 
       var result = await _service.GetByIdAsync(id);
@@ -88,7 +89,11 @@ public class CustomerServiceTests
    public async Task GetByNameAsync_WhenCalled_ReturnsIEnumerableCustomerDto()
    {
       var name = "SearchName";
-      var expected = new List<CustomerDto> { new() { Name = name } };
+      var expected = new List<CustomerDto> 
+      { 
+         new(Id: Guid.Empty, Type: CustomerType.Company, Code: "ABC", Name: name, Description: null, IsActive: true) 
+      };
+
       _customerQueryRepository.GetByNameAsync(name).Returns(expected);
 
       var result = await _service.GetByNameAsync(name);

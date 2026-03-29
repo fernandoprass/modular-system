@@ -19,14 +19,7 @@ public class CustomerQueryRepository : ICustomerQueryRepository
       return await _context.Customers
           .AsNoTracking()
           .Where(c => c.Id == id)
-          .Select(c => new CustomerDto
-          {
-             Id = c.Id,
-             Name = c.Name,
-             Description = c.Description,
-             CreatedAt = c.CreatedAt,
-             UpdatedAt = c.UpdatedAt
-          })
+          .Select(c => new CustomerDto(c.Id, c.Type, c.Code, c.Name, c.Description, c.IsActive))
           .SingleOrDefaultAsync();
    }
 
@@ -34,15 +27,8 @@ public class CustomerQueryRepository : ICustomerQueryRepository
    {
       return await _context.Customers
           .AsNoTracking()
-          .Where(c => c.Name == name)
-          .Select(c => new CustomerDto
-          {
-             Id = c.Id,
-             Name = c.Name,
-             Description = c.Description,
-             CreatedAt = c.CreatedAt,
-             UpdatedAt = c.UpdatedAt
-          })
+          .Where(c => c.Name.Contains(name, StringComparison.InvariantCultureIgnoreCase))
+          .Select(c => new CustomerDto(c.Id, c.Type,c.Code, c.Name, c.Description, c.IsActive))
           .ToListAsync();
    }
 
@@ -50,14 +36,7 @@ public class CustomerQueryRepository : ICustomerQueryRepository
    {
       return await _context.Customers
           .AsNoTracking()
-          .Select(c => new CustomerDto
-          {
-             Id = c.Id,
-             Name = c.Name,
-             Description = c.Description,
-             CreatedAt = c.CreatedAt,
-             UpdatedAt = c.UpdatedAt
-          })
+          .Select(c => new CustomerDto(c.Id, c.Type, c.Code, c.Name, c.Description, c.IsActive))
           .ToListAsync();
    }
 

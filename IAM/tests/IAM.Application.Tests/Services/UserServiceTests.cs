@@ -91,7 +91,7 @@ public class UserServiceTests
    }
 
    [Fact]
-   public async Task DeleteAsync_ShouldReturnNotFoundError_WhenUserDoesNotExist()
+   public async Task DeleteAsync_ShouldReturnForbiddenCustomerError_EvenWhenUserDoesNotExist()
    {
       var userId = Guid.NewGuid();
       _userRepositoryMock.GetByIdAsync(userId).Returns((User)null);
@@ -99,7 +99,7 @@ public class UserServiceTests
       var result = await _userService.DeleteAsync(userId);
 
       result.IsSuccess.Should().BeFalse();
-      result.Messages.Should().ContainSingle(m => m is NotFoundError);
+      result.Messages.Should().ContainSingle(m => m is ForbiddenCustomerError);
 
       await _unitOfWorkMock.Users.DidNotReceive().DeleteAsync(Arg.Any<Guid>());
    }

@@ -17,9 +17,15 @@ namespace IAM.Domain
 
       public class Security
       {
+         public static class User
+         {
+            public const int PasswordExpireTime = 60;
+         }
+
          public static class Claim
          {
             public const string CustomerId = "customerId";
+            public const string IsSystemAdmin = "isSystemAdmin";
             public const string Issuer = "IAM.API";
             public const string Audience = "IAM.Client";
          }

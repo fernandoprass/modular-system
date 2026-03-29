@@ -60,8 +60,6 @@ This file defines how services (PostgreSQL & pgAdmin) are built and linked. It u
 * **External-to-Service:** Your browser or API connects via `localhost`.
 * **Persistence:** Because containers are ephemeral, we use **Volumes**. If you delete a container, your data remains safe on your hard drive.
 
-
-
 ---
 
 ## 5. CLI Reference & Management
@@ -76,7 +74,9 @@ This file defines how services (PostgreSQL & pgAdmin) are built and linked. It u
 1. **Port Conflicts:** If port `5432` or `8080` is busy, change the left-side port in `docker-compose.yml`.
 2. **Permissions (Windows):** If scripts fail, run:  
    `Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process`
-3. **Connectivity:** If pgAdmin cannot find the DB, ensure you are using `db` as the host name inside the pgAdmin registration screen.
+3. **Connectivity:** If pgAdmin fails to detect the database automatically, you must register the server manually. In the Host **Name/Address**  
+   field, use the service name defined in the Docker Compose file: `db`. For authentication, use the credentials specified in your `.env` 
+   file (Default: User: `admin` / Password: `msadmin123`).
 
 ---
 

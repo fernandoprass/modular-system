@@ -34,15 +34,14 @@ public class AuthService(IUserQueryRepository userQueryRepository,
       var user = await _userQueryRepository.GetByEmailWithPasswordAsync(request.Email);
 
       var dummyHash = "$argon2id$v=19$m=65536,t=2,p=1$" 
-                      + Convert.ToBase64String(Encoding.UTF8.GetBytes("salt")) 
-                      + "$" + Convert.ToBase64String(Encoding.UTF8.GetBytes("password"));
+                      + Convert.ToBase64String(Encoding.UTF8.GetBytes("fake-salt")) 
+                      + "$" + Convert.ToBase64String(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString()));
 
       // Use the dummy hash for timing attack prevention even if the user is not found
       var passwordHash = user?.PasswordHash ?? dummyHash;
       var isPasswordCorrect = Argon2.Verify(passwordHash, request.Password);
 
-
-      if (user is null || !user.IsActive|| !isPasswordCorrect)
+      if (user is null || !user.IsActive|| !user.CustomerIsActive || !isPasswordCorrect)
       {
          return Result<LoginResponse?>.Failure(new UnauthorizedError());
       }
@@ -57,13 +56,14 @@ public class AuthService(IUserQueryRepository userQueryRepository,
       return Result<LoginResponse?>.Success(response);
    }
 
-   public (string, DateTime) GenerateJwtToken(UserDto user)
+   private (string, DateTime) GenerateJwtToken(UserDto user)
    {
       var claims = new[]
       {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
             new Claim(JwtRegisteredClaimNames.Name, user.Name),
+            new Claim(Const.Security.Claim.IsSystemAdmin, user.IsSystemAdmin.ToString()),
             new Claim(Const.Security.Claim.CustomerId, user.CustomerId.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };

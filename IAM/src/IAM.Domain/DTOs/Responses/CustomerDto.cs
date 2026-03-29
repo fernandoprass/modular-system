@@ -1,3 +1,5 @@
+using IAM.Domain.Enums;
+
 namespace IAM.Domain.DTOs.Responses;
 
 public sealed record CustomerDto

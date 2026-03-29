@@ -1,4 +1,4 @@
-﻿using IAM.Application.Contracts;
+using IAM.Application.Contracts;
 using IAM.Application.Orchestrators;
 using IAM.Application.Services;
 using IAM.Application.Validators;
@@ -22,6 +22,9 @@ namespace IAM.API.Configure
          builder.Services.AddScoped<IRoleQueryRepository, RoleQueryRepository>();
          builder.Services.AddScoped<IUserRepository, UserRepository>();
          builder.Services.AddScoped<IUserQueryRepository, UserQueryRepository>();
+         builder.Services.AddScoped<IParameterRepository, ParameterRepository>();
+         builder.Services.AddScoped<IParameterCustomerRepository, ParameterCustomerRepository>();
+         builder.Services.AddScoped<IParameterQueryRepository, ParameterQueryRepository>();
          builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
       }
 
@@ -37,6 +40,7 @@ namespace IAM.API.Configure
          builder.Services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
          builder.Services.AddScoped<IRoleService, RoleService>();
          builder.Services.AddScoped<IUserService, UserService>();
+         builder.Services.AddScoped<IParameterService, ParameterService>();
          
          
       }
@@ -46,6 +50,7 @@ namespace IAM.API.Configure
          builder.Services.AddScoped<ICustomerValidator, CustomerValidator>();
          builder.Services.AddScoped<IUserValidator, UserValidator>();
          builder.Services.AddScoped<IRoleValidator, RoleValidator>();
+         builder.Services.AddScoped<IParameterValidator, ParameterValidator>();
       }
    }
 }

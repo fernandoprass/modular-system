@@ -16,6 +16,8 @@ public class IamDbContext : DbContext
    public DbSet<RoleFeature> RoleFeatures { get; set; }
    public DbSet<User> Users { get; set; }
    public DbSet<UserRole> UserRoles { get; set; }
+   public DbSet<Parameter> Parameters { get; set; }
+   public DbSet<ParameterCustomer> ParameterCustomers { get; set; }
 
    protected override void OnModelCreating(ModelBuilder modelBuilder)
    {
@@ -27,5 +29,7 @@ public class IamDbContext : DbContext
       modelBuilder.ApplyConfiguration(new FeatureConfiguration());
       modelBuilder.ApplyConfiguration(new RoleFeatureConfiguration());
       modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
+      modelBuilder.ApplyConfiguration(new ParameterConfiguration());
+      modelBuilder.ApplyConfiguration(new ParameterCustomerConfiguration());
    }
 }

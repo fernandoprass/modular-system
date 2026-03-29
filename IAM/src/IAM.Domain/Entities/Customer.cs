@@ -1,3 +1,5 @@
+using IAM.Domain.Enums;
+
 namespace IAM.Domain.Entities;
 
 public class Customer : Entity

@@ -1,5 +1,4 @@
 using IAM.Domain.DTOs.Responses;
-using IAM.Domain.Entities;
 using IAM.Domain.QueryRepositories;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,6 +1,6 @@
 namespace IAM.Domain
 {
-   public static class Const
+   public static partial class Const
    {
       public static class Customer
       {
@@ -13,6 +13,8 @@ namespace IAM.Domain
          public const string User = nameof(Entities.User);
          public const string Role = nameof(Entities.Role);
          public const string Feature = nameof(Entities.Feature);
+         public const string Parameter = nameof(Entities.Parameter);
+         public const string ParameterCustomer = nameof(Entities.ParameterCustomer);
       }
 
       public class Security

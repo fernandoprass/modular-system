@@ -22,7 +22,7 @@ namespace IAM.Application.Tests.Validators
       [InlineData(CustomerType.Company, "Valid Name", "DUP123", true, false)]    // Invalid: Duplicate Code  
       [InlineData(CustomerType.Company, "Valid Name", "AB", false, false)]       // Invalid: Company Code too short 
       [InlineData(CustomerType.Company, "Valid Name", "A_1", false, false)]      // Invalid: Company Code not alphanumeric    
-      [InlineData(CustomerType.Company, "", "ABC123", false, false)]             // Invalid: Name empty (Assuming ValidatorTemplate.NameRules requires it)
+      [InlineData(CustomerType.Company, "", "ABC123", false, false)]             // Invalid: Title empty (Assuming ValidatorTemplate.NameRules requires it)
       public void ValidateCreate_ShouldProcessAllRules(
           CustomerType type,
           string name,

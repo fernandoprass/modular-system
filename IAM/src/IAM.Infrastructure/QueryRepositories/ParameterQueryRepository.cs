@@ -1,3 +1,4 @@
+using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Mappers;
 using IAM.Domain.QueryRepositories;
@@ -15,37 +16,45 @@ namespace IAM.Infrastructure.QueryRepositories
          return parameter?.ToParameterDto();
       }
 
-      public async Task<IEnumerable<ParameterLiteDto>> GetAllAsync()
+      public async Task<IEnumerable<ParameterLiteDto>> GetAllAsync(ParameterSearchRequest request)
       {
-         return await _context.Parameters
-            .AsNoTracking()
-            .Select(p => p.ToParameterLiteDto())
-            .ToListAsync();
+         var query = _context.Parameters.AsNoTracking();
+
+         if (!string.IsNullOrWhiteSpace(request.Module))
+            query = query.Where(p => p.Module == request.Module);
+
+         if (!string.IsNullOrWhiteSpace(request.Group))
+            query = query.Where(p => p.Group == request.Group);
+
+         if (!string.IsNullOrWhiteSpace(request.Name))
+            query = query.Where(p => p.Name == request.Name);
+
+         if (!string.IsNullOrWhiteSpace(request.Key))
+            query = query.Where(p => p.Key == request.Key);
+
+         if (!string.IsNullOrWhiteSpace(request.Title))
+            query = query.Where(p => p.Title.Contains(request.Title));
+
+         if (!string.IsNullOrWhiteSpace(request.Description))
+            query = query.Where(p => p.Description.Contains(request.Description));
+
+         return await query.Select(p => p.ToParameterLiteDto()).ToListAsync();
       }
 
-      public async Task<IEnumerable<ParameterLiteDto>> GetByGroupAsync(string group)
-      {
-         return await _context.Parameters
-            .AsNoTracking()
-            .Where(p => p.Group == group)
-            .Select(p => p.ToParameterLiteDto())
-            .ToListAsync();
-      }
-
-      public async Task<ParameterDto?> GetByGroupAndKeyAsync(string group, string key)
+      public async Task<ParameterDto?> GetByModuleGroupAndKeyAsync(string key)
       {
          var parameter = await _context.Parameters
             .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.Group == group && p.Key == key);
+            .FirstOrDefaultAsync(p => p.Key == key);
          return parameter?.ToParameterDto();
       }
 
-      public async Task<string?> GetValueAsync(string @group, string key, Guid customerId)
+      public async Task<string?> GetValueAsync(string key, Guid customerId)
       {
          var query = from p in _context.Parameters
                      join pc in _context.ParameterCustomers on new { ParameterId = p.Id, CustomerId = customerId } equals new { pc.ParameterId, pc.CustomerId } into pcGroup
                      from pc in pcGroup.DefaultIfEmpty()
-                     where p.Group == @group && p.Key == key
+                     where p.Key == key
                      select pc != null ? pc.Value : p.Value;
 
          return await query.FirstOrDefaultAsync();

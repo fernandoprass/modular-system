@@ -8,6 +8,6 @@ namespace IAM.Domain.Repositories
       Task AddAsync(Parameter parameter);
       void Update(Parameter parameter);
       Task DeleteAsync(Guid id);
-      Task<Parameter?> GetByGroupAndKeyAsync(string group, string key);
-   }
+      Task<Parameter?> GetByKeyAsync(string key);
+    }
 }

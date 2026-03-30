@@ -10,9 +10,11 @@ namespace IAM.Domain.Mappers
          return new ParameterDto
          {
             Id = parameter.Id,
+            Module = parameter.Module,
             Group = parameter.Group,
-            Key = parameter.Key,
             Name = parameter.Name,
+            Key = parameter.Key,
+            Title = parameter.Title,
             Description = parameter.Description,
             Type = parameter.Type,
             Value = parameter.Value,
@@ -28,9 +30,9 @@ namespace IAM.Domain.Mappers
          return new ParameterLiteDto
          {
             Id = parameter.Id,
-            Group = parameter.Group,
             Key = parameter.Key,
-            Name = parameter.Name,
+            Title = parameter.Title,
+            Description = parameter.Description,
             Type = parameter.Type,
             Value = parameter.Value
          };

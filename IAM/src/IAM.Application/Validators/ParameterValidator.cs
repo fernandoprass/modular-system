@@ -15,13 +15,13 @@ namespace IAM.Application.Validators
       public Result ValidateCreate(ParameterCreateRequest request, bool keyExists)
       {
          var validator = new FluentValidator<ParameterCreateRequest>()
-            .RuleFor(x => x.Group).IsRequired()
-            .RuleFor(x => x.Key).IsRequired()
-            .RuleFor(x => x.Name).IsRequired()
+            .RuleFor(x => x.Key)
+               .IsRequired()
+               .Matches(@"^([a-zA-Z0-9]{2,})\.([a-zA-Z0-9]{2,})\.([a-zA-Z0-9]{2,})$", new InvalidParameterKeyFormatError())
             .RuleFor(x => x.Description).IsRequired()
             .RuleFor(x => x.Type).IsRequired()
             .RuleFor(x => x.Value).IsRequired()
-            .RuleForValue(keyExists).IsFalse(new DuplicateParameterError(request.Group, request.Key));
+            .RuleForValue(keyExists).IsFalse(new DuplicateParameterError(request.Key));
 
          var isValid = validator.Validate(request);
          if (!isValid) return Result.Failure(validator.Messages);
@@ -56,7 +56,7 @@ namespace IAM.Application.Validators
          return ValidateValueFormat(request.Value, parameter.Type);
       }
 
-      private Result ValidateValueFormat(string value, ParameterType type)
+      private static Result ValidateValueFormat(string value, ParameterType type)
       {
          bool isValid = type switch
          {
@@ -71,7 +71,7 @@ namespace IAM.Application.Validators
 
          if (!isValid)
          {
-            return Result.Failure(new InvalidParameterFormatError(type.ToString()));
+            return Result.Failure(new InvalidParameterValueFormatError(type.ToString()));
          }
 
          return Result.Success();

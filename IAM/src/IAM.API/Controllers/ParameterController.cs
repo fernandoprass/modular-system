@@ -22,44 +22,18 @@ namespace IAM.API.Controllers
 
       [HttpGet]
       [Authorize]
-      public async Task<IActionResult> GetAll()
+      public async Task<IActionResult> Get(ParameterSearchRequest request)
       {
-         var parameters = await _parameterService.GetAllAsync();
+         var parameters = await _parameterService.GetAsync(request);
          return OkOrNotFound(parameters);
       }
 
-      [HttpGet("group/{group}")]
+      [HttpGet("key/{key}")]
       [Authorize]
-      public async Task<IActionResult> GetByGroup(string group)
+      public async Task<IActionResult> GetByKey(string key)
       {
-         var parameters = await _parameterService.GetByGroupAsync(group);
-         return OkOrNotFound(parameters);
-      }
-
-      [HttpGet("group/{group}/key/{key}")]
-      [Authorize]
-      public async Task<IActionResult> GetByGroupAndKey(string group, string key)
-      {
-         var parameter = await _parameterService.GetByGroupAndKeyAsync(group, key);
+         var parameter = await _parameterService.GetByKeyAsync(key);
          return OkOrNotFound(parameter);
-      }
-
-      [HttpPost]
-      [Authorize]
-      //[Authorize(Roles = "Admin")]
-      public async Task<IActionResult> Create(ParameterCreateRequest request)
-      {
-         var result = await _parameterService.CreateAsync(request);
-         return OkOrNotFound(result);
-      }
-
-      [HttpPut("{id}")]
-      [Authorize]
-      //[Authorize(Roles = "Admin")]
-      public async Task<IActionResult> Update(Guid id, ParameterUpdateRequest request)
-      {
-         var result = await _parameterService.UpdateAsync(id, request);
-         return OkOrNotFound(result);
       }
 
       [HttpDelete("{id}")]
@@ -71,19 +45,19 @@ namespace IAM.API.Controllers
          return OkOrNotFound(result);
       }
 
-      [HttpPut("group/{group}/key/{key}/override")]
+      [HttpPut("{id}/value")]
       [Authorize]
-      public async Task<IActionResult> SaveOverride(string group, string key, ParameterCustomerUpdateRequest request)
+      public async Task<IActionResult> SaveOverride(Guid id, ParameterCustomerUpdateRequest request)
       {
-         var result = await _parameterService.SaveCustomerOverrideAsync(group, key, request);
+         var result = await _parameterService.SaveCustomerAsync(id, request);
          return OkOrNotFound(result);
       }
 
-      [HttpDelete("group/{group}/key/{key}/override")]
+      [HttpDelete("{parameterId:guid}/customer/{customerId:guid}")]
       [Authorize]
-      public async Task<IActionResult> DeleteOverride(string group, string key)
+      public async Task<IActionResult> Delete(Guid id, Guid customerId)
       {
-         var result = await _parameterService.DeleteCustomerOverrideAsync(group, key);
+         var result = await _parameterService.DeleteCustomerValueAsync(id, customerId);
          return OkOrNotFound(result);
       }
    }

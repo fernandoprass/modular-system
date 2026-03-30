@@ -4,10 +4,9 @@ namespace IAM.Domain.Messages.Errors
 {
    public class DuplicateParameterError : ErrorMessage
    {
-      public DuplicateParameterError(string group, string key) 
-         : base("DuplicateParameterError", "A parameter with Group '{group}' and Key '{key}' already exists.")
+      public DuplicateParameterError(string key) 
+         : base("DuplicateParameterError", "A parameter with key '{key}' already exists.")
       {
-         AddVariable("group", group);
          AddVariable("key", key);
       }
    }
@@ -18,12 +17,18 @@ namespace IAM.Domain.Messages.Errors
          : base("ParameterNotCustomerEditableError", "This parameter is not editable by customers.") { }
    }
 
-   public class InvalidParameterFormatError : ErrorMessage
+   public class InvalidParameterValueFormatError : ErrorMessage
    {
-      public InvalidParameterFormatError(string typeName) 
-         : base("InvalidParameterFormatError", "The value provided is not in a valid format for type '{typeName}'.")
+      public InvalidParameterValueFormatError(string typeName) 
+         : base("InvalidParameterValueFormatError", "The value provided is not in a valid format for type '{typeName}'.")
       {
          AddVariable("typeName", typeName);
       }
+   }
+
+   public class InvalidParameterKeyFormatError : ErrorMessage
+   {
+      public InvalidParameterKeyFormatError()
+         : base("InvalidParameterKeyFormatError", "Invalid Parameter Key format. The key must follow the pattern 'Module.Group.Name', where each segment contains at least 2 alphanumeric characters.") {}
    }
 }

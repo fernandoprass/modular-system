@@ -97,47 +97,48 @@ public class DatabaseSeeder : IDatabaseSeeder
 
    private async Task SeedParamentersAsync()
    {
-      await AddParameter(Const.Parameter.Group.Security, Const.Parameter.Key.PasswordExpireTime, ParameterType.Integer,
+      await AddParameter(Param.IAM.Security.PasswordExpireTime, ParameterType.Integer,
                          "Password expiration time", "Password expiration time, in days.", "60", false, false);
       
       await _unitOfWork.SaveChangesAsync();
    }
 
    private async Task AddParameter(
-      string group,
       string key,
       ParameterType type,
-      string name,
+      string title,
       string description,
       string value,
       bool isCustomerEditable,
       bool isVisible)
    {
-      var param = await _parameterRepository.GetByGroupAndKeyAsync(group, key);
+      var param = await _parameterRepository.GetByKeyAsync(key);
       if (param is null)
       {
-         var parameter = CreateParameter(group, key, type, name, description, value, isCustomerEditable, isVisible);
+         var parameter = CreateParameter(key, type, title, description, value, isCustomerEditable, isVisible);
          await _unitOfWork.Parameters.AddAsync(parameter);
       }
    }
 
    private static Parameter CreateParameter(
-      string group,
       string key, 
       ParameterType type, 
-      string name, 
+      string title, 
       string description, 
       string value, 
       bool isCustomerEditable,
       bool isVisible)
    {
+      var parameterKey = new ParameterKey(key);
+
       return new Parameter
       {
          Id = Guid.CreateVersion7(),
-         Group = group,
-         Key = key,
+         Module = parameterKey.Module,
+         Group = parameterKey.Group,
+         Name = parameterKey.Name,
          Type = type,
-         Name = name,
+         Title = title,
          Description = description,
          Value = value,
          IsCustomerEditable = isCustomerEditable,

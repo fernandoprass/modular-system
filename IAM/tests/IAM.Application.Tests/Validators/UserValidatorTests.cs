@@ -101,7 +101,7 @@ public class UserValidatorTests
    [Theory]   
    [InlineData("Valid User", "test@domain.com", "Pass123!", false, true)]      // Case 1: Everything is valid and email is unique 
    [InlineData("Valid User", "duplicate@domain.com", "Pass123!", true, false)] // Case 2: Data is valid but email ALREADY exists in the database
-   [InlineData("Ab", "test@domain.com", "Pass123!", false, false)]             // Case 3: Email is unique but Name fails template validation (too short)
+   [InlineData("Ab", "test@domain.com", "Pass123!", false, false)]             // Case 3: Email is unique but Title fails template validation (too short)
    [InlineData("Valid User", "test@domain.com", "Password!", false, false)]    // Case 4: Email is unique but Password fails template validation (no digit)
    public void ValidateCreateForNewCustomer_ShouldHandleValidationFlow(
         string name,

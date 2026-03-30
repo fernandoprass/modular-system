@@ -1,4 +1,5 @@
 using IAM.Application.Contracts;
+using IAM.Domain;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;
@@ -32,32 +33,31 @@ namespace IAM.Application.Services
          return await _parameterQueryRepository.GetByIdAsync(id);
       }
 
-      public async Task<IEnumerable<ParameterLiteDto>> GetAllAsync()
+      public async Task<IEnumerable<ParameterLiteDto>> GetAsync(ParameterSearchRequest request)
       {
-         return await _parameterQueryRepository.GetAllAsync();
+         return await _parameterQueryRepository.GetAllAsync(request);
       }
 
-      public async Task<IEnumerable<ParameterLiteDto>> GetByGroupAsync(string group)
+      public async Task<ParameterDto?> GetByKeyAsync(string key)
       {
-         return await _parameterQueryRepository.GetByGroupAsync(group);
-      }
-
-      public async Task<ParameterDto?> GetByGroupAndKeyAsync(string group, string key)
-      {
-         return await _parameterQueryRepository.GetByGroupAndKeyAsync(group, key);
+         return await _parameterQueryRepository.GetByModuleGroupAndKeyAsync(key);
       }
 
       public async Task<Result<ParameterDto>> CreateAsync(ParameterCreateRequest request)
       {
-         var existing = await _parameterRepository.GetByGroupAndKeyAsync(request.Group, request.Key);
+         var existing = await _parameterRepository.GetByKeyAsync(request.Key);
          var validation = _parameterValidator.ValidateCreate(request, existing != null);
          if (validation.HasError) return Result<ParameterDto>.Failure(validation.Messages);
 
+
+         var parameterKey = new ParameterKey(request.Key);
+
          var parameter = new Parameter
          {
-            Group = request.Group,
-            Key = request.Key,
-            Name = request.Name,
+            Module = parameterKey.Module,
+            Group = parameterKey.Group,  
+            Name = parameterKey.Name,
+            Title = request.Title,
             Description = request.Description,
             Type = request.Type,
             Value = request.Value,
@@ -79,7 +79,7 @@ namespace IAM.Application.Services
          var validation = _parameterValidator.ValidateUpdate(parameter, request);
          if (validation.HasError) return Result.Failure(validation.Messages);
 
-         parameter.Name = request.Name;
+         parameter.Title = request.Name;
          parameter.Description = request.Description;
          parameter.Value = request.Value;
          parameter.ListItems = request.ListItems;
@@ -96,7 +96,7 @@ namespace IAM.Application.Services
       public async Task<Result> DeleteAsync(Guid id)
       {
          var parameter = await _parameterRepository.GetByIdAsync(id);
-         if (parameter == null) return Result.Failure(new NotFoundError("Parameter"));
+         if (parameter == null) return Result.Failure(new NotFoundError(Const.Entity.Parameter));
 
          await _unitOfWork.Parameters.DeleteAsync(id);
          await _unitOfWork.SaveChangesAsync();
@@ -104,14 +104,14 @@ namespace IAM.Application.Services
          return Result.Success(new SuccessInfo());
       }
 
-      public async Task<Result> SaveCustomerOverrideAsync(string group, string key, ParameterCustomerUpdateRequest request)
+      public async Task<Result> SaveCustomerAsync(Guid id, ParameterCustomerUpdateRequest request)
       {
-         var parameter = await _parameterRepository.GetByGroupAndKeyAsync(group, key);
+         var parameter = await _parameterRepository.GetByIdAsync(id);
          var validation = _parameterValidator.ValidateCustomerUpdate(parameter, request);
          if (validation.HasError) return Result.Failure(validation.Messages);
 
          var customerId = _userContext.CustomerId;
-         var overrideRecord = await _parameterCustomerRepository.GetByParameterAndCustomerAsync(parameter.Id, customerId);
+         var overrideRecord = await _parameterCustomerRepository.GetByParameterAndCustomerAsync(id, customerId);
 
          if (overrideRecord == null)
          {
@@ -133,55 +133,53 @@ namespace IAM.Application.Services
          return Result.Success(new SuccessInfo());
       }
 
-      public async Task<Result> DeleteCustomerOverrideAsync(string group, string key)
+      public async Task<Result> DeleteCustomerValueAsync(Guid parameterId, Guid customerId)
       {
-         var parameter = await _parameterRepository.GetByGroupAndKeyAsync(group, key);
-         if (parameter == null) return Result.Failure(new NotFoundError("Parameter"));
+         var parameterCustomer = await _parameterCustomerRepository.GetByParameterAndCustomerAsync(parameterId, customerId);
 
-         var customerId = _userContext.CustomerId;
-         var overrideRecord = await _parameterCustomerRepository.GetByParameterAndCustomerAsync(parameter.Id, customerId);
+         if (parameterCustomer == null) return Result.Failure(new NotFoundError(Const.Entity.ParameterCustomer));
 
-         if (overrideRecord != null)
+         if (parameterCustomer != null)
          {
-            await _unitOfWork.ParameterCustomers.DeleteAsync(overrideRecord.Id);
+            await _unitOfWork.ParameterCustomers.DeleteAsync(parameterCustomer.Id);
             await _unitOfWork.SaveChangesAsync();
          }
 
          return Result.Success(new SuccessInfo());
       }
 
-      public async Task<bool> GetBoolAsync(string group, string key)
+      public async Task<bool> GetBoolAsync(string key)
       {
-         var value = await GetResolvedValueAsync(group, key);
+         var value = await GetResolvedValueAsync(key);
          return bool.TryParse(value, out var result) && result;
       }
 
-      public async Task<int> GetIntAsync(string group, string key)
+      public async Task<int> GetIntAsync(string key)
       {
-         var value = await GetResolvedValueAsync(group, key);
+         var value = await GetResolvedValueAsync(key);
          return int.TryParse(value, out var result) ? result : 0;
       }
 
-      public async Task<decimal> GetDecimalAsync(string group, string key)
+      public async Task<decimal> GetDecimalAsync(string key)
       {
-         var value = await GetResolvedValueAsync(group, key);
+         var value = await GetResolvedValueAsync(key);
          return decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result) ? result : 0m;
       }
 
-      public async Task<DateTime> GetDateTimeAsync(string group, string key)
+      public async Task<DateTime> GetDateTimeAsync(string key)
       {
-         var value = await GetResolvedValueAsync(group, key);
+         var value = await GetResolvedValueAsync(key);
          return DateTime.TryParse(value, out var result) ? result : DateTime.MinValue;
       }
 
-      public async Task<string> GetStringAsync(string group, string key)
+      public async Task<string> GetStringAsync(string key)
       {
-         return await GetResolvedValueAsync(group, key) ?? string.Empty;
+         return await GetResolvedValueAsync(key) ?? string.Empty;
       }
 
-      private async Task<string?> GetResolvedValueAsync(string group, string key)
+      private async Task<string?> GetResolvedValueAsync(string key)
       {
-         return await _parameterQueryRepository.GetValueAsync(group, key, _userContext.CustomerId);
+         return await _parameterQueryRepository.GetValueAsync(key, _userContext.CustomerId);
       }
    }
 }

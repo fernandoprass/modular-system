@@ -1,4 +1,6 @@
+using IAM.Domain;
 using IAM.Domain.Entities;
+using IAM.Domain.Enums;
 using IAM.Domain.Repositories;
 using Isopoh.Cryptography.Argon2;
 
@@ -12,19 +14,23 @@ public interface IDatabaseSeeder
 public class DatabaseSeeder : IDatabaseSeeder
 {
    private readonly IUnitOfWork _unitOfWork;
+   private readonly IParameterRepository _parameterRepository;
    private const string DefaultPassword = "Password123!";
 
-   public DatabaseSeeder(IUnitOfWork unitOfWork)
+   public DatabaseSeeder(
+      IParameterRepository parameterRepository,
+      IUnitOfWork unitOfWork)
    {
+      _parameterRepository = parameterRepository;
       _unitOfWork = unitOfWork;
    }
 
    public async Task SeedAsync()
    {
-      await SeedAdminCustomerAsync();
+      //await SeedAdminCustomerAsync();
      // await SeedScientistsCustomerAsync();
 
-      await _unitOfWork.SaveChangesAsync();
+      await SeedParamentersAsync();
    }
 
    private async Task SeedAdminCustomerAsync()
@@ -52,6 +58,7 @@ public class DatabaseSeeder : IDatabaseSeeder
       await _unitOfWork.Customers.AddAsync(customer);
       await _unitOfWork.Users.AddAsync(superUser);
       await _unitOfWork.Users.AddAsync(User.Create("Internal Support", "support@saas.com", passwordHash, customerId));
+      await _unitOfWork.SaveChangesAsync();
    }
 
    private async Task SeedScientistsCustomerAsync()
@@ -85,5 +92,54 @@ public class DatabaseSeeder : IDatabaseSeeder
       {
          await _unitOfWork.Users.AddAsync(User.Create(name, email, passwordHash, customerId));
       }
+      await _unitOfWork.SaveChangesAsync();
+   }
+
+   private async Task SeedParamentersAsync()
+   {
+      await AddParameter(Param.IAM.Security.PasswordExpireTime, ParameterType.Integer,
+                         "Password expiration time", "Password expiration time, in days.", "60", false, false);
+      
+      await _unitOfWork.SaveChangesAsync();
+   }
+
+   private async Task AddParameter(
+      string key,
+      ParameterType type,
+      string title,
+      string description,
+      string value,
+      bool isCustomerEditable,
+      bool isVisible)
+   {
+      var param = await _parameterRepository.GetByKeyAsync(key);
+      if (param is null)
+      {
+         var parameter = CreateParameter(key, type, title, description, value, isCustomerEditable, isVisible);
+         await _unitOfWork.Parameters.AddAsync(parameter);
+      }
+   }
+
+   private static Parameter CreateParameter(
+      string key, 
+      ParameterType type, 
+      string title, 
+      string description, 
+      string value, 
+      bool isCustomerEditable,
+      bool isVisible)
+   {
+      var parameterKey = new ParameterKey(key);
+
+      return Parameter.Create(
+         parameterKey.Module,
+         parameterKey.Group,
+         parameterKey.Name,
+         title,
+         description,
+         type,
+         value,
+         isCustomerEditable: isCustomerEditable,
+         isVisible: isVisible);
    }
 }

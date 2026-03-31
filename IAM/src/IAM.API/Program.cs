@@ -65,7 +65,7 @@ app.MapControllers();
 
 //Apply migrations and seed database in development
 //await MigrateDatabase(app);
-//await PopulateDatabase(app);
+await PopulateDatabase(app);
 
 app.Run();
 

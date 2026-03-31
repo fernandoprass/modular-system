@@ -4,6 +4,7 @@ using IAM.Domain;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;
+using IAM.Domain.Enums;
 using IAM.Domain.Interfaces;
 using IAM.Domain.Mappers;
 using IAM.Domain.Messages.Errors;

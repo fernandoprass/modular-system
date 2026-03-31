@@ -1,3 +1,5 @@
+namespace IAM.Domain.Enums;
+
 public enum CustomerType : byte
 {
     Company = 1,

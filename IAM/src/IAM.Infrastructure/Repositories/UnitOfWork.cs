@@ -12,18 +12,24 @@ public class UnitOfWork : IUnitOfWork
    public IUserContext _userContext;
    public IUserRepository Users { get; }
    public IRoleRepository Roles { get; }
+   public IParameterRepository Parameters { get; }
+   public IParameterCustomerRepository ParameterCustomers { get; }
 
    public UnitOfWork(IamDbContext dbContext,
       IUserContext userContext,
       IUserRepository userRepository,
       ICustomerRepository customerRepository,
-      IRoleRepository roleRepository)
+      IRoleRepository roleRepository,
+      IParameterRepository parameterRepository,
+      IParameterCustomerRepository parameterCustomerRepository)
    {
       _dbContext = dbContext;
       _userContext = userContext;
       Users = userRepository;
       Customers = customerRepository;
       Roles = roleRepository;
+      Parameters = parameterRepository;
+      ParameterCustomers = parameterCustomerRepository;
    }
 
    //public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

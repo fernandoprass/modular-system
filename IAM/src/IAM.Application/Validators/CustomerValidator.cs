@@ -1,6 +1,7 @@
 using IAM.Application.Contracts;
 using IAM.Domain;
 using IAM.Domain.DTOs.Requests;
+using IAM.Domain.Enums;
 using IAM.Domain.Messages.Errors;
 using Myce.FluentValidator;
 using Myce.Response;

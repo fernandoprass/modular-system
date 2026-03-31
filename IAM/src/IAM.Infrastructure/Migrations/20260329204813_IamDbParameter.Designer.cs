@@ -3,6 +3,7 @@ using System;
 using IAM.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IAM.Infrastructure.Migrations
 {
     [DbContext(typeof(IamDbContext))]
-    partial class IamDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260329204813_IamDbParameter")]
+    partial class IamDbParameter
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -156,6 +159,7 @@ namespace IAM.Infrastructure.Migrations
                         .HasColumnName("description");
 
                     b.Property<string>("ExternalListEndpoint")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)")
                         .HasColumnName("external_list_endpoint");
@@ -185,6 +189,7 @@ namespace IAM.Infrastructure.Migrations
                         .HasColumnName("key");
 
                     b.Property<string>("ListItems")
+                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("list_items");
 

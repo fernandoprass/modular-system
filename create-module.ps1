@@ -20,8 +20,11 @@ dotnet new classlib -n "$MODULE_NAME.Domain" -o "src/$MODULE_NAME.Domain" -f $DO
 dotnet sln add "src/$MODULE_NAME.Domain"
 
 # Create Split Repository Structure
-New-Item -ItemType Directory -Path "src/$MODULE_NAME.Domain/Repositories" -Force | Out-Null
+New-Item -ItemType Directory -Path "src/$MODULE_NAME.Domain/DTOs" -Force | Out-Null
+New-Item -ItemType Directory -Path "src/$MODULE_NAME.Domain/Entities" -Force | Out-Null
+New-Item -ItemType Directory -Path "src/$MODULE_NAME.Domain/Interfaces" -Force | Out-Null
 New-Item -ItemType Directory -Path "src/$MODULE_NAME.Domain/QueryRepositories" -Force | Out-Null
+New-Item -ItemType Directory -Path "src/$MODULE_NAME.Domain/Repositories" -Force | Out-Null
 
 # 2. Application
 dotnet new classlib -n "$MODULE_NAME.Application" -o "src/$MODULE_NAME.Application" -f $DOTNET_VERSION
@@ -29,8 +32,10 @@ dotnet sln add "src/$MODULE_NAME.Application"
 dotnet add "src/$MODULE_NAME.Application" reference "src/$MODULE_NAME.Domain"
 
 # Create Split Repository Structure
-New-Item -ItemType Directory -Path "src/$MODULE_NAME.Application/Services" -Force | Out-Null
+New-Item -ItemType Directory -Path "src/$MODULE_NAME.Application/Contracts" -Force | Out-Null
 New-Item -ItemType Directory -Path "src/$MODULE_NAME.Application/Orchestrators" -Force | Out-Null
+New-Item -ItemType Directory -Path "src/$MODULE_NAME.Application/Services" -Force | Out-Null
+New-Item -ItemType Directory -Path "src/$MODULE_NAME.Application/Validators" -Force | Out-Null
 
 # 3. Infrastructure
 dotnet new classlib -n "$MODULE_NAME.Infrastructure" -o "src/$MODULE_NAME.Infrastructure" -f $DOTNET_VERSION
@@ -40,10 +45,10 @@ dotnet add "src/$MODULE_NAME.Infrastructure" reference "src/$MODULE_NAME.Applica
 dotnet add "src/$MODULE_NAME.Infrastructure" package Npgsql.EntityFrameworkCore.PostgreSQL
 
 # Create Split Repository Structure
-New-Item -ItemType Directory -Path "src/$MODULE_NAME.Infrastructure/Migrations" -Force | Out-Null
 New-Item -ItemType Directory -Path "src/$MODULE_NAME.Infrastructure/Configurations" -Force | Out-Null
+New-Item -ItemType Directory -Path "src/$MODULE_NAME.Infrastructure/Migrations" -Force | Out-Null
+New-Item -ItemType Directory -Path "src/$MODULE_NAME.Infrastructure/QuertRepositories" -Force | Out-Null
 New-Item -ItemType Directory -Path "src/$MODULE_NAME.Infrastructure/Repositories" -Force | Out-Null
-New-Item -ItemType Directory -Path "src/$MODULE_NAME.Infrastructure/QueryRepositories" -Force | Out-Null
 
 # 4. API
 dotnet new webapi -n "$MODULE_NAME.API" -o "src/$MODULE_NAME.API" -f $DOTNET_VERSION

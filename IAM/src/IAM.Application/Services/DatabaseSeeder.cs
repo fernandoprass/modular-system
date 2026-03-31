@@ -131,18 +131,15 @@ public class DatabaseSeeder : IDatabaseSeeder
    {
       var parameterKey = new ParameterKey(key);
 
-      return new Parameter
-      {
-         Id = Guid.CreateVersion7(),
-         Module = parameterKey.Module,
-         Group = parameterKey.Group,
-         Name = parameterKey.Name,
-         Type = type,
-         Title = title,
-         Description = description,
-         Value = value,
-         IsCustomerEditable = isCustomerEditable,
-         IsVisible = isVisible
-      };
+      return Parameter.Create(
+         parameterKey.Module,
+         parameterKey.Group,
+         parameterKey.Name,
+         title,
+         description,
+         type,
+         value,
+         isCustomerEditable: isCustomerEditable,
+         isVisible: isVisible);
    }
 }

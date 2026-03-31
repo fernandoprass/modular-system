@@ -4,7 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IAM.Infrastructure.Repositories
 {
-   public class ParameterCustomerRepository(IamDbContext context) : BaseRepository<ParameterCustomer>(context), IParameterCustomerRepository
+   public class ParameterCustomerRepository(IamDbContext context) 
+      : BaseRepository<ParameterCustomer>(context), IParameterCustomerRepository
    {
       public async Task<ParameterCustomer?> GetByParameterAndCustomerAsync(Guid parameterId, Guid customerId)
       {

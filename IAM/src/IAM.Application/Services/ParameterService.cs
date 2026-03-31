@@ -40,32 +40,28 @@ namespace IAM.Application.Services
 
       public async Task<ParameterDto?> GetByKeyAsync(string key)
       {
-         return await _parameterQueryRepository.GetByModuleGroupAndKeyAsync(key);
+         var parameterKey = new ParameterKey(key);
+         return await _parameterQueryRepository.GetByModuleGroupAndKeyAsync(parameterKey.Module, parameterKey.Group, parameterKey.Name);
       }
 
       public async Task<Result<ParameterDto>> CreateAsync(ParameterCreateRequest request)
       {
-         var existing = await _parameterRepository.GetByKeyAsync(request.Key);
+         var existing = await _parameterQueryRepository.GetByModuleGroupAndKeyAsync(request.Module, request.Group, request.Name);
          var validation = _parameterValidator.ValidateCreate(request, existing != null);
          if (validation.HasError) return Result<ParameterDto>.Failure(validation.Messages);
 
-
-         var parameterKey = new ParameterKey(request.Key);
-
-         var parameter = new Parameter
-         {
-            Module = parameterKey.Module,
-            Group = parameterKey.Group,  
-            Name = parameterKey.Name,
-            Title = request.Title,
-            Description = request.Description,
-            Type = request.Type,
-            Value = request.Value,
-            ListItems = request.ListItems,
-            ExternalListEndpoint = request.ExternalListEndpoint,
-            IsCustomerEditable = request.IsCustomerEditable,
-            IsVisible = request.IsVisible
-         };
+         var parameter = Parameter.Create(
+             request.Module,
+             request.Group,
+             request.Name,
+             request.Title,
+             request.Description,
+             request.Type,
+             request.Value,
+             request.ListItems,
+             request.ExternalListEndpoint,
+             request.IsCustomerEditable,
+             request.IsVisible);
 
          await _unitOfWork.Parameters.AddAsync(parameter);
          await _unitOfWork.SaveChangesAsync();
@@ -79,13 +75,18 @@ namespace IAM.Application.Services
          var validation = _parameterValidator.ValidateUpdate(parameter, request);
          if (validation.HasError) return Result.Failure(validation.Messages);
 
-         parameter.Title = request.Name;
-         parameter.Description = request.Description;
-         parameter.Value = request.Value;
-         parameter.ListItems = request.ListItems;
-         parameter.ExternalListEndpoint = request.ExternalListEndpoint;
-         parameter.IsCustomerEditable = request.IsCustomerEditable;
-         parameter.IsVisible = request.IsVisible;
+         parameter.Update(
+             request.Module,
+             request.Group,
+             request.Name,
+             request.Title,
+             request.Description,
+             request.Type,
+             request.Value,
+             request.ListItems,
+             request.ExternalListEndpoint,
+             request.IsCustomerEditable,
+             request.IsVisible);
 
          _unitOfWork.Parameters.Update(parameter);
          await _unitOfWork.SaveChangesAsync();
@@ -111,22 +112,19 @@ namespace IAM.Application.Services
          if (validation.HasError) return Result.Failure(validation.Messages);
 
          var customerId = _userContext.CustomerId;
-         var overrideRecord = await _parameterCustomerRepository.GetByParameterAndCustomerAsync(id, customerId);
 
-         if (overrideRecord == null)
+         var parameterCustomer = await _parameterCustomerRepository.GetByParameterAndCustomerAsync(id, customerId);
+
+         if (parameterCustomer == null)
          {
-            overrideRecord = new ParameterCustomer
-            {
-               ParameterId = parameter.Id,
-               CustomerId = customerId,
-               Value = request.Value
-            };
-            await _unitOfWork.ParameterCustomers.AddAsync(overrideRecord);
+            parameterCustomer = ParameterCustomer.Create(id, customerId, request.Value);
+
+            await _unitOfWork.ParameterCustomers.AddAsync(parameterCustomer);
          }
          else
          {
-            overrideRecord.Value = request.Value;
-            _unitOfWork.ParameterCustomers.Update(overrideRecord);
+            parameterCustomer.Update(request.Value);
+            _unitOfWork.ParameterCustomers.Update(parameterCustomer);
          }
 
          await _unitOfWork.SaveChangesAsync();

@@ -12,16 +12,19 @@ namespace IAM.Application.Validators
 {
    public class ParameterValidator : IParameterValidator
    {
+      private static void MemberKey<T>(RuleBuilder<T, string> rb) where T : class
+                        => rb.IsRequired().MinLength(2).IsAlphaNumeric();
+
       public Result ValidateCreate(ParameterCreateRequest request, bool keyExists)
       {
          var validator = new FluentValidator<ParameterCreateRequest>()
-            .RuleFor(x => x.Key)
-               .IsRequired()
-               .Matches(@"^([a-zA-Z0-9]{2,})\.([a-zA-Z0-9]{2,})\.([a-zA-Z0-9]{2,})$", new InvalidParameterKeyFormatError())
+            .RuleFor(x => x.Module).ApplyTemplate(MemberKey)
+            .RuleFor(x => x.Group).ApplyTemplate(MemberKey)
+            .RuleFor(x => x.Name).ApplyTemplate(MemberKey)
             .RuleFor(x => x.Description).IsRequired()
             .RuleFor(x => x.Type).IsRequired()
             .RuleFor(x => x.Value).IsRequired()
-            .RuleForValue(keyExists).IsFalse(new DuplicateParameterError(request.Key));
+            .RuleForValue(keyExists).IsFalse(new DuplicateParameterError(request.Module, request.Group, request.Name));
 
          var isValid = validator.Validate(request);
          if (!isValid) return Result.Failure(validator.Messages);

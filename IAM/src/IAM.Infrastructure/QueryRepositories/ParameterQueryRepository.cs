@@ -12,7 +12,9 @@ namespace IAM.Infrastructure.QueryRepositories
 
       public async Task<ParameterDto?> GetByIdAsync(Guid id)
       {
-         var parameter = await _context.Parameters.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+         var parameter = await _context.Parameters
+            .AsNoTracking()
+            .SingleOrDefaultAsync(p => p.Id == id);
          return parameter?.ToParameterDto();
       }
 
@@ -41,11 +43,11 @@ namespace IAM.Infrastructure.QueryRepositories
          return await query.Select(p => p.ToParameterLiteDto()).ToListAsync();
       }
 
-      public async Task<ParameterDto?> GetByModuleGroupAndKeyAsync(string key)
+      public async Task<ParameterDto?> GetByModuleGroupAndKeyAsync(string module, string group, string name)
       {
          var parameter = await _context.Parameters
             .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.Key == key);
+            .SingleOrDefaultAsync(p => p.Module == module && p.Group == group && p.Name == name);
          return parameter?.ToParameterDto();
       }
 
@@ -57,7 +59,8 @@ namespace IAM.Infrastructure.QueryRepositories
                      where p.Key == key
                      select pc != null ? pc.Value : p.Value;
 
-         return await query.FirstOrDefaultAsync();
+         return await query.AsNoTracking()
+            .SingleOrDefaultAsync();
       }
    }
 }

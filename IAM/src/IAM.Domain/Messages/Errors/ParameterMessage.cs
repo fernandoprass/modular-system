@@ -4,10 +4,12 @@ namespace IAM.Domain.Messages.Errors
 {
    public class DuplicateParameterError : ErrorMessage
    {
-      public DuplicateParameterError(string key) 
-         : base("DuplicateParameterError", "A parameter with key '{key}' already exists.")
+      public DuplicateParameterError(string module, string group, string name)
+         : base("DuplicateParameterError", "A parameter with Module '{module}', Group '{group}' and Name '{name}' already exists.")
       {
-         AddVariable("key", key);
+         AddVariable(nameof(module), module);
+         AddVariable(nameof(group), group);
+         AddVariable(nameof(name), name);
       }
    }
 
@@ -22,7 +24,7 @@ namespace IAM.Domain.Messages.Errors
       public InvalidParameterValueFormatError(string typeName) 
          : base("InvalidParameterValueFormatError", "The value provided is not in a valid format for type '{typeName}'.")
       {
-         AddVariable("typeName", typeName);
+         AddVariable(nameof(typeName), typeName);
       }
    }
 

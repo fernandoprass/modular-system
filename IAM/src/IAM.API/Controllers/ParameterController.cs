@@ -55,9 +55,9 @@ namespace IAM.API.Controllers
 
       [HttpDelete("{parameterId:guid}/customer/{customerId:guid}")]
       [Authorize]
-      public async Task<IActionResult> Delete(Guid id, Guid customerId)
+      public async Task<IActionResult> Delete(Guid parameterId, Guid customerId)
       {
-         var result = await _parameterService.DeleteCustomerValueAsync(id, customerId);
+         var result = await _parameterService.DeleteCustomerValueAsync(parameterId, customerId);
          return OkOrNotFound(result);
       }
    }

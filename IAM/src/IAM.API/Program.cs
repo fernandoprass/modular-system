@@ -17,9 +17,9 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 // Add DbContext
-builder.Services.AddDbContext<IamDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("IAM")).
     UseSnakeCaseNamingConvention());
+
+DependencyInjection.RegisterContexts(builder);
 
 UserContext.Configure(builder);
 
@@ -74,8 +74,10 @@ static async Task MigrateDatabase(WebApplication app)
    if (app.Environment.IsDevelopment())
    {
       using var scope = app.Services.CreateScope();
-      var db = scope.ServiceProvider.GetRequiredService<IamDbContext>();
-      db.Database.Migrate();
+      var dbIam = scope.ServiceProvider.GetRequiredService<IamDbContext>();
+      dbIam.Database.Migrate();
+      var dbShared = scope.ServiceProvider.GetRequiredService<SharedDbContext>();
+      dbShared.Database.Migrate();
    }
 }
 

@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>Shared.Domain</PackageId>
@@ -8,4 +8,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>YourCompany</Authors>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.5" />
+    <PackageReference Include="Myce.Response" Version="1.1.0" />
+  </ItemGroup>
 </Project>

@@ -1,4 +1,6 @@
-﻿using Shared.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Domain.Entities;
 
 namespace Shared.Infrastructure.Configurations
 {

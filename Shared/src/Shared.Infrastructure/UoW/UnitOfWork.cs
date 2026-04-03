@@ -4,7 +4,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Shared.Infrastructure.UoW;
 
-public class UnitOfWork<TContext> : IUnitOfWork<TContext> where TContext : DbContext
+/// <summary>
+/// UnitOfWork is an abstract class that implements the IUnitOfWork interface, providing a base 
+/// implementation for managing database transactions and ensuring that changes to entities are 
+/// tracked and saved correctly. It uses Entity Framework Core's DbContext to manage the database 
+/// context and includes logic to automatically set audit fields (CreatedAt, CreatedBy, UpdatedAt, 
+/// UpdatedBy) based on the state of the entities being tracked. The class also ensures that the 
+/// database context is properly disposed of when the unit of work is no longer needed.
+/// </summary>
+/// <typeparam name="TContext">The database context</typeparam>
+public abstract class UnitOfWork<TContext> : IUnitOfWork<TContext> where TContext : DbContext
 {
     private readonly TContext _dbContext;
     private readonly IUserContext _userContext;

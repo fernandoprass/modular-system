@@ -1,8 +1,15 @@
 using Microsoft.EntityFrameworkCore;
+using Shared.Domain.Repositories;
 
 namespace Shared.Domain.Interfaces;
 
-public interface IUnitOfWork<TContext> : IDisposable where TContext : DbContext
+
+public interface IUnitOfWork : IDisposable
 {
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+   Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+}
+
+public interface IUnitOfWork<TContext> : IUnitOfWork where TContext : DbContext
+{
+
 }

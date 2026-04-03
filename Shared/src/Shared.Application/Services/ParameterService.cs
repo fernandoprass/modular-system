@@ -1,3 +1,4 @@
+using Myce.Response;
 using Shared.Application.Contracts;
 using Shared.Domain;
 using Shared.Domain.DTOs.Requests;
@@ -8,20 +9,19 @@ using Shared.Domain.Mappers;
 using Shared.Domain.Messages;
 using Shared.Domain.QueryRepositories;
 using Shared.Domain.Repositories;
-using Myce.Response;
 using System.Globalization;
 
 namespace Shared.Application.Services;
 
 public class ParameterService(
-    IUnitOfWork unitOfWork,
+    ISharedUnitOfWork unitOfWork,
     IUserContext userContext,
     IParameterValidator parameterValidator,
     IParameterRepository parameterRepository,
     IParameterCustomerRepository parameterCustomerRepository,
     IParameterQueryRepository parameterQueryRepository) : BaseService(userContext), IParameterService
 {
-   private readonly IUnitOfWork _unitOfWork = unitOfWork;
+   private readonly ISharedUnitOfWork _unitOfWork = unitOfWork;
    private readonly IParameterValidator _parameterValidator = parameterValidator;
    private readonly IParameterRepository _parameterRepository = parameterRepository;
    private readonly IParameterCustomerRepository _parameterCustomerRepository = parameterCustomerRepository;
@@ -110,7 +110,7 @@ public class ParameterService(
       var validation = _parameterValidator.ValidateCustomerUpdate(parameter, request);
       if (validation.HasError) return Result.Failure(validation.Messages);
 
-      var customerId = _userContext.CustomerId;
+      var customerId = _userContext.OwnerId;
 
       var parameterCustomer = await _parameterCustomerRepository.GetByParameterAndCustomerAsync(id, customerId);
 
@@ -176,6 +176,6 @@ public class ParameterService(
 
    private async Task<string?> GetResolvedValueAsync(string key)
    {
-      return await _parameterQueryRepository.GetValueAsync(key, _userContext.CustomerId);
+      return await _parameterQueryRepository.GetValueAsync(key, _userContext.OwnerId);
    }
 }

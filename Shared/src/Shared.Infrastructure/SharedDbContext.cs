@@ -1,6 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using Shared.Domain.Entities;
 using Shared.Infrastructure.Configurations;
-using Microsoft.EntityFrameworkCore;
 
 namespace Shared.Infrastructure;
 
@@ -17,7 +17,7 @@ public class SharedDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.ApplyConfiguration(new ParameterConfiguration());
-        modelBuilder.ApplyConfiguration(new ParameterCustomerConfiguration());
+        modelBuilder.ApplyConfiguration<Parameter>(new ParameterConfiguration());
+        modelBuilder.ApplyConfiguration<ParameterCustomer>(new ParameterCustomerConfiguration());
     }
 }

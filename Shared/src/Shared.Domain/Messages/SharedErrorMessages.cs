@@ -16,3 +16,8 @@ public class NotFoundError : ErrorMessage
       AddVariable("entity", entity);
    }
 }
+
+public class UnauthorizedAccessError : ErrorMessage
+{
+   public UnauthorizedAccessError() : base("UnauthorizedAccessError", "You do not have permission to access this resource.") { }
+}

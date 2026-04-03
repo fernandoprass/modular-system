@@ -1,5 +1,6 @@
 ﻿using Myce.Response;
 using Shared.Domain.Interfaces;
+using Shared.Domain.Messages;
 
 namespace Shared.Application.Services;
 
@@ -12,23 +13,42 @@ public class BaseService
       _userContext = userContext;
    }
 
-   protected async Task<Result> ExecuteIfUserOwnsAsync(Guid? resourceCustomerId, Func<Task<Result>> actionAsync)
+   /// <summary>
+   /// Validates resource ownership before executing a task that returns a standard <see cref="Result"/>.
+   /// </summary>
+   /// <param name="resourceOwnerId">The unique identifier of the resource owner to be validated against the current user context.</param>
+   /// <param name="actionAsync">The asynchronous function to execute if ownership validation succeeds.</param>
+   /// <returns>
+   /// A <see cref="Result"/> indicating success and executing the action, 
+   /// or a failure result containing an <see cref="UnauthorizedAccessError"/> if validation fails.
+   /// </returns>
+   protected async Task<Result> ExecuteIfUserOwnsAsync(Guid? resourceOwnerId, Func<Task<Result>> actionAsync)
    {
-      if (!IsUserAlllowedToAccess(resourceCustomerId))
+      if (!IsUserAlllowedToAccess(resourceOwnerId))
       {
-         return Result.Failure(new ForbiddenCustomerError());
+         return Result.Failure(new UnauthorizedAccessError());
       }
 
       return await actionAsync();
    }
 
-   protected async Task<TResult> ExecuteIfUserOwnsAsync<TResult>(Guid? resourceCustomerId, Func<Task<TResult>> actionAsync) where TResult : Result
+   /// <summary>
+   /// Validates resource ownership before executing a task that returns a specialized <typeparamref name="TResult"/>.
+   /// </summary>
+   /// <typeparam name="TResult">A type that inherits from <see cref="Result"/>.</typeparam>
+   /// <param name="resourceOwnerId">The unique identifier of the resource owner to be validated against the current user context.</param>
+   /// <param name="actionAsync">The asynchronous function to execute if ownership validation succeeds.</param>
+   /// <returns>
+   /// The <typeparamref name="TResult"/> produced by the action, 
+   /// or a new instance of <typeparamref name="TResult"/> with an <see cref="UnauthorizedAccessError"/> message if validation fails.
+   /// </returns>
+   protected async Task<TResult> ExecuteIfUserOwnsAsync<TResult>(Guid? resourceOwnerId, Func<Task<TResult>> actionAsync) where TResult : Result
    {
-      if (!IsUserAlllowedToAccess(resourceCustomerId))
+      if (!IsUserAlllowedToAccess(resourceOwnerId))
       {
          var result = Activator.CreateInstance<TResult>()!;
 
-         result.AddMessage(new ForbiddenCustomerError());
+         result.AddMessage(new UnauthorizedAccessError());
 
          return result;
       }
@@ -36,9 +56,9 @@ public class BaseService
       return await actionAsync();
    }
 
-   private bool IsUserAlllowedToAccess(Guid? resourceCustomerId)
+   private bool IsUserAlllowedToAccess(Guid? resourceOwnerId)
    {
       return _userContext.IsSystemAdmin ||
-             (resourceCustomerId.HasValue && resourceCustomerId == _userContext.CustomerId);
+             (resourceOwnerId.HasValue && resourceOwnerId == _userContext.OwnerId);
    }
 }

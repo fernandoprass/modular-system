@@ -2,7 +2,7 @@
 {
    public interface IUserContext
    {
-      Guid CustomerId { get; }
+      Guid OwnerId { get; }
       bool IsAuthenticated { get; }
       bool IsSystemAdmin { get; }
       Guid UserId { get; }

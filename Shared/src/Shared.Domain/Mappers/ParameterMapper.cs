@@ -20,7 +20,7 @@ namespace Shared.Domain.Mappers
             Value = parameter.Value,
             ListItems = parameter.ListItems,
             ExternalListEndpoint = parameter.ExternalListEndpoint,
-            IsCustomerEditable = parameter.IsCustomerEditable,
+            IsOwnerEditable = parameter.IsOwnerEditable,
             IsVisible = parameter.IsVisible
          };
       }

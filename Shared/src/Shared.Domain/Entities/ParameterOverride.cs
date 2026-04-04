@@ -1,18 +1,18 @@
 namespace Shared.Domain.Entities
 {
-   public class ParameterCustomer : Entity
+   public class ParameterOverride : Entity
    {
       public string Value { get; set; }
-      public Guid CustomerId { get; set; }
+      public Guid OwnerId { get; set; }
       public Guid ParameterId { get; set; }
 
-      public static ParameterCustomer Create(Guid parameterId, Guid customerId, string value)
+      public static ParameterOverride Create(Guid parameterId, Guid ownerId, string value)
       {
-         return new ParameterCustomer
+         return new ParameterOverride
          {
             Id = Guid.CreateVersion7(),
             ParameterId = parameterId,
-            CustomerId = customerId,
+            OwnerId = ownerId,
             Value = value
          };
       }

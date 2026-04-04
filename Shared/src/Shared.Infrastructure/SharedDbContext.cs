@@ -11,13 +11,13 @@ public class SharedDbContext : DbContext
     }
 
     public DbSet<Parameter> Parameters { get; set; }
-    public DbSet<ParameterCustomer> ParameterCustomers { get; set; }
+    public DbSet<ParameterOverride> ParameterOverrides { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfiguration<Parameter>(new ParameterConfiguration());
-        modelBuilder.ApplyConfiguration<ParameterCustomer>(new ParameterCustomerConfiguration());
+        modelBuilder.ApplyConfiguration<ParameterOverride>(new ParameterOverrideConfiguration());
     }
 }

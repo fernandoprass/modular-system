@@ -12,10 +12,10 @@ public class DuplicateParameterError : ErrorMessage
    }
 }
 
-public class ParameterNotCustomerEditableError : ErrorMessage
+public class ParameterNotOwnerEditableError : ErrorMessage
 {
-   public ParameterNotCustomerEditableError() 
-      : base("ParameterNotCustomerEditableError", "This parameter is not editable by customers.") { }
+   public ParameterNotOwnerEditableError() 
+      : base("ParameterNotOwnerEditableError", "This parameter is not editable by owners.") { }
 }
 
 public class InvalidParameterValueFormatError : ErrorMessage

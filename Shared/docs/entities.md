@@ -1,6 +1,6 @@
 # Shared Entities
 
-The **Shared** module provides a flexible configuration system through the **Parameter** and **ParameterCustomer** entities. This system allows the application to define global settings that can be specifically overridden at the customer (tenant) level, enabling fine-grained control over business rules and UI behavior without requiring code changes or deployments.
+The **Shared** module provides a flexible configuration system through the **Parameter** and **ParameterOverride** entities. This system allows the application to define global settings that can be specifically overridden at the owner (tenant) level, enabling fine-grained control over business rules and UI behavior without requiring code changes or deployments.
 
 ## Base Entity<TId> (Generic Base Class)
 
@@ -51,7 +51,7 @@ The `Parameter` entity defines a global configuration setting. It acts as the "t
 -   **Value** (string): The default system-wide value for the parameter.
 -   **ListItems** (string?): Optional JSON containing selectable options for the UI.
 -   **ExternalListEndpoint** (string?): Optional URL to fetch dynamic list items from an external service.
--   **IsCustomerEditable** (bool): If true, customers are allowed to override this value in their own context.
+-   **IsOwnerEditable** (bool): If true, users are allowed to override this value in their own context.
 -   **IsVisible** (bool): Informs if the parameter should be displayed in the management UI.
     
 ### Audit Trail
@@ -60,15 +60,15 @@ Inherits from `Entity`, providing `Id` `CreatedAt`, `CreatedBy`, `UpdatedAt`, an
 
 ----------
 
-## ParameterCustomer Entity
+## ParameterOverride Entity
 
-The `ParameterCustomer` entity represents a **customer-specific override**. If a record exists here for a given `CustomerId` and `ParameterId`, the system will prioritize this value over the default global value in `Parameter`.
+The `ParameterOverride` entity represents a **user-specific override**. If a record exists here for a given `OwnerId` and `ParameterId`, the system will prioritize this value over the default global value in `Parameter`.
 
 ### Properties
 
 -   **ParameterId** (Guid): Foreign key linking to the base `Parameter`.
--   **CustomerId** (Guid): The identifier of the customer (owner) this override applies to.
--   **Value** (string): The specific value defined by the customer, overriding the system default.
+-   **OwnerId** (Guid): The identifier of the owner (a customer, an user) this override applies to.
+-   **Value** (string): The specific value defined by the data owner, overriding the system default.
     
 ----------
 
@@ -82,7 +82,7 @@ The `Key` is automatically maintained via a private `GetKey` method during creat
 
 The `ParameterService` implements a "fallback" logic:
 
-1.  Search for a value in `ParameterCustomer` using the current `OwnerId`.
+1.  Search for a value in `ParameterOverride` using the current `OwnerId`.
 2.  If not found, return the default `Value` from the `Parameter` entity.
     
 ### 3. Encapsulation
@@ -93,9 +93,9 @@ are only modified through the explicit `Update` method, which triggers the neces
 ### 4. Integrity and Constraints
 
 -   **Uniqueness**: The combination of `Module`, `Group`, and `Name` (reflected in the `Key`) must be unique at the system level.
--   **Override Constraint**: A customer can only have one override per parameter. 
+-   **Override Constraint**: An owner can only have one override per parameter. 
 
 ## Relationships
 
--   **Parameter to ParameterCustomer**: One-to-many. A single global parameter can have multiple customer-specific overrides.  
+-   **Parameter to ParameterOverride**: One-to-many. A single global parameter can have multiple owner-specific overrides.  
 -   **Audit Logging**: Handled automatically by the `UnitOfWork` during `SaveChangesAsync` for all parameter-related changes.

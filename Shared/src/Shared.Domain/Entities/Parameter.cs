@@ -14,10 +14,10 @@ namespace Shared.Domain.Entities
       public string Value { get; set; }
       public string? ListItems { get; set; }
       public string? ExternalListEndpoint { get; set; }
-      public bool IsCustomerEditable { get; set; }
+      public bool IsOwnerEditable { get; set; }
       public bool IsVisible { get; set; }
 
-      public ICollection<ParameterCustomer> ParameterCustomers { get; set; } = new List<ParameterCustomer>();
+      public ICollection<ParameterOverride> ParameterOwners { get; set; } = new List<ParameterOverride>();
 
       public static Parameter Create(
          string module,
@@ -29,7 +29,7 @@ namespace Shared.Domain.Entities
          string value,
          string? listItems = null,
          string? externalListEndpoint = null,
-         bool isCustomerEditable = false,
+         bool isOwnerEditable = false,
          bool isVisible = true)
       {
          var parameter = new Parameter
@@ -45,7 +45,7 @@ namespace Shared.Domain.Entities
             Value = value,
             ListItems = listItems,
             ExternalListEndpoint = externalListEndpoint,
-            IsCustomerEditable = isCustomerEditable,
+            IsOwnerEditable = isOwnerEditable,
             IsVisible = isVisible
          };
 
@@ -62,7 +62,7 @@ namespace Shared.Domain.Entities
          string value,
          string? listItems = null,
          string? externalListEndpoint = null,
-         bool isCustomerEditable = false,
+         bool isOwnerEditable = false,
          bool isVisible = true)
       {
          Module = module;
@@ -75,7 +75,7 @@ namespace Shared.Domain.Entities
          Value = value;
          ListItems = listItems;
          ExternalListEndpoint = externalListEndpoint;
-         IsCustomerEditable = isCustomerEditable;
+         IsOwnerEditable = isOwnerEditable;
          IsVisible = isVisible;
       }
 

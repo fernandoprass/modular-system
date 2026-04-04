@@ -18,13 +18,13 @@ public class ParameterService(
     IUserContext userContext,
     IParameterValidator parameterValidator,
     IParameterRepository parameterRepository,
-    IParameterCustomerRepository parameterCustomerRepository,
+    IParameterOverrideRepository parameterOverrideRepository,
     IParameterQueryRepository parameterQueryRepository) : BaseService(userContext), IParameterService
 {
    private readonly ISharedUnitOfWork _unitOfWork = unitOfWork;
    private readonly IParameterValidator _parameterValidator = parameterValidator;
    private readonly IParameterRepository _parameterRepository = parameterRepository;
-   private readonly IParameterCustomerRepository _parameterCustomerRepository = parameterCustomerRepository;
+   private readonly IParameterOverrideRepository _parameterOverrideRepository = parameterOverrideRepository;
    private readonly IParameterQueryRepository _parameterQueryRepository = parameterQueryRepository;
 
    public async Task<ParameterDto?> GetByIdAsync(Guid id)
@@ -59,7 +59,7 @@ public class ParameterService(
           request.Value,
           request.ListItems,
           request.ExternalListEndpoint,
-          request.IsCustomerEditable,
+          request.IsOwnerEditable,
           request.IsVisible);
 
       await _unitOfWork.Parameters.AddAsync(parameter);
@@ -84,7 +84,7 @@ public class ParameterService(
           request.Value,
           request.ListItems,
           request.ExternalListEndpoint,
-          request.IsCustomerEditable,
+          request.IsOwnerEditable,
           request.IsVisible);
 
       _unitOfWork.Parameters.Update(parameter);
@@ -104,41 +104,41 @@ public class ParameterService(
       return Result.Success(new SuccessInfo());
    }
 
-   public async Task<Result> SaveCustomerAsync(Guid id, ParameterCustomerUpdateRequest request)
+   public async Task<Result> SaveOwnerValueAsync(Guid id, ParameterOwnerUpdateRequest request)
    {
       var parameter = await _parameterRepository.GetByIdAsync(id);
-      var validation = _parameterValidator.ValidateCustomerUpdate(parameter, request);
+      var validation = _parameterValidator.ValidateOwnerUpdate(parameter, request);
       if (validation.HasError) return Result.Failure(validation.Messages);
 
-      var customerId = _userContext.OwnerId;
+      var ownerId = _userContext.OwnerId;
 
-      var parameterCustomer = await _parameterCustomerRepository.GetByParameterAndCustomerAsync(id, customerId);
+      var parameterOverride = await _parameterOverrideRepository.GetByParameterAndOwnerAsync(id, ownerId);
 
-      if (parameterCustomer == null)
+      if (parameterOverride == null)
       {
-         parameterCustomer = ParameterCustomer.Create(id, customerId, request.Value);
+         parameterOverride = ParameterOverride.Create(id, ownerId, request.Value);
 
-         await _unitOfWork.ParameterCustomers.AddAsync(parameterCustomer);
+         await _unitOfWork.ParameterOverrides.AddAsync(parameterOverride);
       }
       else
       {
-         parameterCustomer.Update(request.Value);
-         _unitOfWork.ParameterCustomers.Update(parameterCustomer);
+         parameterOverride.Update(request.Value);
+         _unitOfWork.ParameterOverrides.Update(parameterOverride);
       }
 
       await _unitOfWork.SaveChangesAsync();
       return Result.Success(new SuccessInfo());
    }
 
-   public async Task<Result> DeleteCustomerValueAsync(Guid parameterId, Guid customerId)
+   public async Task<Result> DeleteOwnerValueAsync(Guid parameterId, Guid ownerId)
    {
-      var parameterCustomer = await _parameterCustomerRepository.GetByParameterAndCustomerAsync(parameterId, customerId);
+      var parameterOverride = await _parameterOverrideRepository.GetByParameterAndOwnerAsync(parameterId, ownerId);
 
-      if (parameterCustomer == null) return Result.Failure(new NotFoundError(Const.Entity.ParameterCustomer));
+      if (parameterOverride == null) return Result.Failure(new NotFoundError(Const.Entity.ParameterOverride));
 
-      if (parameterCustomer != null)
+      if (parameterOverride != null)
       {
-         await _unitOfWork.ParameterCustomers.DeleteAsync(parameterCustomer.Id);
+         await _unitOfWork.ParameterOverrides.DeleteAsync(parameterOverride.Id);
          await _unitOfWork.SaveChangesAsync();
       }
 

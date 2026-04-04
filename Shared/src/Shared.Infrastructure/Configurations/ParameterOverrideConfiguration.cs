@@ -4,19 +4,19 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Shared.Infrastructure.Configurations
 {
-   public class ParameterCustomerConfiguration : BaseConfiguration<ParameterCustomer>
+   public class ParameterOverrideConfiguration : BaseConfiguration<ParameterOverride>
    {
-      public override void Configure(EntityTypeBuilder<ParameterCustomer> builder)
+      public override void Configure(EntityTypeBuilder<ParameterOverride> builder)
       {
          base.Configure(builder);
-         builder.ToTable("ParameterCustomers", "shared");
+         builder.ToTable("ParameterOverrides", "shared");
 
          builder.Property(p => p.Value).IsRequired().HasColumnType("text");
-         builder.Property(pc => pc.CustomerId).IsRequired();
+         builder.Property(pc => pc.OwnerId).IsRequired();
          builder.Property(pc => pc.ParameterId).IsRequired();
 
          builder.HasOne<Parameter>()
-                .WithMany(p => p.ParameterCustomers)
+                .WithMany(p => p.ParameterOwners)
                 .HasForeignKey(pc => pc.ParameterId)
                 .OnDelete(DeleteBehavior.Cascade);
       }

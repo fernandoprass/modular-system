@@ -46,11 +46,11 @@ public class ParameterValidator : IParameterValidator
       return ValidateValueFormat(request.Value, parameter.Type);
    }
 
-   public Result ValidateCustomerUpdate(Parameter? parameter, ParameterCustomerUpdateRequest request)
+   public Result ValidateOwnerUpdate(Parameter? parameter, ParameterOwnerUpdateRequest request)
    {
-      var validator = new FluentValidator<ParameterCustomerUpdateRequest>()
+      var validator = new FluentValidator<ParameterOwnerUpdateRequest>()
          .RuleForValue(parameter).IsNotNull(new NotFoundError(Const.Entity.Parameter))
-         .RuleForValue(parameter?.IsCustomerEditable ?? false).IsTrue(new ParameterNotCustomerEditableError())
+         .RuleForValue(parameter?.IsOwnerEditable ?? false).IsTrue(new ParameterNotOwnerEditableError())
          .RuleFor(x => x.Value).IsRequired();
 
       var isValid = validator.Validate(request);

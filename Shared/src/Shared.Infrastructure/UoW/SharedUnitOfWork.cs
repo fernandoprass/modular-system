@@ -18,5 +18,5 @@ public class SharedUnitOfWork : UnitOfWork<SharedDbContext>, ISharedUnitOfWork
    }
 
    public IParameterRepository Parameters => new ParameterRepository(_dbContext);
-   public IParameterCustomerRepository ParameterCustomers => new ParameterCustomerRepository(_dbContext);
+   public IParameterOverrideRepository ParameterOverrides => new ParameterOverrideRepository(_dbContext);
 }

@@ -8,6 +8,6 @@ namespace Shared.Domain.QueryRepositories
       Task<ParameterDto?> GetByIdAsync(Guid id);
       Task<IEnumerable<ParameterLiteDto>> GetAllAsync(ParameterSearchRequest request);
       Task<ParameterDto?> GetByModuleGroupAndKeyAsync(string module, string group, string name);
-      Task<string?> GetValueAsync(string key, Guid customerId);
+      Task<string?> GetValueAsync(string key, Guid ownerId);
    }
 }

@@ -13,7 +13,7 @@ namespace Shared.Domain.DTOs.Requests
       public string Value { get; set; }
       public string ListItems { get; set; }
       public string ExternalListEndpoint { get; set; }
-      public bool IsCustomerEditable { get; set; }
+      public bool IsOwnerEditable { get; set; }
       public bool IsVisible { get; set; }
    }
 }

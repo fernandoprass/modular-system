@@ -8,6 +8,6 @@ namespace Shared.Application.Contracts
    {
       Result ValidateCreate(ParameterCreateRequest request, bool keyExists);
       Result ValidateUpdate(Parameter? parameter, ParameterUpdateRequest request);
-      Result ValidateCustomerUpdate(Parameter? parameter, ParameterCustomerUpdateRequest request);
+      Result ValidateOwnerUpdate(Parameter? parameter, ParameterOwnerUpdateRequest request);
    }
 }

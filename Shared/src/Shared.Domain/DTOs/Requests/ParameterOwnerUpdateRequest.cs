@@ -1,6 +1,6 @@
 namespace Shared.Domain.DTOs.Requests
 {
-   public class ParameterCustomerUpdateRequest
+   public class ParameterOwnerUpdateRequest
    {
       public string Value { get; set; }
    }

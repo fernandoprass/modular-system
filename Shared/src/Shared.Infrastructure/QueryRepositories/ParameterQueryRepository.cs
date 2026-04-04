@@ -51,10 +51,10 @@ namespace Shared.Infrastructure.QueryRepositories
          return parameter?.ToParameterDto();
       }
 
-      public async Task<string?> GetValueAsync(string key, Guid customerId)
+      public async Task<string?> GetValueAsync(string key, Guid ownerId)
       {
          var query = from p in _dbContext.Parameters
-                     join pc in _dbContext.ParameterCustomers on new { ParameterId = p.Id, CustomerId = customerId } equals new { pc.ParameterId, pc.CustomerId } into pcGroup
+                     join pc in _dbContext.ParameterOverrides on new { ParameterId = p.Id, OwnerId = ownerId } equals new { pc.ParameterId, pc.OwnerId } into pcGroup
                      from pc in pcGroup.DefaultIfEmpty()
                      where p.Key == key
                      select pc != null ? pc.Value : p.Value;

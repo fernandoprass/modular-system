@@ -5,5 +5,5 @@ namespace Shared.Domain.Interfaces;
 public interface ISharedUnitOfWork : IUnitOfWork
 {
    IParameterRepository Parameters { get; }
-   IParameterCustomerRepository ParameterCustomers { get; }
+   IParameterOverrideRepository ParameterOverrides { get; }
 }

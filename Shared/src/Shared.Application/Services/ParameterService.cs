@@ -4,6 +4,7 @@ using Shared.Domain;
 using Shared.Domain.DTOs.Requests;
 using Shared.Domain.DTOs.Responses;
 using Shared.Domain.Entities;
+using Shared.Domain.Enums;
 using Shared.Domain.Interfaces;
 using Shared.Domain.Mappers;
 using Shared.Domain.Messages;
@@ -61,8 +62,7 @@ public class ParameterService(
           request.ValidationErrorCustomMessage,
           request.ListItems,
           request.ExternalListEndpoint,
-          request.IsOwnerEditable,
-          request.AllowedOverrideTypes,
+          request.OverrideType,
           request.IsVisible);
 
       await _unitOfWork.Parameters.AddAsync(parameter);
@@ -90,8 +90,7 @@ public class ParameterService(
           request.ValidationErrorCustomMessage,
           request.ListItems,
           request.ExternalListEndpoint,
-          request.IsOwnerEditable,
-          request.AllowedOverrideTypes,
+          request.OverrideType,
           request.IsVisible);
 
       _unitOfWork.Parameters.Update(parameter);
@@ -117,13 +116,13 @@ public class ParameterService(
       var validation = _parameterValidator.ValidateOwnerUpdate(parameter, request);
       if (validation.HasError) return Result.Failure(validation.Messages);
 
-      var userOwnerId = _userContext.UserOwnerId;
+      var ownerId = GetOwnerId(parameter.OverrideType);
 
-      var parameterOverride = await _parameterOverrideRepository.GetByParameterAndOwnerAsync(parameterId, request.OwnerType, request.OwnerId);
+      var parameterOverride = await _parameterOverrideRepository.GetByParameterIdAndOwnerIdAsync(parameterId, ownerId);
 
       if (parameterOverride == null)
       {
-         parameterOverride = ParameterOverride.Create(parameterId, request.OwnerType, request.OwnerId, request.Value);
+         parameterOverride = ParameterOverride.Create(parameterId, ownerId, request.Value);
 
          await _unitOfWork.ParameterOverrides.AddAsync(parameterOverride);
       }
@@ -137,9 +136,9 @@ public class ParameterService(
       return Result.Success(new SuccessInfo());
    }
 
-   public async Task<Result> DeleteOwnerValueAsync(Guid parameterId, string ownerType, Guid ownerId)
+   public async Task<Result> DeleteOwnerValueAsync(Guid parameterId, Guid ownerId)
    {
-      var parameterOverride = await _parameterOverrideRepository.GetByParameterAndOwnerAsync(parameterId, ownerType, ownerId);
+      var parameterOverride = await _parameterOverrideRepository.GetByParameterIdAndOwnerIdAsync(parameterId, ownerId);
 
       if (parameterOverride == null) return Result.Failure(new NotFoundError(Const.Entity.ParameterOverride));
 
@@ -184,5 +183,15 @@ public class ParameterService(
    private async Task<string?> GetResolvedValueAsync(string key)
    {
       return await _parameterQueryRepository.GetValueAsync(key, _userContext.UserOwnerId);
+   }
+
+   private Guid GetOwnerId(ParameterOverrideType overrideType) 
+   {
+      return overrideType switch
+      {
+         ParameterOverrideType.UserOwnerId => _userContext.UserOwnerId,
+         ParameterOverrideType.UserId => _userContext.UserId,
+         _ => throw new InvalidOperationException("Invalid override type")
+      };
    }
 }

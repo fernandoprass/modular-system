@@ -15,8 +15,7 @@ namespace Shared.Domain.DTOs.Requests
       public string? ValidationErrorCustomMessage { get; set; }
       public string? ListItems { get; set; }
       public string? ExternalListEndpoint { get; set; }
-      public bool IsOwnerEditable { get; set; }
-      public string? AllowedOverrideTypes { get; set; }
+      public ParameterOverrideType OverrideType { get; set; }
       public bool IsVisible { get; set; }
    }
 }

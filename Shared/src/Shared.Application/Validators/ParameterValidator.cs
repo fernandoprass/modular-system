@@ -23,12 +23,13 @@ public class ParameterValidator : IParameterValidator
          .RuleFor(x => x.Name).ApplyTemplate(MemberKeyTemplate)
          .RuleFor(x => x.Description).IsRequired()
          .RuleFor(x => x.Type).IsRequired()
+         .RuleFor(x => x.OverrideType).IsRequired().IsInEnum()
          .RuleFor(x => x.ValidationErrorCustomMessage)
             .If(x => !string.IsNullOrEmpty(x.ValidationRegex), x => x.IsRequired())
          .RuleFor(x => x.Value)
             .IsRequired()
             .If(x => !string.IsNullOrEmpty(x.ValidationRegex), 
-                x => x.Matches(request.ValidationRegex, new ParameterInvalidValueError(request.ValidationErrorCustomMessage)))
+                x => x.Matches(request.ValidationRegex, new ParameterInvalidValueError(request?.ValidationErrorCustomMessage)))
          .RuleForValue(keyExists).IsFalse(new ParameterDuplicatedError(request.Module, request.Group, request.Name));
 
       var isValid = validator.Validate(request);
@@ -39,11 +40,13 @@ public class ParameterValidator : IParameterValidator
 
    public Result ValidateUpdate(bool parameterExists, bool keyExists, ParameterUpdateRequest request)
    {
-      var validator = new FluentValidator<ParameterUpdateRequest>() 
+      var validator = new FluentValidator<ParameterUpdateRequest>()
          .RuleFor(x => x.Module).ApplyTemplate(MemberKeyTemplate)
          .RuleFor(x => x.Group).ApplyTemplate(MemberKeyTemplate)
-         .RuleFor(x => x.Name).IsRequired()
-         .RuleFor(x => x.Description)
+         .RuleFor(x => x.Name).ApplyTemplate(MemberKeyTemplate)
+         .RuleFor(x => x.Description).IsRequired()
+         .RuleFor(x => x.Type).IsRequired()
+         .RuleFor(x => x.OverrideType).IsRequired().IsInEnum()
          .RuleFor(x => x.ValidationErrorCustomMessage)
             .If(x => !string.IsNullOrEmpty(x.ValidationRegex), x => x.IsRequired())
          .RuleFor(x => x.Value)
@@ -63,7 +66,11 @@ public class ParameterValidator : IParameterValidator
    {
       var validator = new FluentValidator<ParameterOwnerUpdateRequest>()
          .RuleForValue(parameter).IsNotNull(new NotFoundError(Const.Entity.Parameter))
-         .RuleForValue(parameter?.IsOwnerEditable ?? false).IsTrue(new ParameterNotOwnerEditableError())
+         .RuleForValue(parameter?.OverrideType == ParameterOverrideType.None).IsTrue(new ParameterNotOwnerEditableError())
+         .RuleFor(x => x.Value)
+            .IsRequired()
+            .If(x => !string.IsNullOrEmpty(parameter?.ValidationRegex),
+                x => x.Matches(parameter.ValidationRegex, new ParameterInvalidValueError(parameter.ValidationErrorCustomMessage)))
          .RuleFor(x => x.Value).IsRequired();
 
       var isValid = validator.Validate(request);

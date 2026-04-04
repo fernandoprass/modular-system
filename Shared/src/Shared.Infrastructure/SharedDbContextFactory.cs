@@ -16,7 +16,7 @@ public class SharedDbContextFactory : IDesignTimeDbContextFactory<SharedDbContex
           .AddJsonFile($"appsettings.{environment}.json", optional: true)
           .Build();
 
-      var connectionString = configuration.GetConnectionString("SharedDb");
+      var connectionString = configuration.GetConnectionString(Domain.Const.System.DbConnectionName);
 
       if (string.IsNullOrEmpty(connectionString))
       {

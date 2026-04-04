@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shared.Domain.Entities;
+using Shared.Domain.Enums;
 
 namespace Shared.Infrastructure.Configurations
 {
@@ -23,8 +24,7 @@ namespace Shared.Infrastructure.Configurations
          builder.Property(p => p.ValidationErrorCustomMessage).IsRequired(false).HasMaxLength(255);
          builder.Property(p => p.ListItems).IsRequired(false).HasColumnType("text");
          builder.Property(p => p.ExternalListEndpoint).IsRequired(false).HasMaxLength(500);
-         builder.Property(p => p.IsOwnerEditable).IsRequired().HasDefaultValue(false);
-         builder.Property(p => p.AllowedOverrideTypes).IsRequired(false).HasMaxLength(500);
+         builder.Property(p => p.OverrideType).IsRequired().HasDefaultValue(ParameterOverrideType.None);
          builder.Property(p => p.IsVisible).IsRequired().HasDefaultValue(true);
 
          builder.HasIndex(p => new {p.Module, p.Group, p.Name }).IsUnique();

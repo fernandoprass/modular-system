@@ -16,8 +16,7 @@ namespace Shared.Domain.Entities
       public string? ValidationErrorCustomMessage { get; set; }
       public string? ListItems { get; set; }
       public string? ExternalListEndpoint { get; set; }
-      public bool IsOwnerEditable { get; set; }
-      public string? AllowedOverrideTypes { get; set; }
+      public ParameterOverrideType OverrideType { get; set; }
       public bool IsVisible { get; set; }
 
       public ICollection<ParameterOverride> ParameterOwners { get; set; } = new List<ParameterOverride>();
@@ -34,8 +33,7 @@ namespace Shared.Domain.Entities
          string? validationErrorCustomMessage,
          string? listItems,
          string? externalListEndpoint,
-         bool isOwnerEditable,
-         string? allowedOverrideTypes,
+         ParameterOverrideType OverrideType,
          bool isVisible = true)
       {
          var parameter = new Parameter
@@ -53,8 +51,7 @@ namespace Shared.Domain.Entities
             ValidationErrorCustomMessage = validationErrorCustomMessage,
             ListItems = listItems,
             ExternalListEndpoint = externalListEndpoint,
-            IsOwnerEditable = isOwnerEditable,
-            AllowedOverrideTypes = allowedOverrideTypes,
+            OverrideType = OverrideType,
             IsVisible = isVisible
          };
 
@@ -73,8 +70,7 @@ namespace Shared.Domain.Entities
          string? validationErrorCustomMessage,
          string? listItems,
          string? externalListEndpoint,
-         bool isOwnerEditable,
-         string? allowedOverrideTypes,
+         ParameterOverrideType overrideType,
          bool isVisible)
       {
          Module = module;
@@ -89,8 +85,7 @@ namespace Shared.Domain.Entities
          ValidationErrorCustomMessage = validationErrorCustomMessage;
          ListItems = listItems;
          ExternalListEndpoint = externalListEndpoint;
-         IsOwnerEditable = isOwnerEditable;
-         AllowedOverrideTypes = allowedOverrideTypes;
+         OverrideType = overrideType;
          IsVisible = isVisible;
       }
 

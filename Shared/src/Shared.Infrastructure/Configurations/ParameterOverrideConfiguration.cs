@@ -13,7 +13,6 @@ namespace Shared.Infrastructure.Configurations
 
          builder.Property(p => p.Value).IsRequired().HasColumnType("text");
          builder.Property(pc => pc.OwnerId).IsRequired();
-         builder.Property(pc => pc.OwnerType).IsRequired().HasMaxLength(50);
          builder.Property(pc => pc.ParameterId).IsRequired();
 
          builder.HasOne<Parameter>()

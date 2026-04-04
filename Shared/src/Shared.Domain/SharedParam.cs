@@ -8,6 +8,6 @@ public class SharedParam
    {
       private const string Group = nameof(SharedParam.Parameter);
 
-      public const string OwnerTypesAndPriority = $"{Module}.{Group}.{nameof(OwnerTypesAndPriority)}";
+      public const string ParaName = $"{Module}.{Group}.{nameof(ParaName)}";
    }
 }

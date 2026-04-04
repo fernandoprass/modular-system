@@ -4,7 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>Shared.Domain</PackageId>
-    <Version>1.0.0</Version>
+    <Version>0.0.1</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>YourCompany</Authors>
   </PropertyGroup>

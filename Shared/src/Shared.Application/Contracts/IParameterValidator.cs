@@ -7,7 +7,7 @@ namespace Shared.Application.Contracts
    public interface IParameterValidator
    {
       Result ValidateCreate(ParameterCreateRequest request, bool keyExists);
-      Result ValidateUpdate(Parameter? parameter, ParameterUpdateRequest request);
+      Result ValidateUpdate(bool parameterExists, bool keyExists, ParameterUpdateRequest request);
       Result ValidateOwnerUpdate(Parameter? parameter, ParameterOwnerUpdateRequest request);
    }
 }

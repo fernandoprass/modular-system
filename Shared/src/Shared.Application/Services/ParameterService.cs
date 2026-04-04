@@ -45,8 +45,8 @@ public class ParameterService(
 
    public async Task<Result<ParameterDto>> CreateAsync(ParameterCreateRequest request)
    {
-      var existing = await _parameterQueryRepository.GetByModuleGroupAndKeyAsync(request.Module, request.Group, request.Name);
-      var validation = _parameterValidator.ValidateCreate(request, existing != null);
+      var keyExists = await _parameterQueryRepository.GetByModuleGroupAndKeyAsync(request.Module, request.Group, request.Name);
+      var validation = _parameterValidator.ValidateCreate(request, keyExists != null);
       if (validation.HasError) return Result<ParameterDto>.Failure(validation.Messages);
 
       var parameter = Parameter.Create(
@@ -57,9 +57,12 @@ public class ParameterService(
           request.Description,
           request.Type,
           request.Value,
+          request.ValidationRegex,
+          request.ValidationErrorCustomMessage,
           request.ListItems,
           request.ExternalListEndpoint,
           request.IsOwnerEditable,
+          request.AllowedOverrideTypes,
           request.IsVisible);
 
       await _unitOfWork.Parameters.AddAsync(parameter);
@@ -71,7 +74,8 @@ public class ParameterService(
    public async Task<Result> UpdateAsync(Guid id, ParameterUpdateRequest request)
    {
       var parameter = await _parameterRepository.GetByIdAsync(id);
-      var validation = _parameterValidator.ValidateUpdate(parameter, request);
+      var keyExists = await _parameterQueryRepository.GetByModuleGroupAndKeyAsync(request.Module, request.Group, request.Name);
+      var validation = _parameterValidator.ValidateUpdate(parameter != null, keyExists != null, request);
       if (validation.HasError) return Result.Failure(validation.Messages);
 
       parameter.Update(
@@ -82,9 +86,12 @@ public class ParameterService(
           request.Description,
           request.Type,
           request.Value,
+          request.ValidationRegex,
+          request.ValidationErrorCustomMessage,
           request.ListItems,
           request.ExternalListEndpoint,
           request.IsOwnerEditable,
+          request.AllowedOverrideTypes,
           request.IsVisible);
 
       _unitOfWork.Parameters.Update(parameter);
@@ -104,19 +111,19 @@ public class ParameterService(
       return Result.Success(new SuccessInfo());
    }
 
-   public async Task<Result> SaveOwnerValueAsync(Guid id, ParameterOwnerUpdateRequest request)
+   public async Task<Result> SaveOwnerValueAsync(Guid parameterId, ParameterOwnerUpdateRequest request)
    {
-      var parameter = await _parameterRepository.GetByIdAsync(id);
+      var parameter = await _parameterRepository.GetByIdAsync(parameterId);
       var validation = _parameterValidator.ValidateOwnerUpdate(parameter, request);
       if (validation.HasError) return Result.Failure(validation.Messages);
 
-      var ownerId = _userContext.OwnerId;
+      var userOwnerId = _userContext.UserOwnerId;
 
-      var parameterOverride = await _parameterOverrideRepository.GetByParameterAndOwnerAsync(id, ownerId);
+      var parameterOverride = await _parameterOverrideRepository.GetByParameterAndOwnerAsync(parameterId, request.OwnerType, request.OwnerId);
 
       if (parameterOverride == null)
       {
-         parameterOverride = ParameterOverride.Create(id, ownerId, request.Value);
+         parameterOverride = ParameterOverride.Create(parameterId, request.OwnerType, request.OwnerId, request.Value);
 
          await _unitOfWork.ParameterOverrides.AddAsync(parameterOverride);
       }
@@ -130,9 +137,9 @@ public class ParameterService(
       return Result.Success(new SuccessInfo());
    }
 
-   public async Task<Result> DeleteOwnerValueAsync(Guid parameterId, Guid ownerId)
+   public async Task<Result> DeleteOwnerValueAsync(Guid parameterId, string ownerType, Guid ownerId)
    {
-      var parameterOverride = await _parameterOverrideRepository.GetByParameterAndOwnerAsync(parameterId, ownerId);
+      var parameterOverride = await _parameterOverrideRepository.GetByParameterAndOwnerAsync(parameterId, ownerType, ownerId);
 
       if (parameterOverride == null) return Result.Failure(new NotFoundError(Const.Entity.ParameterOverride));
 
@@ -176,6 +183,6 @@ public class ParameterService(
 
    private async Task<string?> GetResolvedValueAsync(string key)
    {
-      return await _parameterQueryRepository.GetValueAsync(key, _userContext.OwnerId);
+      return await _parameterQueryRepository.GetValueAsync(key, _userContext.UserOwnerId);
    }
 }

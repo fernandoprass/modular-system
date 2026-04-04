@@ -59,6 +59,6 @@ public class BaseService
    private bool IsUserAlllowedToAccess(Guid? resourceOwnerId)
    {
       return _userContext.IsSystemAdmin ||
-             (resourceOwnerId.HasValue && resourceOwnerId == _userContext.OwnerId);
+             (resourceOwnerId.HasValue && resourceOwnerId == _userContext.UserOwnerId);
    }
 }

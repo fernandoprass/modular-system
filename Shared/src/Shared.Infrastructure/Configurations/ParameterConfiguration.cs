@@ -19,9 +19,12 @@ namespace Shared.Infrastructure.Configurations
          builder.Property(p => p.Description).IsRequired().HasColumnType("text");
          builder.Property(p => p.Type).IsRequired();
          builder.Property(p => p.Value).IsRequired().HasColumnType("text");
+         builder.Property(p => p.ValidationRegex).IsRequired(false).HasMaxLength(255);
+         builder.Property(p => p.ValidationErrorCustomMessage).IsRequired(false).HasMaxLength(255);
          builder.Property(p => p.ListItems).IsRequired(false).HasColumnType("text");
          builder.Property(p => p.ExternalListEndpoint).IsRequired(false).HasMaxLength(500);
          builder.Property(p => p.IsOwnerEditable).IsRequired().HasDefaultValue(false);
+         builder.Property(p => p.AllowedOverrideTypes).IsRequired(false).HasMaxLength(500);
          builder.Property(p => p.IsVisible).IsRequired().HasDefaultValue(true);
 
          builder.HasIndex(p => new {p.Module, p.Group, p.Name }).IsUnique();

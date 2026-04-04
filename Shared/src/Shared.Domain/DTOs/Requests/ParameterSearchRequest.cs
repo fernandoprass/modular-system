@@ -1,5 +1,3 @@
-using Shared.Domain.Enums;
-
 namespace Shared.Domain.DTOs.Requests
 {
    public class ParameterSearchRequest

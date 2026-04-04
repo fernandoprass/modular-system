@@ -49,9 +49,12 @@ The `Parameter` entity defines a global configuration setting. It acts as the "t
 -   **Description** (string): A detailed explanation of what the parameter controls.
 -   **Type** (ParameterType): Enum defining the data format (e.g., String, Boolean, Integer, JSON).
 -   **Value** (string): The default system-wide value for the parameter.
+-   **ValidationRegex** (string?): Optional regular expression to validate the format of the `Value` and any overrides.
+-   **ValidationErrorCustomMessage** (string?): Optional custom error message to display when validation fails. 
 -   **ListItems** (string?): Optional JSON containing selectable options for the UI.
 -   **ExternalListEndpoint** (string?): Optional URL to fetch dynamic list items from an external service.
 -   **IsOwnerEditable** (bool): If true, users are allowed to override this value in their own context.
+-   **AllowedOverrideTypes**: If `IsOwnerEditable` is true, this comma-separated list of strings defines which data types are allowed for overrides (e.g.: customer,project,user)). The types of overrides are defined in the system parameter: Shared.Parameter.OwnerTypesAndPriority.
 -   **IsVisible** (bool): Informs if the parameter should be displayed in the management UI.
     
 ### Audit Trail
@@ -62,11 +65,13 @@ Inherits from `Entity`, providing `Id` `CreatedAt`, `CreatedBy`, `UpdatedAt`, an
 
 ## ParameterOverride Entity
 
-The `ParameterOverride` entity represents a **user-specific override**. If a record exists here for a given `OwnerId` and `ParameterId`, the system will prioritize this value over the default global value in `Parameter`.
+The `ParameterOverride` handles specific overrides for a global parameter. It uses a Polymorphic Owner pattern, where `OwnerId` refers to the unique ID of the entity owning the override, and `OwnerType` defines its context (e.g., "User", "Customer", "Dept"). No physical foreign keys are maintained for the OwnerId to ensure module independence.
+If a record exists here for a given `OwnerType`, `OwnerId` and `ParameterId`, the system will prioritize this value over the default global value in `Parameter`.
 
 ### Properties
 
 -   **ParameterId** (Guid): Foreign key linking to the base `Parameter`.
+-   **OwnerType** (string): The type of owner (e.g., "Customer", "User", "Project") this override applies to.
 -   **OwnerId** (Guid): The identifier of the owner (a customer, an user) this override applies to.
 -   **Value** (string): The specific value defined by the data owner, overriding the system default.
     
@@ -82,7 +87,7 @@ The `Key` is automatically maintained via a private `GetKey` method during creat
 
 The `ParameterService` implements a "fallback" logic:
 
-1.  Search for a value in `ParameterOverride` using the current `OwnerId`.
+1.  Search for a value in `ParameterOverride` using the `OwnerType` and `OwnerId`.
 2.  If not found, return the default `Value` from the `Parameter` entity.
     
 ### 3. Encapsulation

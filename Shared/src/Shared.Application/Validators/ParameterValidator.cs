@@ -12,19 +12,24 @@ namespace Shared.Application.Validators;
 
 public class ParameterValidator : IParameterValidator
 {
-   private static void MemberKey<T>(RuleBuilder<T, string> rb) where T : class
+   private static void MemberKeyTemplate<T>(RuleBuilder<T, string> rb) where T : class
                      => rb.IsRequired().MinLength(2).IsAlphaNumeric();
 
    public Result ValidateCreate(ParameterCreateRequest request, bool keyExists)
    {
       var validator = new FluentValidator<ParameterCreateRequest>()
-         .RuleFor(x => x.Module).ApplyTemplate(MemberKey)
-         .RuleFor(x => x.Group).ApplyTemplate(MemberKey)
-         .RuleFor(x => x.Name).ApplyTemplate(MemberKey)
+         .RuleFor(x => x.Module).ApplyTemplate(MemberKeyTemplate)
+         .RuleFor(x => x.Group).ApplyTemplate(MemberKeyTemplate)
+         .RuleFor(x => x.Name).ApplyTemplate(MemberKeyTemplate)
          .RuleFor(x => x.Description).IsRequired()
          .RuleFor(x => x.Type).IsRequired()
-         .RuleFor(x => x.Value).IsRequired()
-         .RuleForValue(keyExists).IsFalse(new DuplicateParameterError(request.Module, request.Group, request.Name));
+         .RuleFor(x => x.ValidationErrorCustomMessage)
+            .If(x => !string.IsNullOrEmpty(x.ValidationRegex), x => x.IsRequired())
+         .RuleFor(x => x.Value)
+            .IsRequired()
+            .If(x => !string.IsNullOrEmpty(x.ValidationRegex), 
+                x => x.Matches(request.ValidationRegex, new ParameterInvalidValueError(request.ValidationErrorCustomMessage)))
+         .RuleForValue(keyExists).IsFalse(new ParameterDuplicatedError(request.Module, request.Group, request.Name));
 
       var isValid = validator.Validate(request);
       if (!isValid) return Result.Failure(validator.Messages);
@@ -32,18 +37,26 @@ public class ParameterValidator : IParameterValidator
       return ValidateValueFormat(request.Value, request.Type);
    }
 
-   public Result ValidateUpdate(Parameter? parameter, ParameterUpdateRequest request)
+   public Result ValidateUpdate(bool parameterExists, bool keyExists, ParameterUpdateRequest request)
    {
-      var validator = new FluentValidator<ParameterUpdateRequest>()
-         .RuleForValue(parameter).IsNotNull(new NotFoundError(Const.Entity.Parameter))
+      var validator = new FluentValidator<ParameterUpdateRequest>() 
+         .RuleFor(x => x.Module).ApplyTemplate(MemberKeyTemplate)
+         .RuleFor(x => x.Group).ApplyTemplate(MemberKeyTemplate)
          .RuleFor(x => x.Name).IsRequired()
          .RuleFor(x => x.Description)
-         .RuleFor(x => x.Value).IsRequired();
+         .RuleFor(x => x.ValidationErrorCustomMessage)
+            .If(x => !string.IsNullOrEmpty(x.ValidationRegex), x => x.IsRequired())
+         .RuleFor(x => x.Value)
+            .IsRequired()
+            .If(x => !string.IsNullOrEmpty(x.ValidationRegex),
+                x => x.Matches(request.ValidationRegex, new ParameterInvalidValueError(request.ValidationErrorCustomMessage)))
+         .RuleForValue(parameterExists).IsNotNull(new NotFoundError(Const.Entity.Parameter))
+         .RuleForValue(keyExists).IsFalse(new ParameterDuplicatedError(request.Module, request.Group, request.Name));
 
       var isValid = validator.Validate(request);
       if (!isValid) return Result.Failure(validator.Messages);
 
-      return ValidateValueFormat(request.Value, parameter.Type);
+      return ValidateValueFormat(request.Value, request.Type);
    }
 
    public Result ValidateOwnerUpdate(Parameter? parameter, ParameterOwnerUpdateRequest request)
@@ -74,7 +87,7 @@ public class ParameterValidator : IParameterValidator
 
       if (!isValid)
       {
-         return Result.Failure(new InvalidParameterValueFormatError(type.ToString()));
+         return Result.Failure(new ParameterInvalidValueFormatError(type.ToString()));
       }
 
       return Result.Success();

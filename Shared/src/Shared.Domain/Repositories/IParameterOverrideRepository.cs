@@ -8,6 +8,6 @@ namespace Shared.Domain.Repositories
       Task AddAsync(ParameterOverride parameterOverride);
       void Update(ParameterOverride parameterOverride);
       Task DeleteAsync(Guid id);
-      Task<ParameterOverride?> GetByParameterAndOwnerAsync(Guid parameterId, Guid ownerId);
+      Task<ParameterOverride?> GetByParameterAndOwnerAsync(Guid parameterId, string ownerType, Guid ownerId);
    }
 }

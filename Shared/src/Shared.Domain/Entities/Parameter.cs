@@ -12,9 +12,12 @@ namespace Shared.Domain.Entities
       public string Description { get; set; }
       public ParameterType Type { get; set; }
       public string Value { get; set; }
+      public string? ValidationRegex { get; set; }
+      public string? ValidationErrorCustomMessage { get; set; }
       public string? ListItems { get; set; }
       public string? ExternalListEndpoint { get; set; }
       public bool IsOwnerEditable { get; set; }
+      public string? AllowedOverrideTypes { get; set; }
       public bool IsVisible { get; set; }
 
       public ICollection<ParameterOverride> ParameterOwners { get; set; } = new List<ParameterOverride>();
@@ -27,9 +30,12 @@ namespace Shared.Domain.Entities
          string description,
          ParameterType type,
          string value,
-         string? listItems = null,
-         string? externalListEndpoint = null,
-         bool isOwnerEditable = false,
+         string? validationRegex,
+         string? validationErrorCustomMessage,
+         string? listItems,
+         string? externalListEndpoint,
+         bool isOwnerEditable,
+         string? allowedOverrideTypes,
          bool isVisible = true)
       {
          var parameter = new Parameter
@@ -43,9 +49,12 @@ namespace Shared.Domain.Entities
             Description = description,
             Type = type,
             Value = value,
+            ValidationRegex = validationRegex,
+            ValidationErrorCustomMessage = validationErrorCustomMessage,
             ListItems = listItems,
             ExternalListEndpoint = externalListEndpoint,
             IsOwnerEditable = isOwnerEditable,
+            AllowedOverrideTypes = allowedOverrideTypes,
             IsVisible = isVisible
          };
 
@@ -60,10 +69,13 @@ namespace Shared.Domain.Entities
          string description,
          ParameterType type,
          string value,
-         string? listItems = null,
-         string? externalListEndpoint = null,
-         bool isOwnerEditable = false,
-         bool isVisible = true)
+         string? validationRegex,
+         string? validationErrorCustomMessage,
+         string? listItems,
+         string? externalListEndpoint,
+         bool isOwnerEditable,
+         string? allowedOverrideTypes,
+         bool isVisible)
       {
          Module = module;
          Group = group;
@@ -73,9 +85,12 @@ namespace Shared.Domain.Entities
          Description = description;
          Type = type;
          Value = value;
+         ValidationRegex = validationRegex;
+         ValidationErrorCustomMessage = validationErrorCustomMessage;
          ListItems = listItems;
          ExternalListEndpoint = externalListEndpoint;
          IsOwnerEditable = isOwnerEditable;
+         AllowedOverrideTypes = allowedOverrideTypes;
          IsVisible = isVisible;
       }
 

@@ -14,8 +14,8 @@ namespace Shared.Application.Contracts
       Task<Result> UpdateAsync(Guid id, ParameterUpdateRequest request);
       Task<Result> DeleteAsync(Guid id);
 
-      Task<Result> SaveOwnerValueAsync(Guid id, ParameterOwnerUpdateRequest request);
-      Task<Result> DeleteOwnerValueAsync(Guid parameterId, Guid ownerId);
+      Task<Result> SaveOwnerValueAsync(Guid parameterId, ParameterOwnerUpdateRequest request);
+      Task<Result> DeleteOwnerValueAsync(Guid parameterId, string ownerType, Guid ownerId);
 
       Task<bool> GetBoolAsync(string key);
       Task<int> GetIntAsync(string key);

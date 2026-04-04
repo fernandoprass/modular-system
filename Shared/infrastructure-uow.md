@@ -1,0 +1,72 @@
+# Unit of Work (UoW) Pattern
+
+The **Unit of Work** is responsible for ensuring that multiple repository operations are treated as a single atomic transaction. In this architecture, it also centralizes the **Automatic Audit Logic**.
+
+## Automatic Auditing Logic
+
+The `UnitOfWork<TContext>` base class intercepts the `SaveChangesAsync` call. Before persisting data, it iterates through the change tracker for any class inheriting from `Entity`:
+
+-   **Added State**: Sets `CreatedAt` to `DateTime.UtcNow` and populates `CreatedBy` using the `UserId` from the `IUserContext`.
+-   **Modified State**: Sets `UpdatedAt` to `DateTime.UtcNow` and populates `UpdatedBy`.
+    
+
+## Generic Structure
+
+The `IUnitOfWork<TContext>` interface allows the system to support multiple independent database contexts (e.g., `IAM` and `Shared`) while reusing the same transactional and auditing logic.
+
+### Usage Example: IAM Module
+
+To create a specialized Unit of Work for the Identity and Access Management module:
+
+**1. Custom Interface (Domain Layer):**
+
+```csharp
+public interface IIamUnitOfWork : IUnitOfWork
+{
+    IUserRepository Users { get; }
+    ICustomerRepository Customers { get; }
+    // Other module-specific repositories...
+}
+```
+
+**2. Concrete Implementation (Infrastructure Layer):**
+
+```csharp
+public class IamUnitOfWork : UnitOfWork<IamDbContext>, IIamUnitOfWork
+{
+    private readonly IamDbContext _context;
+
+    public IamUnitOfWork(IamDbContext context, IUserContext userContext) 
+        : base(context, userContext)
+    {
+        _context = context;
+    }
+
+    public IUserRepository Users => new UserRepository(_context);
+    public ICustomerRepository Customers => new CustomerRepository(_context);
+}
+
+```
+
+**3. Application Service Usage:**
+
+```csharp
+public class UserService(IIamUnitOfWork uow)
+{
+    public async Task CreateUser(User user)
+    {
+        // Add to repository
+        await uow.Users.AddAsync(user);
+        
+        // Audit fields (CreatedBy/At) are automatically populated here:
+        await uow.SaveChangesAsync();
+    }
+}
+
+```
+
+## Design Principles
+
+-   **Isolation**: Each module manages its own Unit of Work and Context, preventing side effects between modules.
+-   **Automation**: Developers do not need to manually assign timestamps or user IDs for auditing; the UoW handles this globally via `IUserContext`.
+-   **Atomic Transactions**: Ensures that either all changes within a service method are saved, or none are, maintaining data integrity.

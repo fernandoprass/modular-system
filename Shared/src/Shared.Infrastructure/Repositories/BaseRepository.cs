@@ -12,7 +12,7 @@ namespace Shared.Infrastructure.Repositories;
 /// <typeparam name="T">The Type of the Entity</typeparam>
 /// <typeparam name="TId">The Type of the Entity Id</typeparam>
 /// <param name="context">The DbContext instance used for database operations</param>
-public abstract class BaseRepository<T, TId>(DbContext context) : IBaseRepository<T, TId>
+public class BaseRepository<T, TId>(DbContext context) : IBaseRepository<T, TId>
     where T : Entity
 {
    protected readonly DbContext _context = context;

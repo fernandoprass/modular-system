@@ -13,8 +13,8 @@ namespace Shared.Domain.DTOs.Responses
       public string Description { get; set; }
       public ParameterType Type { get; set; }
       public string Value { get; set; }
-      public string ListItems { get; set; }
-      public string ExternalListEndpoint { get; set; }
+      public string? ListItems { get; set; }
+      public string? ExternalListEndpoint { get; set; }
       public ParameterOverrideType OverrideType { get; set; }
       public bool IsVisible { get; set; }
    }

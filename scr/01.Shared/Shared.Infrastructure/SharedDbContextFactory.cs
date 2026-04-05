@@ -25,7 +25,7 @@ public class SharedDbContextFactory : IDesignTimeDbContextFactory<SharedDbContex
       }
 
       var optionsBuilder = new DbContextOptionsBuilder<SharedDbContext>();
-      optionsBuilder.UseNpgsql(connectionString);
+      optionsBuilder.UseNpgsql(connectionString).UseSnakeCaseNamingConvention();
 
       return new SharedDbContext(optionsBuilder.Options);
    }

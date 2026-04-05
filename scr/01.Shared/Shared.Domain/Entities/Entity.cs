@@ -20,7 +20,5 @@ namespace Shared.Domain.Entities
    /// <summary>
    /// The Entity class is a specialization of the generic Entity class for entities that use Guid as their identifier type.
    /// </summary>
-   public abstract class Entity : Entity<Guid>
-   {
-   }
+   public abstract class Entity : Entity<Guid> { }
 }

@@ -1,12 +1,23 @@
-namespace Shared.Domain.DTOs.Requests
-{
-   public class ParameterSearchRequest
-   {
-      public string Module { get; set; }
-      public string Group { get; set; }
-      public string Name { get; set; }
-      public string Key { get; set; }
-      public string Title { get; set; }
-      public string Description { get; set; }
-   }
-}
+namespace Shared.Domain.DTOs.Requests;
+
+public record ParameterSearchRequest(
+    string? Module,
+    string? Group,
+    string? Name,
+    string? Key,
+    string? Title,
+    string? Description
+);
+
+
+public record ParameterSearchRequestInternal(
+    string? Module,
+    string? Group,
+    string? Name,
+    string? Key,
+    string? Title,
+    string? Description,
+    Guid UserId,
+    Guid UserOwnerId,
+    bool IsSystemAdmin
+);

@@ -19,6 +19,14 @@ namespace Shared.Domain
          Key = key;
       }
 
+      public ParameterKey(string module, string group, string name)
+      {
+         Module = module;
+         Group = group;
+         Name = name;
+         Key = $"{module}.{group}.{name}"; 
+      }
+
       public static implicit operator ParameterKey(string path) => new(path);
    }
 }

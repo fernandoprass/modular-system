@@ -1,7 +1,3 @@
-namespace Shared.Domain.DTOs.Requests
-{
-   public class ParameterOwnerUpdateRequest
-   {
-      public string Value { get; set; }
-   }
-}
+namespace Shared.Domain.DTOs.Requests;
+
+public class ParameterOwnerUpdateRequest( string Value);

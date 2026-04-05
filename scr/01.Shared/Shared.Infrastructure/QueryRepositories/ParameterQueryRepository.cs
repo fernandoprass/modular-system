@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shared.Domain.DTOs.Requests;
 using Shared.Domain.DTOs.Responses;
+using Shared.Domain.Enums;
 using Shared.Domain.Interfaces;
 using Shared.Domain.Mappers;
 
@@ -18,29 +19,50 @@ namespace Shared.Infrastructure.QueryRepositories
          return parameter?.ToParameterDto();
       }
 
-      public async Task<IEnumerable<ParameterLiteDto>> GetAllAsync(ParameterSearchRequest request)
+      public async Task<IEnumerable<ParameterLiteDto>> GetAllAsync(ParameterSearchRequestInternal request)
       {
-         var query = _dbContext.Parameters.AsNoTracking();
+         var query = from p in _dbContext.Parameters.AsNoTracking()
+                     join o in _dbContext.ParameterOverrides on new
+                     {
+                        ParamId = p.Id,
+                        Owner = (p.OverrideType == ParameterOverrideType.UserId ? request.UserId : request.UserOwnerId)
+                     }
+                     equals new
+                     {
+                        ParamId = o.ParameterId,
+                        Owner = (Guid?)o.OwnerId
+                     } into overrides
+                     from subOver in overrides.DefaultIfEmpty()
+                     select new { p, subOver };
 
          if (!string.IsNullOrWhiteSpace(request.Module))
-            query = query.Where(p => p.Module == request.Module);
+            query = query.Where(x => x.p.Module == request.Module);
 
          if (!string.IsNullOrWhiteSpace(request.Group))
-            query = query.Where(p => p.Group == request.Group);
+            query = query.Where(x => x.p.Group == request.Group);
 
          if (!string.IsNullOrWhiteSpace(request.Name))
-            query = query.Where(p => p.Name == request.Name);
+            query = query.Where(x => x.p.Name == request.Name);
 
          if (!string.IsNullOrWhiteSpace(request.Key))
-            query = query.Where(p => p.Key == request.Key);
-
-         if (!string.IsNullOrWhiteSpace(request.Title))
-            query = query.Where(p => p.Title.Contains(request.Title));
+            query = query.Where(x => x.p.Key == request.Key);
 
          if (!string.IsNullOrWhiteSpace(request.Description))
-            query = query.Where(p => p.Description.Contains(request.Description));
+            query = query.Where(x => x.p.Description.Contains(request.Description));
 
-         return await query.Select(p => p.ToParameterLiteDto()).ToListAsync();
+         if (!request.IsSystemAdmin)
+            query = query.Where(x => x.p.IsVisible);
+
+         return await query.Select(x => new ParameterLiteDto
+         {
+            Id = x.p.Id,
+            Key = x.p.Key,
+            Title = x.p.Title,
+            Description = x.p.Description,
+            Type = x.p.Type,
+            Value = x.subOver != null ? x.subOver.Value : x.p.Value,
+            OverrideType = x.subOver != null
+         }).ToListAsync();
       }
 
       public async Task<ParameterDto?> GetByModuleGroupAndKeyAsync(string module, string group, string name)

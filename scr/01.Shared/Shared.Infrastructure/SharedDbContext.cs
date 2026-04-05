@@ -4,13 +4,9 @@ using Shared.Infrastructure.Configurations;
 
 namespace Shared.Infrastructure;
 
-public class SharedDbContext : DbContext
+public class SharedDbContext(DbContextOptions<SharedDbContext> options) : DbContext(options)
 {
-    public SharedDbContext(DbContextOptions<SharedDbContext> options) : base(options)
-    {
-    }
-
-    public DbSet<Parameter> Parameters { get; set; }
+   public DbSet<Parameter> Parameters { get; set; }
     public DbSet<ParameterOverride> ParameterOverrides { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

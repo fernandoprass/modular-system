@@ -1,3 +1,4 @@
+using Shared.Domain.DTOs.Requests;
 using Shared.Domain.DTOs.Responses;
 using Shared.Domain.Entities;
 
@@ -34,8 +35,29 @@ namespace Shared.Domain.Mappers
             Title = parameter.Title,
             Description = parameter.Description,
             Type = parameter.Type,
-            Value = parameter.Value
+            Value = parameter.Value,
+            OverrideType = parameter.OverrideType
          };
       }
+
+      public static ParameterSearchRequestInternal ToInternal(
+        this ParameterSearchRequest publicRequest
+        Guid userOwnerId,
+        Guid userId,
+        bool isSystemAdmin)
+      {
+         return new ParameterSearchRequestInternal(
+             publicRequest.Module,
+             publicRequest.Group,
+             publicRequest.Name,
+             publicRequest.Key,
+             publicRequest.Title,
+             publicRequest.Description,
+             userId,
+             userOwnerId,
+             isSystemAdmin
+         );
+      }
+
    }
 }

@@ -91,7 +91,7 @@ namespace Shared.Domain.Entities
 
       private static string GetKey(string module, string group, string name)
       {
-         return $"{module}.{group}.{name}";
+         return new ParameterKey(module, group, name).Key;
       }
    }
 }

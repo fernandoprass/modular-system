@@ -33,7 +33,8 @@ public class ParameterService(
 
    public async Task<IEnumerable<ParameterLiteDto>> GetAsync(ParameterSearchRequest request)
    {
-      return await _parameterQueryRepository.GetAllAsync(request);
+      var requestInternal = request.ToInternal(_userContext.UserOwnerId, _userContext.UserId, _userContext.IsSystemAdmin);
+      return await _parameterQueryRepository.GetAllAsync(requestInternal);
    }
 
    public async Task<ParameterDto?> GetByKeyAsync(string key)

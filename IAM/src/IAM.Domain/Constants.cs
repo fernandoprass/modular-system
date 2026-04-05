@@ -13,8 +13,6 @@ namespace IAM.Domain
          public const string User = nameof(Entities.User);
          public const string Role = nameof(Entities.Role);
          public const string Feature = nameof(Entities.Feature);
-         public const string Parameter = nameof(Entities.Parameter);
-         public const string ParameterCustomer = nameof(Entities.ParameterCustomer);
       }
 
       public class Security
@@ -26,7 +24,7 @@ namespace IAM.Domain
 
          public static class Claim
          {
-            public const string CustomerId = "customerId";
+            public const string OwnerId = "ownerIdId";
             public const string IsSystemAdmin = "isSystemAdmin";
             public const string Issuer = "IAM.API";
             public const string Audience = "IAM.Client";

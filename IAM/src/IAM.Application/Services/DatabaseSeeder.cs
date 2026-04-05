@@ -97,7 +97,7 @@ public class DatabaseSeeder : IDatabaseSeeder
 
    private async Task SeedParamentersAsync()
    {
-      await AddParameter(Param.IAM.Security.PasswordExpireTime, ParameterType.Integer,
+      await AddParameter(IamParam.IAM.Security.PasswordExpireTime, ParameterType.Integer,
                          "Password expiration time", "Password expiration time, in days.", "60", false, false);
       
       await _unitOfWork.SaveChangesAsync();

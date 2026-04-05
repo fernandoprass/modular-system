@@ -1,6 +1,5 @@
-# Entities
+# IAM Entities
 
-## Overview
 In Domain-Driven Design (DDD), entities are objects that have a distinct identity and lifecycle, representing core business concepts. Unlike value objects, entities are mutable and tracked by their unique identifier. In this project, entities are defined in the Domain layer, free from infrastructure concerns, ensuring business logic purity.
 
 The IAM (Identity and Access Management) module manages users and customers, modeled as entities with relationships.

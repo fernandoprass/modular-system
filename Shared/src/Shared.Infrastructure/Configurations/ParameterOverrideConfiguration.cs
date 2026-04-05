@@ -1,6 +1,7 @@
-using Shared.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Domain;
+using Shared.Domain.Entities;
 
 namespace Shared.Infrastructure.Configurations
 {
@@ -9,7 +10,7 @@ namespace Shared.Infrastructure.Configurations
       public override void Configure(EntityTypeBuilder<ParameterOverride> builder)
       {
          base.Configure(builder);
-         builder.ToTable("ParameterOverrides", "shared");
+         builder.ToTable("ParameterOverrides", Const.Database.Schema);
 
          builder.Property(p => p.Value).IsRequired().HasColumnType("text");
          builder.Property(pc => pc.OwnerId).IsRequired();

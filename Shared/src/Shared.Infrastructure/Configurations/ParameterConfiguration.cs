@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Domain;
 using Shared.Domain.Entities;
 using Shared.Domain.Enums;
 
@@ -10,7 +11,7 @@ namespace Shared.Infrastructure.Configurations
       public override void Configure(EntityTypeBuilder<Parameter> builder)
       {
          base.Configure(builder);
-         builder.ToTable("Parameters", "shared");
+         builder.ToTable("Parameters", Const.Database.Schema);
 
          builder.Property(p => p.Module).IsRequired().HasMaxLength(100);
          builder.Property(p => p.Group).IsRequired().HasMaxLength(100);

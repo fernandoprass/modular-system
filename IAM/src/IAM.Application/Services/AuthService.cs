@@ -64,7 +64,7 @@ public class AuthService(IUserQueryRepository userQueryRepository,
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
             new Claim(JwtRegisteredClaimNames.Name, user.Name),
             new Claim(Const.Security.Claim.IsSystemAdmin, user.IsSystemAdmin.ToString()),
-            new Claim(Const.Security.Claim.CustomerId, user.CustomerId.ToString()),
+            new Claim(Const.Security.Claim.OwnerId, user.CustomerId.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

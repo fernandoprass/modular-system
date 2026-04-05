@@ -21,7 +21,7 @@ public class AspNetUserContext : IUserContext
 
    private Guid GetCustomerId()
    {
-      var value = _accessor.HttpContext?.User.FindFirst(Const.Security.Claim.CustomerId)?.Value;
+      var value = _accessor.HttpContext?.User.FindFirst(Const.Security.Claim.OwnerId)?.Value;
       return Guid.TryParse(value, out var id) ? id : Guid.Empty;
    }
 

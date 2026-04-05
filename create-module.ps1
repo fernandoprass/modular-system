@@ -1,6 +1,6 @@
 # --- Configuration ---
 $MODULE_NAME = "IAM" # Change this for new modules
-$DOTNET_VERSION = "net9.0"
+$DOTNET_VERSION = "net10.0"
 
 Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host "Creating Business Module Structure"

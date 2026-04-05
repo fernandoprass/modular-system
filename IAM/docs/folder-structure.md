@@ -1,9 +1,11 @@
 # Folder Structure
 
-## Overview
-This project follows a **modular architecture** based on **Clean Architecture** principles. Clean Architecture is a software design philosophy that emphasizes separation of concerns, making systems more testable, maintainable, and independent of external frameworks. The core idea is to organize code into layers where dependencies flow inward, from outer layers (like UI and infrastructure) to inner layers (like business logic and domain).
+This project follows a **modular architecture** based on **Clean Architecture** principles. Clean Architecture is a software design philosophy that 
+emphasizes separation of concerns, making systems more testable, maintainable, and independent of external frameworks. The core idea is to organize 
+code into layers where dependencies flow inward, from outer layers (like UI and infrastructure) to inner layers (like business logic and domain).
 
-In a modular system, the application is divided into self-contained modules, each handling a specific business domain (e.g., IAM for Identity and Access Management). This promotes scalability and allows teams to work on different modules independently.
+In a modular system, the application is divided into self-contained modules, each handling a specific business domain (e.g., IAM for Identity and 
+Access Management). This promotes scalability and allows teams to work on different modules independently.
 
 ## Root Level Structure
 - `create-module.ps1` and `create-module-shared.ps1`: Scripts to scaffold new modules or shared libraries.
@@ -16,7 +18,8 @@ The IAM module is organized into the following layers:
 ### `src/`
 Contains the source code, divided into projects:
 
-- **`IAM.API/`**: The outermost layer, containing the Web API controllers and configuration. This layer depends on all inner layers and exposes endpoints for client interactions.
+- **`IAM.API/`**: The outermost layer, containing the Web API controllers and configuration. This layer depends on all inner layers and exposes 
+- endpoints for client interactions.
   - `Configure/`: Dependency injection configuratios.
   - `Controllers/`: API controllers like `UserController`, `CustomerController`.
   - `Middlewares/`: Custom middleware for error handling, logging, etc.
@@ -72,35 +75,42 @@ This chain ensures that no class is overloaded with responsibility, making the s
 The execution flow for a typical request, such as creating a user or updating a password, follows this sequence:
 
 #### 1. UserController (The Entry Point)
-The Controller is responsible for handling HTTP communication. It defines the API endpoints, handles routing, and extracts data from the request (Body, Query, or Identity Claims).
+The Controller is responsible for handling HTTP communication. It defines the API endpoints, handles routing, and extracts data from 
+the request (Body, Query, or Identity Claims).
 
 Purpose: To map HTTP requests to specific application actions.
 
-Role: It should remain "thin," performing no business logic. Its main job is to extract the Operator's Context (like the operatorCustomerId from the JWT) and **pass the DTO to the Orchestrator or Service**.
+Role: It should remain "thin," performing no business logic. Its main job is to extract the Operator's Context (like the operatorCustomerId 
+from the JWT) and **pass the DTO to the Orchestrator or Service**.
 
 #### 2. RegisterOrchestrator (The Coordinator)
-The Orchestrator acts as a "Maestro" for operations that cross domain boundaries. For example, creating a user requires checking if a Customer exists and if the User's email is unique.
+The Orchestrator acts as a "Maestro" for operations that cross domain boundaries. For example, creating a user requires checking if a Customer 
+exists and if the User's email is unique.
 
 Purpose: To coordinate logic between different domains (User and Customer) and enforce high-level security rules, such as ForbiddenCustomerError.
 
 Role: It fetches necessary data from various repositories to prepare a "complete picture" for validation.
 
 #### 3. UserService (The Domain Manager)
-The Service manages the lifecycle of the primary entity. Once the Orchestrator has validated the cross-domain requirements, the Service performs the specific entity actions.
+The Service manages the lifecycle of the primary entity. Once the Orchestrator has validated the cross-domain requirements, the Service performs 
+the specific entity actions.
 
 Purpose: To encapsulate application logic specific to the User entity.
 
-Role: It interacts with the Unit of Work to persist changes. It calls the User domain entity methods (like UpdatePassword) to ensure state changes are handled correctly according to Domain-Driven Design (DDD) principles.
+Role: It interacts with the Unit of Work to persist changes. It calls the User domain entity methods (like UpdatePassword) to ensure state 
+changes are handled correctly according to Domain-Driven Design (DDD) principles.
 
 #### 4. UserValidator (The Logic Filter)
 The Validator is a pure, stateless class that evaluates the validity of a request against the current state of the system.
 
 Purpose: To centralize business rules and prevent invalid data from reaching the database.
 
-Role: It receives the request DTO and "facts" provided by the Orchestrator (e.g., emailExists, customerExists) and returns a Result object containing success or failure messages.
+Role: It receives the request DTO and "facts" provided by the Orchestrator (e.g., emailExists, customerExists) and returns a Result object 
+containing success or failure messages.
 
 #### 5. Repositories and Unit of Work (The Data Access)
-These classes handle the actual communication with the database. We distinguish between QueryRepositories (optimized for read operations) and Repositories (for write operations).
+These classes handle the actual communication with the database. We distinguish between QueryRepositories (optimized for read operations) and 
+Repositories (for write operations).
 
 Purpose: To abstract the persistence mechanism (EF Core/SQL).
 

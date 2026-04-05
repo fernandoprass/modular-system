@@ -2,7 +2,7 @@
 
 public class SharedParam
 {
-   private const string Module = "Shared";
+   private const string Module = Const.System.ModuleName;
 
    public static class Parameter
    {

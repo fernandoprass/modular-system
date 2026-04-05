@@ -1,6 +1,6 @@
 # --- Configuration ---
 $PROJECT_NAME = "Shared"
-$DOTNET_VERSION = "net9.0"
+$DOTNET_VERSION = "net10.0"
 
 Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host "Creating Multilayered Shared Solution"

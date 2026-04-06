@@ -12,7 +12,7 @@ public class ParameterController(IParameterService parameterService) : BaseContr
 {
    private readonly IParameterService _parameterService = parameterService;
 
-   [HttpGet("{id}")]
+   [HttpGet("{id:guid}")]
    [Authorize]
    public async Task<IActionResult> GetById(Guid id)
    {
@@ -32,32 +32,23 @@ public class ParameterController(IParameterService parameterService) : BaseContr
    [Authorize]
    public async Task<IActionResult> GetByKey(string key)
    {
-      var parameter = await _parameterService.GetByKeyAsync(key);
+      var parameter = await _parameterService.GetValueAsync(key);
       return OkOrNotFound(parameter);
    }
 
-   [HttpDelete("{id}")]
-   [Authorize]
-   //[Authorize(Roles = "Admin")]
-   public async Task<IActionResult> Delete(Guid id)
-   {
-      var result = await _parameterService.DeleteAsync(id);
-      return OkOrNotFound(result);
-   }
-
-   [HttpPut("{id}/value")]
+   [HttpPut("{id:guid}/override")]
    [Authorize]
    public async Task<IActionResult> SaveOverride(Guid id, ParameterOwnerUpdateRequest request)
    {
-      var result = await _parameterService.SaveOwnerValueAsync(id, request);
+      var result = await _parameterService.SaveOverrideValueAsync(id, request);
       return OkOrNotFound(result);
    }
 
-   [HttpDelete("{parameterId:guid}/customer/{customerId:guid}")]
+   [HttpDelete("{id:guid}/override")]
    [Authorize]
-   public async Task<IActionResult> Delete(Guid parameterId, Guid customerId)
+   public async Task<IActionResult> Delete(Guid id)
    {
-      var result = await _parameterService.DeleteOwnerValueAsync(parameterId, customerId);
+      var result = await _parameterService.DeleteOverrideValueAsync(id);
       return OkOrNotFound(result);
    }
 }

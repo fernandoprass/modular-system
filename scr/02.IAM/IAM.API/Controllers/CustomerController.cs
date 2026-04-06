@@ -15,7 +15,7 @@ public class CustomerController(
    private readonly ICustomerService _customerService = customerService;
    private readonly IRegisterOrchestrator _registerOrchestrator = registerOrchestrator;
 
-   [HttpGet("{id}")]
+   [HttpGet("{id:guid}")]
    [Authorize]
    public async Task<IActionResult> GetById(Guid id)
    {
@@ -38,7 +38,7 @@ public class CustomerController(
       return OkOrNotFound(result);
    }
 
-   [HttpPut("{id}")]
+   [HttpPut("{id:guid}")]
    [Authorize]
    public async Task<IActionResult> Update(Guid id, [FromBody] CustomerUpdateRequest customer)
    {
@@ -46,7 +46,7 @@ public class CustomerController(
       return OkOrNotFound(result);
    }
 
-   [HttpPatch("{id}/code")]
+   [HttpPatch("{id:guid}/code")]
    [Authorize]
    public async Task<IActionResult> UpdateCode(Guid id, [FromBody] CustomerUpdateCodeRequest customer)
    {
@@ -54,7 +54,7 @@ public class CustomerController(
       return OkOrNotFound(result);
    }
 
-   [HttpDelete("{id}")]
+   [HttpDelete("{id:guid}")]
    [Authorize]
    public async Task<IActionResult> Delete(Guid id)
    {

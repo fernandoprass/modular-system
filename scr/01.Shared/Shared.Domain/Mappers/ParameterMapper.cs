@@ -26,22 +26,8 @@ namespace Shared.Domain.Mappers
          };
       }
 
-      public static ParameterLiteDto ToParameterLiteDto(this Parameter parameter)
-      {
-         return new ParameterLiteDto
-         {
-            Id = parameter.Id,
-            Key = parameter.Key,
-            Title = parameter.Title,
-            Description = parameter.Description,
-            Type = parameter.Type,
-            Value = parameter.Value,
-            OverrideType = parameter.OverrideType
-         };
-      }
-
       public static ParameterSearchRequestInternal ToInternal(
-        this ParameterSearchRequest publicRequest
+        this ParameterSearchRequest publicRequest,
         Guid userOwnerId,
         Guid userId,
         bool isSystemAdmin)

@@ -18,7 +18,7 @@ public class UserController(
    private readonly IUserService _userService = userService;
    private readonly IAuthService _authService = authService;
 
-   [HttpGet("{id}")]
+   [HttpGet("{id:guid}")]
    [Authorize]
    public async Task<IActionResult> GetById(Guid id)
    {
@@ -26,7 +26,7 @@ public class UserController(
       return OkOrNotFound(user);
    }
 
-   [HttpGet("by-customer/{customerId}")]
+   [HttpGet("by-customer/{customerI:guid}")]
    [Authorize]
    public async Task<IActionResult> GetByCustomerId(Guid customerId)
    {
@@ -44,7 +44,7 @@ public class UserController(
       return OkOrNotFound(user);
    }
 
-   [HttpPut("{id}")]
+   [HttpPut("{id:guid}")]
    [Authorize]
    public async Task<IActionResult> Update(Guid id, [FromBody] UserUpdateRequest user)
    {
@@ -53,7 +53,7 @@ public class UserController(
       return OkOrNotFound(response);
    }
 
-   [HttpPatch("{id}/password")]
+   [HttpPatch("{id:guid}/password")]
    [Authorize]
    public async Task<IActionResult> UpdatePassword(Guid id, [FromBody] UserUpdatePasswordRequest request)
    {
@@ -62,7 +62,7 @@ public class UserController(
       return OkOrNotFound(result);
    }
 
-   [HttpDelete("{id}")]
+   [HttpDelete("{id:guid}")]
    [Authorize]
    public async Task<IActionResult> Delete(Guid id)
    {

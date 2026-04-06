@@ -18,14 +18,12 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 // Add DbContext
-// Add DbContext
-builder.Services.AddDbContext<IamDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString(IamConst.Database.ConnectionString)).
-    UseSnakeCaseNamingConvention());
+var connectionString = builder.Configuration.GetConnectionString(IamConst.Database.ConnectionString);
+builder.Services.AddDbContext<IamDbContext>(options => options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention());
 
 builder.Services.AddSharedInfrastructure(builder.Configuration);
 
-UserContext.Configure(builder);
+DependencyInjection.RegisterUserContext(builder);
 
 DependencyInjection.RegisterRepositories(builder);
 

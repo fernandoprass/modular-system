@@ -27,7 +27,7 @@ public class RoleController(IRoleService roleService) : BaseController
       return OkOrNotFound(result);
    }
 
-   [HttpPut("{id}")]
+   [HttpPut("{id:guid}")]
    public async Task<IActionResult> Update(Guid id, [FromBody] RoleUpdateRequest request)
    {
       var result = await _roleService.UpdateAsync(id, request);
@@ -41,7 +41,7 @@ public class RoleController(IRoleService roleService) : BaseController
       return OkOrNotFound(result);
    }
 
-   [HttpGet("user/{userId}/features")]
+   [HttpGet("user/{userId:guid}/features")]
    public async Task<IActionResult> GetUserFeatures(Guid userId)
    {
       var result = await _roleService.GetUserFeaturesAsync(userId);

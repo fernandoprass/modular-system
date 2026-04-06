@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Myce.Response;
 using Shared.Application.Contracts;
 using Shared.Domain;
@@ -8,7 +9,6 @@ using Shared.Domain.Enums;
 using Shared.Domain.Interfaces;
 using Shared.Domain.Mappers;
 using Shared.Domain.Messages;
-using System.Globalization;
 
 namespace Shared.Application.Services;
 
@@ -26,23 +26,79 @@ public class ParameterService(
    private readonly IParameterOverrideRepository _parameterOverrideRepository = parameterOverrideRepository;
    private readonly IParameterQueryRepository _parameterQueryRepository = parameterQueryRepository;
 
-   public async Task<ParameterDto?> GetByIdAsync(Guid id)
+   #region Controller Methods
+   public async Task<Result<ParameterDto>> GetByIdAsync(Guid id)
    {
-      return await _parameterQueryRepository.GetByIdAsync(id);
+      var parameter = await _parameterQueryRepository.GetByIdAsync(id);
+
+      if (parameter == null) return Result<ParameterDto>.Failure(new NotFoundError(SharedConst.Entity.Parameter));
+
+      return Result<ParameterDto>.Success(parameter);
    }
 
-   public async Task<IEnumerable<ParameterLiteDto>> GetAsync(ParameterSearchRequest request)
+   public async Task<Result<IEnumerable<ParameterLiteDto>>> GetAsync(ParameterSearchRequest request)
    {
       var requestInternal = request.ToInternal(_userContext.UserOwnerId, _userContext.UserId, _userContext.IsSystemAdmin);
-      return await _parameterQueryRepository.GetAllAsync(requestInternal);
+
+      var parameters = await _parameterQueryRepository.GetAllAsync(requestInternal);
+
+      return Result<IEnumerable<ParameterLiteDto>>.Success(parameters);
    }
 
-   public async Task<ParameterDto?> GetByKeyAsync(string key)
+   public async Task<Result<ParameterValueDto>> GetValueAsync(string key)
    {
-      var parameterKey = new ParameterKey(key);
-      return await _parameterQueryRepository.GetByModuleGroupAndKeyAsync(parameterKey.Module, parameterKey.Group, parameterKey.Name);
+      var parameter = await _parameterQueryRepository.GetValueAsync(key, _userContext.UserOwnerId, _userContext.UserId);
+
+      if (parameter == null) return Result<ParameterValueDto>.Failure(new NotFoundError(key));
+
+      return Result<ParameterValueDto>.Success(parameter);
    }
 
+   public async Task<Result> SaveOverrideValueAsync(Guid parameterId, ParameterOwnerUpdateRequest request)
+   {
+      var parameter = await _parameterRepository.GetByIdAsync(parameterId);
+      var validation = _parameterValidator.ValidateOwnerUpdate(parameter, request);
+      if (validation.HasError) return Result.Failure(validation.Messages);
+
+      var ownerId = GetOwnerId(parameter.OverrideType);
+
+      var parameterOverride = await _parameterOverrideRepository.GetByParameterIdAndOwnerIdAsync(parameterId, ownerId);
+
+      if (parameterOverride == null)
+      {
+         parameterOverride = ParameterOverride.Create(parameterId, ownerId, request.Value);
+
+         await _unitOfWork.ParameterOverrides.AddAsync(parameterOverride);
+      }
+      else
+      {
+         parameterOverride.Update(request.Value);
+         _unitOfWork.ParameterOverrides.Update(parameterOverride);
+      }
+
+      await _unitOfWork.SaveChangesAsync();
+      return Result.Success(new SuccessInfo());
+   }
+
+   public async Task<Result> DeleteOverrideValueAsync(Guid parameterId)
+   {
+      var parameter = await _parameterRepository.GetByIdAsync(parameterId);
+
+      if (parameter == null) return Result<ParameterValueDto>.Failure(new NotFoundError(SharedConst.Entity.Parameter));
+
+      var ownerId = GetOwnerId(parameter.OverrideType);
+      var parameterOverride = await _parameterOverrideRepository.GetByParameterIdAndOwnerIdAsync(parameterId, ownerId);
+
+      if (parameterOverride == null) return Result.Failure(new NotFoundError(SharedConst.Entity.ParameterOverride));
+
+      await _unitOfWork.ParameterOverrides.DeleteAsync(parameterOverride.Id);
+      await _unitOfWork.SaveChangesAsync();
+
+      return Result.Success(new SuccessInfo());
+   }
+   #endregion
+
+   #region Internal Methods for Parameter Management
    public async Task<Result<ParameterDto>> CreateAsync(ParameterCreateRequest request)
    {
       var keyExists = await _parameterQueryRepository.GetByModuleGroupAndKeyAsync(request.Module, request.Group, request.Name);
@@ -98,10 +154,17 @@ public class ParameterService(
       return Result.Success(new SuccessInfo());
    }
 
+   public async Task<ParameterDto?> GetByKeyAsync(string key)
+   {
+      var parameterKey = new ParameterKey(key);
+      return await _parameterQueryRepository.GetByModuleGroupAndKeyAsync(parameterKey.Module, parameterKey.Group, parameterKey.Name);
+   }
+
    public async Task<Result> DeleteAsync(Guid id)
    {
       var parameter = await _parameterRepository.GetByIdAsync(id);
-      if (parameter == null) return Result.Failure(new NotFoundError(SharedConst.Entity.Parameter));
+
+      if(parameter == null) return Result.Failure(new NotFoundError(SharedConst.Entity.Parameter));
 
       await _unitOfWork.Parameters.DeleteAsync(id);
       await _unitOfWork.SaveChangesAsync();
@@ -109,79 +172,43 @@ public class ParameterService(
       return Result.Success(new SuccessInfo());
    }
 
-   public async Task<Result> SaveOwnerValueAsync(Guid parameterId, ParameterOwnerUpdateRequest request)
-   {
-      var parameter = await _parameterRepository.GetByIdAsync(parameterId);
-      var validation = _parameterValidator.ValidateOwnerUpdate(parameter, request);
-      if (validation.HasError) return Result.Failure(validation.Messages);
+   public Task<bool> GetBoolAsync(string key) => GetAndParseAsync<bool>(key, bool.TryParse);
 
-      var ownerId = GetOwnerId(parameter.OverrideType);
+   public Task<int> GetIntAsync(string key) => GetAndParseAsync<int>(key, int.TryParse);
 
-      var parameterOverride = await _parameterOverrideRepository.GetByParameterIdAndOwnerIdAsync(parameterId, ownerId);
+   public Task<decimal> GetDecimalAsync(string key) => GetAndParseAsync<decimal>(key, decimal.TryParse);
 
-      if (parameterOverride == null)
-      {
-         parameterOverride = ParameterOverride.Create(parameterId, ownerId, request.Value);
-
-         await _unitOfWork.ParameterOverrides.AddAsync(parameterOverride);
-      }
-      else
-      {
-         parameterOverride.Update(request.Value);
-         _unitOfWork.ParameterOverrides.Update(parameterOverride);
-      }
-
-      await _unitOfWork.SaveChangesAsync();
-      return Result.Success(new SuccessInfo());
-   }
-
-   public async Task<Result> DeleteOwnerValueAsync(Guid parameterId, Guid ownerId)
-   {
-      var parameterOverride = await _parameterOverrideRepository.GetByParameterIdAndOwnerIdAsync(parameterId, ownerId);
-
-      if (parameterOverride == null) return Result.Failure(new NotFoundError(SharedConst.Entity.ParameterOverride));
-
-      if (parameterOverride != null)
-      {
-         await _unitOfWork.ParameterOverrides.DeleteAsync(parameterOverride.Id);
-         await _unitOfWork.SaveChangesAsync();
-      }
-
-      return Result.Success(new SuccessInfo());
-   }
-
-   public async Task<bool> GetBoolAsync(string key)
-   {
-      var value = await GetResolvedValueAsync(key);
-      return bool.TryParse(value, out var result) && result;
-   }
-
-   public async Task<int> GetIntAsync(string key)
-   {
-      var value = await GetResolvedValueAsync(key);
-      return int.TryParse(value, out var result) ? result : 0;
-   }
-
-   public async Task<decimal> GetDecimalAsync(string key)
-   {
-      var value = await GetResolvedValueAsync(key);
-      return decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result) ? result : 0m;
-   }
-
-   public async Task<DateTime> GetDateTimeAsync(string key)
-   {
-      var value = await GetResolvedValueAsync(key);
-      return DateTime.TryParse(value, out var result) ? result : DateTime.MinValue;
-   }
+   public Task<DateTime> GetDateTimeAsync(string key) => GetAndParseAsync<DateTime>(key, DateTime.TryParse);
 
    public async Task<string> GetStringAsync(string key)
    {
       return await GetResolvedValueAsync(key) ?? string.Empty;
    }
 
+   private delegate bool TryParseDelegate<T>(string s, out T result);
+
+   private async Task<T> GetAndParseAsync<T>(string key, TryParseDelegate<T> parser)
+   {
+      var value = await GetResolvedValueAsync(key);
+
+      if (value == null || !parser(value, out var result))
+      {
+         throw new InvalidDataException($"Value '{value ?? "null"}' is invalid for parameter '{key}' and expected type {typeof(T).Name}");
+      }
+
+      return result;
+   }
+
    private async Task<string?> GetResolvedValueAsync(string key)
    {
-      return await _parameterQueryRepository.GetValueAsync(key, _userContext.UserOwnerId);
+      var parameter = await _parameterQueryRepository.GetValueAsync(key, _userContext.UserOwnerId, _userContext.UserId);
+
+      if (parameter == null)
+      {
+         throw new ArgumentNullException(nameof(key));
+      }
+
+      return parameter.Value;
    }
 
    private Guid GetOwnerId(ParameterOverrideType overrideType) 
@@ -193,4 +220,5 @@ public class ParameterService(
          _ => throw new InvalidOperationException("Invalid override type")
       };
    }
+   #endregion
 }

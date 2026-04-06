@@ -85,7 +85,7 @@ public class ParameterValidator : IParameterValidator
       {
          ParameterType.Boolean => bool.TryParse(value, out _),
          ParameterType.Integer => int.TryParse(value, out _),
-         ParameterType.Numeric => decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out _),
+         ParameterType.Decimal => decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out _),
          ParameterType.DateTime => DateTime.TryParse(value, out _),
          ParameterType.Date => DateTime.TryParse(value, out _),
          ParameterType.Time => TimeSpan.TryParse(value, out _),

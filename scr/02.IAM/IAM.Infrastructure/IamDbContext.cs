@@ -4,12 +4,8 @@ using IAM.Infrastructure.Configurations;
 
 namespace IAM.Infrastructure;
 
-public class IamDbContext : DbContext
+public class IamDbContext(DbContextOptions<IamDbContext> options) : DbContext(options)
 {
-   public IamDbContext(DbContextOptions<IamDbContext> options) : base(options)
-   {
-   }
-
    public DbSet<Customer> Customers { get; set; }
    public DbSet<Feature> Features { get; set; }
    public DbSet<Role> Roles { get; set; }

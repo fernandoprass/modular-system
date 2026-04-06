@@ -3,8 +3,9 @@ using IAM.Domain.Entities;
 using IAM.Domain.Enums;
 using IAM.Domain.Interfaces;
 using Isopoh.Cryptography.Argon2;
+using Shared.Application.Contracts;
 using Shared.Domain;
-using Shared.Domain.Entities;
+using Shared.Domain.DTOs.Requests;
 using Shared.Domain.Enums;
 using Shared.Domain.Interfaces;
 
@@ -17,18 +18,16 @@ public interface IDatabaseSeeder
 
 public class DatabaseSeeder : IDatabaseSeeder
 {
-   private readonly ISharedUnitOfWork _sharedUnitOfWork;
    private readonly IIamUnitOfWork _iamUnitOfWork;
-   private readonly IParameterRepository _parameterRepository;
+   private readonly IParameterService _parameterService;
    private const string DefaultPassword = "Password123!";
 
    public DatabaseSeeder(
-      IParameterRepository parameterRepository,
+      IParameterService parameterService,
       ISharedUnitOfWork sharedUnitOfWork,
       IIamUnitOfWork iamUnitOfWork)
    {
-      _parameterRepository = parameterRepository;
-      _sharedUnitOfWork = sharedUnitOfWork;
+      _parameterService = parameterService;
       _iamUnitOfWork = iamUnitOfWork;
    }
 
@@ -37,7 +36,7 @@ public class DatabaseSeeder : IDatabaseSeeder
       //await SeedAdminCustomerAsync();
      // await SeedScientistsCustomerAsync();
 
-      //await SeedParamentersAsync();
+      await SeedParamentersAsync();
    }
 
    private async Task SeedAdminCustomerAsync()
@@ -102,52 +101,61 @@ public class DatabaseSeeder : IDatabaseSeeder
       await _iamUnitOfWork.SaveChangesAsync();
    }
 
-   //todo fix using ParameterService instead of repository
-   //private async Task SeedParamentersAsync()
-   //{
-   //   await AddParameter(IamParam.Security.PasswordExpireTime, ParameterType.Integer,
-   //                      "Password expiration time", "Password expiration time, in days.", "60", false, false);
+   private async Task SeedParamentersAsync()
+   {
+      await AddParameter(IamParam.Security.PasswordExpireTime, "Password expiration time", "Password expiration time, in days.",
+                         ParameterType.Integer, "60", ParameterOverrideType.None, false);
 
-   //   await _iamUnitOfWork.SaveChangesAsync();
-   //}
+      await _iamUnitOfWork.SaveChangesAsync();
+   }
 
-   //private async Task AddParameter(
-   //   string key,
-   //   ParameterType type,
-   //   string title,
-   //   string description,
-   //   string value,
-   //   bool isCustomerEditable,
-   //   bool isVisible)
-   //{
-   //   var param = await _parameterRepository.GetByKeyAsync(key);
-   //   if (param is null)
-   //   {
-   //      var parameter = CreateParameter(key, type, title, description, value, isCustomerEditable, isVisible);
-   //      await _sharedUnitOfWork.Parameters.AddAsync(parameter);
-   //   }
-   //}
+   private async Task AddParameter(
+      string key,
+      string title,
+      string description,
+      ParameterType type,
+      string value,
+      ParameterOverrideType overrideType,
+      bool isVisible)
+   {
+      await AddParameter(key, title, description, type, value, overrideType, isVisible, null, null, null, null);
+   }
 
-   //private static Parameter CreateParameter(
-   //   string key, 
-   //   ParameterType type, 
-   //   string title, 
-   //   string description, 
-   //   string value, 
-   //   ParameterOverrideType overrideType,
-   //   bool isVisible)
-   //{
-   //   var parameterKey = new ParameterKey(key);
+   private async Task AddParameter(
+      string key,
+      string title,
+      string description,
+      ParameterType type,
+      string value,
+      ParameterOverrideType overrideType,
+      bool isVisible,
+      string? validationRegex,
+      string? validationErrorCustomMessage,
+      string? listItems,
+      string? externalListEndpoint)
+   {
+      var param = await _parameterService.GetByKeyAsync(key);
 
-   //   return Parameter.Create(
-   //      parameterKey.Module,
-   //      parameterKey.Group,
-   //      parameterKey.Name,
-   //      title,
-   //      description,
-   //      type,
-   //      value,
-   //      overrideType: overrideType,
-   //      isVisible: isVisible);
-   //}
+      if (param is null)
+      {
+         var parameterKey = new ParameterKey(key);
+
+         var parameter = new ParameterCreateRequest(
+                                 parameterKey.Module,
+                                 parameterKey.Group,
+                                 parameterKey.Name,
+                                 title,
+                                 description,
+                                 type,
+                                 value,
+                                 overrideType,
+                                 isVisible,
+                                 validationRegex,
+                                 validationErrorCustomMessage,
+                                 listItems,
+                                 externalListEndpoint);
+
+         await _parameterService.CreateAsync(parameter);
+      }
+   }
 }

@@ -1,13 +1,12 @@
 using Shared.Domain.Entities;
 
-namespace Shared.Domain.Interfaces
+namespace Shared.Domain.Interfaces;
+
+internal interface IParameterOverrideRepository
 {
-   public interface IParameterOverrideRepository
-   {
-      Task<ParameterOverride?> GetByIdAsync(Guid id);
-      Task AddAsync(ParameterOverride parameterOverride);
-      void Update(ParameterOverride parameterOverride);
-      Task DeleteAsync(Guid id);
-      Task<ParameterOverride?> GetByParameterIdAndOwnerIdAsync(Guid parameterId, Guid ownerId);
-   }
+   Task<ParameterOverride?> GetByIdAsync(Guid id);
+   Task AddAsync(ParameterOverride parameterOverride);
+   void Update(ParameterOverride parameterOverride);
+   Task DeleteAsync(Guid id);
+   Task<ParameterOverride?> GetByParameterIdAndOwnerIdAsync(Guid parameterId, Guid ownerId);
 }

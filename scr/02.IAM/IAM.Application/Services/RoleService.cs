@@ -5,8 +5,8 @@ using IAM.Domain.Entities;
 using IAM.Domain.Interfaces;
 using IAM.Domain.QueryRepositories;
 using Myce.Response;
+using Shared.Application.Contracts;
 using Shared.Application.Services;
-using Shared.Domain.Interfaces;
 using Shared.Domain.Messages;
 
 namespace IAM.Application.Services;
@@ -21,6 +21,7 @@ public class RoleService(
    private readonly IIamUnitOfWork _iamUnitOfWork = iamUnitOfWork;
    private readonly IRoleValidator _roleValidator = roleValidator;
    private readonly IRoleQueryRepository _roleQueryRepository = roleQueryRepository;
+   private readonly IUserContext _userContext = userContext;
    private readonly IUserQueryRepository _userQueryRepository = userQueryRepository;
 
    public async Task<Result<RoleDto>> CreateAsync(RoleCreateRequest request)

@@ -10,8 +10,8 @@ using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
 using Isopoh.Cryptography.Argon2;
 using Myce.Response;
+using Shared.Application.Contracts;
 using Shared.Application.Services;
-using Shared.Domain.Interfaces;
 using Shared.Domain.Messages;
 
 namespace IAM.Application.Orchestrators;

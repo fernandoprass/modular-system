@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Myce.Response;
 using Shared.Application.Contracts;
 using Shared.Domain;
@@ -12,7 +11,7 @@ using Shared.Domain.Messages;
 
 namespace Shared.Application.Services;
 
-public class ParameterService(
+internal class ParameterService(
     ISharedUnitOfWork unitOfWork,
     IUserContext userContext,
     IParameterValidator parameterValidator,

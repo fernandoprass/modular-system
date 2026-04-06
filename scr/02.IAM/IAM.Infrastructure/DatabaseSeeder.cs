@@ -24,7 +24,6 @@ public class DatabaseSeeder : IDatabaseSeeder
 
    public DatabaseSeeder(
       IParameterService parameterService,
-      ISharedUnitOfWork sharedUnitOfWork,
       IIamUnitOfWork iamUnitOfWork)
    {
       _parameterService = parameterService;

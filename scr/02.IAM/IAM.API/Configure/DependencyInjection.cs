@@ -10,7 +10,7 @@ using IAM.Infrastructure.QueryRepositories;
 using IAM.Infrastructure.Repositories;
 using IAM.Infrastructure.Security;
 using IAM.Infrastructure.UoW;
-using Shared.Domain.Interfaces;
+using Shared.Application.Contracts;
 
 namespace IAM.API.Configure;
 

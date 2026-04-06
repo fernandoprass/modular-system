@@ -1,5 +1,5 @@
 ﻿using Myce.Response;
-using Shared.Domain.Interfaces;
+using Shared.Application.Contracts;
 using Shared.Domain.Messages;
 
 namespace Shared.Application.Services;

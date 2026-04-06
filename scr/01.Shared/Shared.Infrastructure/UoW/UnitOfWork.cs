@@ -1,6 +1,7 @@
 using Shared.Domain.Entities;
 using Shared.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Shared.Application.Contracts;
 
 namespace Shared.Infrastructure.UoW;
 
@@ -13,18 +14,13 @@ namespace Shared.Infrastructure.UoW;
 /// database context is properly disposed of when the unit of work is no longer needed.
 /// </summary>
 /// <typeparam name="TContext">The database context</typeparam>
-public class UnitOfWork<TContext> : IUnitOfWork<TContext> where TContext : DbContext
+public class UnitOfWork<TContext>(TContext dbContext, IUserContext userContext) 
+   : IUnitOfWork<TContext> where TContext : DbContext
 {
-    private readonly TContext _dbContext;
-    private readonly IUserContext _userContext;
+    private readonly TContext _dbContext = dbContext;
+    private readonly IUserContext _userContext = userContext;
 
-    public UnitOfWork(TContext dbContext, IUserContext userContext)
-    {
-        _dbContext = dbContext;
-        _userContext = userContext;
-    }
-
-    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+   public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var userId = _userContext.UserId;
         var entries = _dbContext.ChangeTracker.Entries<Entity>();

@@ -1,6 +1,6 @@
 ﻿using IAM.Domain;
 using Microsoft.AspNetCore.Http;
-using Shared.Domain.Interfaces;
+using Shared.Application.Contracts;
 using System.Security.Claims;
 
 namespace IAM.Infrastructure.Security;

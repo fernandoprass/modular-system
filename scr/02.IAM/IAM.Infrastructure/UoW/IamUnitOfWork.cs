@@ -1,7 +1,7 @@
 ﻿using IAM.Domain.Interfaces;
 using IAM.Domain.Repositories;
 using IAM.Infrastructure.Repositories;
-using Shared.Domain.Interfaces;
+using Shared.Application.Contracts;
 using Shared.Infrastructure.UoW;
 
 namespace IAM.Infrastructure.UoW;

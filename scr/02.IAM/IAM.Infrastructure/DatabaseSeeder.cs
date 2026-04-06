@@ -104,8 +104,6 @@ public class DatabaseSeeder : IDatabaseSeeder
    {
       await AddParameter(IamParam.Security.PasswordExpireTime, "Password expiration time", "Password expiration time, in days.",
                          ParameterType.Integer, "60", ParameterOverrideType.None, false);
-
-      await _iamUnitOfWork.SaveChangesAsync();
    }
 
    private async Task AddParameter(
@@ -133,7 +131,7 @@ public class DatabaseSeeder : IDatabaseSeeder
       string? listItems,
       string? externalListEndpoint)
    {
-      var param = await _parameterService.GetByKeyAsync(key);
+      var param = await _parameterService.GetValueAsync(key);
 
       if (param is null)
       {

@@ -16,7 +16,20 @@ namespace IAM.API.Configure;
 
 public static class DependencyInjection
 {
-   public static void RegisterRepositories(WebApplicationBuilder builder)
+   public static void Configure(WebApplicationBuilder builder)
+   {
+      RegisterUserContext(builder);
+
+      RegisterRepositories(builder);
+
+      RegisterOrchestrators(builder);
+
+      RegisterServices(builder);
+
+      RegisterValidators(builder);
+   }
+
+   private static void RegisterRepositories(WebApplicationBuilder builder)
    {
       builder.Services.AddScoped<IIamUnitOfWork, IamUnitOfWork>();
 
@@ -28,12 +41,12 @@ public static class DependencyInjection
       builder.Services.AddScoped<IUserQueryRepository, UserQueryRepository>();
    }
 
-   public static void RegisterOrchestrators(WebApplicationBuilder builder)
+   private static void RegisterOrchestrators(WebApplicationBuilder builder)
    {
       builder.Services.AddScoped<IRegisterOrchestrator, ResgisterOrchestrator>();
    }
 
-   public static void RegisterServices(WebApplicationBuilder builder)
+   private static void RegisterServices(WebApplicationBuilder builder)
    {
       builder.Services.AddScoped<IAuthService, AuthService>(); 
       builder.Services.AddScoped<ICustomerService, CustomerService>();
@@ -42,14 +55,14 @@ public static class DependencyInjection
       builder.Services.AddScoped<IUserService, UserService>();
    }
 
-   public static void RegisterValidators(WebApplicationBuilder builder)
+   private static void RegisterValidators(WebApplicationBuilder builder)
    {
       builder.Services.AddScoped<ICustomerValidator, CustomerValidator>();
       builder.Services.AddScoped<IUserValidator, UserValidator>();
       builder.Services.AddScoped<IRoleValidator, RoleValidator>();
    }
 
-   public static void RegisterUserContext(WebApplicationBuilder builder)
+   private static void RegisterUserContext(WebApplicationBuilder builder)
    {
       builder.Services.AddHttpContextAccessor();
       builder.Services.AddScoped<IUserContext, AspNetUserContext>();

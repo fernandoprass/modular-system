@@ -24,6 +24,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{237E2C74-BCEA-4576-A28A-259A846C9572}"
 	ProjectSection(SolutionItems) = preProject
 		docs\01.Shared.entities.md = docs\01.Shared.entities.md
+		docs\00.migrations.md = docs\00.migrations.md
 		docs\01.shared.enums.md = docs\01.shared.enums.md
 		docs\01.shared.infrastructure-repository.md = docs\01.shared.infrastructure-repository.md
 		docs\01.shared.infrastructure-uow.md = docs\01.shared.infrastructure-uow.md
@@ -31,17 +32,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{237E2C74-B
 		docs\02.iam.entities.md = docs\02.iam.entities.md
 		docs\02.iam.folder-structure.md = docs\02.iam.folder-structure.md
 		docs\02.iam.libraries.md = docs\02.iam.libraries.md
-		docs\02.iam.migrations.md = docs\02.iam.migrations.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infra", "infra", "{D2CC5424-073E-4EB9-8679-7E05134562ED}"
 	ProjectSection(SolutionItems) = preProject
 		infra\.env = infra\.env
-		infra\0.create-module-shared.ps1 = infra\0.create-module-shared.ps1
-		infra\0.create-module.ps1 = infra\0.create-module.ps1
-		infra\02.IAM.db-backup.ps1 = infra\02.IAM.db-backup.ps1
-		infra\02.IAM.db-setup.ps1 = infra\02.IAM.db-setup.ps1
-		infra\02.IAM.docker-compose.yml = infra\02.IAM.docker-compose.yml
+		infra\iam.db-backup.ps1 = infra\iam.db-backup.ps1
+		infra\create-module.ps1 = infra\create-module.ps1
+		infra\create-module-shared.ps1 = infra\create-module-shared.ps1
+		infra\iam.docker-compose.yml = infra\iam.docker-compose.yml
+		infra\iam.db-setup.ps1 = infra\iam.db-setup.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
@@ -56,6 +56,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02.IAM", "02.IAM", "{19FCF543-F90F-4CB1-B52B-7C2D724D4E1C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IAM.Application.Tests", "tests\02.IAM\IAM.Application.Tests\IAM.Application.Tests.csproj", "{AE9A0791-C706-E6C0-705B-5A761445DDB3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "api", "api", "{A95467B8-D6F9-407E-98FF-C9228DEEEC89}"
+	ProjectSection(SolutionItems) = preProject
+		tests\api\http-client.env.json = tests\api\http-client.env.json
+		tests\api\iam.users.http = tests\api\iam.users.http
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -109,6 +115,7 @@ Global
 		{32679322-12EB-2146-B5A9-AD936C12D448} = {1CBBE467-E54F-45C7-9088-233B57EE7831}
 		{19FCF543-F90F-4CB1-B52B-7C2D724D4E1C} = {560BEF3A-21C3-4882-9273-E7CE4047A1D3}
 		{AE9A0791-C706-E6C0-705B-5A761445DDB3} = {19FCF543-F90F-4CB1-B52B-7C2D724D4E1C}
+		{A95467B8-D6F9-407E-98FF-C9228DEEEC89} = {560BEF3A-21C3-4882-9273-E7CE4047A1D3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0261E40D-A39C-470A-BAF3-DE2F7156D08B}

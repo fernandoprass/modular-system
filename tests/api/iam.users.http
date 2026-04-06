@@ -1,0 +1,17 @@
+### 1. Login
+# @name login
+POST {{server}}/api/{{version}}/{{loginEndpoint}}
+Content-Type: application/json
+
+{
+  "email": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+### Get by Id
+GET {{server}}/api/{{version}}/iam/users/019d360f-9cd7-7cad-b690-7907d3b50457
+Authorization: Bearer {{token}}
+
+### Get Users by CustomerId
+GET {{server}}/api/{{version}}/iam/users/by-customer/00000000-0000-0000-0000-000000000001
+Authorization: Bearer {{token}}

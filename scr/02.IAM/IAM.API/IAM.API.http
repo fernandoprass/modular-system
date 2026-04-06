@@ -1,0 +1,9 @@
+﻿@IAM.API_HostAddress = https://localhost:5055
+
+GET {{IAM.API_HostAddress}}/api/v{version:apiVersion}/iam/users/{id:guid}
+
+###
+
+GET {{IAM.API_HostAddress}}/api/v{version:apiVersion}/iam/users/{id:guid}
+
+###

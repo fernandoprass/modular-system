@@ -1,4 +1,3 @@
-using Asp.Versioning;
 using IAM.API.Configure;
 using IAM.API.Middlewares;
 using IAM.Domain;
@@ -21,30 +20,11 @@ builder.Services.AddProblemDetails();
 var connectionString = builder.Configuration.GetConnectionString(IamConst.Database.ConnectionString);
 builder.Services.AddDbContext<IamDbContext>(options => options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention());
 
-builder.Services.AddSharedInfrastructure(builder.Configuration);
+builder.Services.AddSharedInfrastructure(builder.Configuration, connectionString);
 
-DependencyInjection.RegisterUserContext(builder);
+DependencyInjection.Configure(builder);
 
-DependencyInjection.RegisterRepositories(builder);
-
-DependencyInjection.RegisterOrchestrators(builder);
-
-DependencyInjection.RegisterServices(builder);
-
-DependencyInjection.RegisterValidators(builder);
-
-// Configure API Versioning
-builder.Services.AddApiVersioning(options =>
-{
-   options.DefaultApiVersion = new ApiVersion(1);
-   options.ReportApiVersions = true;
-   options.AssumeDefaultVersionWhenUnspecified = true;
-   options.ApiVersionReader = ApiVersionReader.Combine(
-       new UrlSegmentApiVersionReader(),
-       new HeaderApiVersionReader("X-Api-Version"));
-});
-
-builder.Services.AddAuthorization();
+ApiVersioning.Configure(builder);
 
 JWTAuthentication.Configure(builder);
 

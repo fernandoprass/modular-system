@@ -16,9 +16,10 @@ public static class SharedDependencyInjection
 {
    public static IServiceCollection AddSharedInfrastructure(
        this IServiceCollection services,
-       IConfiguration configuration)
+       IConfiguration configuration,
+       string connectionString)
    {
-      ConfigureDbContext(services, configuration);
+      ConfigureDbContext(services, configuration, connectionString);
 
       services.AddScoped<ISharedUnitOfWork, SharedUnitOfWork>();
 
@@ -35,10 +36,9 @@ public static class SharedDependencyInjection
       return services;
    }
 
-   private static void ConfigureDbContext(IServiceCollection services, IConfiguration configuration)
+   private static void ConfigureDbContext(IServiceCollection services, IConfiguration configuration, string connectionString)
    {
-      var connectionString = configuration.GetConnectionString(SharedConst.Database.ConnectionString);
-      services.AddDbContext<SharedDbContext>(options => options.UseNpgsql(connectionString));
+      connectionString = !string.IsNullOrEmpty(connectionString) ? connectionString : configuration.GetConnectionString(SharedConst.Database.ConnectionString);
       services.AddDbContext<SharedDbContext>(options => options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention());
    }
 }

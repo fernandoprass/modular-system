@@ -12,6 +12,8 @@ namespace IAM.API.Configure
          var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "your-super-secret-jwt-key-here-make-it-long-and-secure";
          var key = Encoding.UTF8.GetBytes(jwtSecret);
 
+         builder.Services.AddAuthorization();
+
          builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
              .AddJwtBearer(options =>
              {

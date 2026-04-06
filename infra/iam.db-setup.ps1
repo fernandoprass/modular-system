@@ -1,6 +1,6 @@
 # --- Configuration ---
 $ENV_FILE = ".env"
-$DOCKER_COMPOSE_FILE = "docker-compose.yml"
+$DOCKER_COMPOSE_FILE = "iam.docker-compose.yml"
 
 Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host "PostgreSQL Optimized Setup"
@@ -9,7 +9,7 @@ Write-Host "==========================================" -ForegroundColor Cyan
 # 1. Hardware Auto-Detection
 Write-Host "[INFO] Detecting System Resources..." -ForegroundColor Gray
 $SystemRAM_GB = [Math]::Floor((Get-CimInstance Win32_PhysicalMemory | Measure-Object Capacity -Sum).Sum / 1GB)
-if ($SystemRAM_GB -lt 1) { $SystemRAM_GB = 1 } # Garantia mínima de 1GB
+if ($SystemRAM_GB -lt 1) { $SystemRAM_GB = 1 } # minimum 1GB
 Write-Host "Detected: $SystemRAM_GB GB RAM" -ForegroundColor Green
 
 # 2. Check/Create .env with dynamic RAM value
@@ -32,8 +32,7 @@ TOTAL_RAM_GB=$SystemRAM_GB
     $defaultEnvContent | Set-Content -Path $ENV_FILE -Encoding UTF8
 }
 
-# 3. Load Environment Variables into PowerShell context (IMPORTANTE)
-# Isso permite que o script conheça as senhas se você precisar rodar comandos EF Core depois
+# 3. Load Environment Variables into PowerShell context
 Get-Content $ENV_FILE | Where-Object { $_ -match '=' -and $_ -notmatch '^#' } | ForEach-Object {
     $name, $value = $_.Split('=', 2)
     [System.Environment]::SetEnvironmentVariable($name.Trim(), $value.Trim())

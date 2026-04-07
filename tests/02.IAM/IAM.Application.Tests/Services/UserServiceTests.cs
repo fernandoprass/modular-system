@@ -5,18 +5,17 @@ using IAM.Domain.DTOs.Requests;
 using IAM.Domain.Entities;
 using IAM.Domain.Interfaces;
 using IAM.Domain.Messages;
-using IAM.Domain.Messages.Errors;
 using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
-using IAM.Infrastructure.QueryRepositories;
 using Myce.Response;
 using NSubstitute;
+using Shared.Application.Contracts;
 
 namespace IAM.Application.Tests.Services;
 
 public class UserServiceTests
 {
-   private readonly IUnitOfWork _unitOfWorkMock;
+   private readonly IIamUnitOfWork _unitOfWorkMock;
    private readonly IUserValidator _userValidatorMock;
    private readonly IUserContext _userContextMock;
    private readonly IUserRepository _userRepositoryMock;
@@ -25,14 +24,14 @@ public class UserServiceTests
 
    public UserServiceTests()
    {
-      _unitOfWorkMock = Substitute.For<IUnitOfWork>();
+      _unitOfWorkMock = Substitute.For<IIamUnitOfWork>();
       _userContextMock = Substitute.For<IUserContext>();
       _userValidatorMock = Substitute.For<IUserValidator>();
       _userRepositoryMock = Substitute.For<IUserRepository>();
       _userQueryRepositoryMock = Substitute.For<IUserQueryRepository>();
       
       _unitOfWorkMock.Users.Returns(_userRepositoryMock);
-      _userContextMock.CustomerId.Returns(Guid.CreateVersion7());
+      _userContextMock.UserOwnerId.Returns(Guid.CreateVersion7());
 
       _userService = new UserService(
           _unitOfWorkMock,
@@ -58,7 +57,7 @@ public class UserServiceTests
    [Fact]
    public async Task CreateUserAsync_ShouldReturnValidationErrors_WhenValidatorFails()
    {
-      var request = new UserCreateRequest("John Smith", "test@test.com", string.Empty, _userContextMock.CustomerId);
+      var request = new UserCreateRequest("John Smith", "test@test.com", string.Empty, _userContextMock.UserOwnerId);
 
 
       _userQueryRepositoryMock.GetIdByEmailAsync(request.Email).Returns(Guid.NewGuid());
@@ -76,7 +75,7 @@ public class UserServiceTests
    [Fact]
    public async Task CreateUserAsync_ShouldSaveUser_WhenRequestIsValid()
    {
-      var request = new UserCreateRequest("John Doe", "new@test.com", "SecurePassword123", _userContextMock.CustomerId);
+      var request = new UserCreateRequest("John Doe", "new@test.com", "SecurePassword123", _userContextMock.UserOwnerId);
 
       _userQueryRepositoryMock.GetIdByEmailAsync(request.Email).Returns(Guid.Empty);
 

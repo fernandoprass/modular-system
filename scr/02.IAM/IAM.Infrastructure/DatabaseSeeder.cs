@@ -7,7 +7,6 @@ using Shared.Application.Contracts;
 using Shared.Domain;
 using Shared.Domain.DTOs.Requests;
 using Shared.Domain.Enums;
-using Shared.Domain.Interfaces;
 
 namespace IAM.Infrastructure;
 
@@ -33,14 +32,14 @@ public class DatabaseSeeder : IDatabaseSeeder
    public async Task SeedAsync()
    {
       //await SeedAdminCustomerAsync();
-     // await SeedScientistsCustomerAsync();
+      //await SeedScientistsCustomerAsync();
 
       await SeedParamentersAsync();
    }
 
    private async Task SeedAdminCustomerAsync()
    {
-      var customerId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+      var customerId = Guid.CreateVersion7();
       if (await _iamUnitOfWork.Customers.ExistsAsync(customerId)) return;
 
       var customer = new Customer
@@ -68,7 +67,7 @@ public class DatabaseSeeder : IDatabaseSeeder
     
    private async Task SeedScientistsCustomerAsync()
    {
-      var customerId = Guid.Parse("00000000-0000-0000-0000-000000000002");
+      var customerId = Guid.CreateVersion7();
       if (await _iamUnitOfWork.Customers.ExistsAsync(customerId)) return;
 
       var customer = new Customer
@@ -131,9 +130,9 @@ public class DatabaseSeeder : IDatabaseSeeder
       string? listItems,
       string? externalListEndpoint)
    {
-      var param = await _parameterService.GetValueAsync(key);
+      var paramExists = await _parameterService.ExistsAsync(key);
 
-      if (param is null)
+      if (!paramExists)
       {
          var parameterKey = new ParameterKey(key);
 

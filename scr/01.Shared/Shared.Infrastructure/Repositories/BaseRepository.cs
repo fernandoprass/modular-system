@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Shared.Domain.Entities;
 using Shared.Domain.Interfaces;
 
@@ -13,7 +14,7 @@ namespace Shared.Infrastructure.Repositories;
 /// <typeparam name="TId">The Type of the Entity Id</typeparam>
 /// <param name="context">The DbContext instance used for database operations</param>
 public class BaseRepository<T, TId>(DbContext context) : IBaseRepository<T, TId>
-    where T : Entity
+    where T : Entity<TId>
 {
    protected readonly DbContext _context = context;
    protected readonly DbSet<T> _dbSet = context.Set<T>();
@@ -44,8 +45,7 @@ public class BaseRepository<T, TId>(DbContext context) : IBaseRepository<T, TId>
 
    public virtual async Task<bool> ExistsAsync(TId id)
    {
-      var entity = await _dbSet.FindAsync(id);
-      return entity != null;
+      return await _dbSet.AnyAsync(e => e.Id.Equals(id));
    }
 }
 

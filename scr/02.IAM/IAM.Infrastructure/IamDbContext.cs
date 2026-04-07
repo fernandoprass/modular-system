@@ -1,6 +1,7 @@
 using IAM.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using IAM.Infrastructure.Configurations;
+using IAM.Domain;
 
 namespace IAM.Infrastructure;
 
@@ -16,6 +17,7 @@ public class IamDbContext(DbContextOptions<IamDbContext> options) : DbContext(op
    protected override void OnModelCreating(ModelBuilder modelBuilder)
    {
       base.OnModelCreating(modelBuilder);
+      modelBuilder.HasDefaultSchema(IamConst.Database.Schema);
 
       modelBuilder.ApplyConfiguration(new CustomerConfiguration());
       modelBuilder.ApplyConfiguration(new UserConfiguration());
@@ -23,5 +25,10 @@ public class IamDbContext(DbContextOptions<IamDbContext> options) : DbContext(op
       modelBuilder.ApplyConfiguration(new FeatureConfiguration());
       modelBuilder.ApplyConfiguration(new RoleFeatureConfiguration());
       modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
+   }
+
+   protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+   {
+      configurationBuilder.Properties<Guid>().HaveColumnType(IamConst.Database.UuidType);
    }
 }

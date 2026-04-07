@@ -171,6 +171,16 @@ internal class ParameterService(
       return Result.Success(new SuccessInfo());
    }
 
+   public Task<bool> ExistsAsync(Guid id)
+   {
+      return _parameterRepository.ExistsAsync(id);
+   }
+
+   public Task<bool> ExistsAsync(string key)
+   {
+      return _parameterRepository.ExistsAsync(key);
+   }
+
    public Task<bool> GetBoolAsync(string key) => GetAndParseAsync<bool>(key, bool.TryParse);
 
    public Task<int> GetIntAsync(string key) => GetAndParseAsync<int>(key, int.TryParse);

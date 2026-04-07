@@ -3,6 +3,8 @@ using IAM.Domain.Interfaces;
 using IAM.Domain.Messages;
 using Myce.Response;
 using NSubstitute;
+using Shared.Application.Contracts;
+using Shared.Application.Services;
 
 namespace IAM.Application.Tests.Services
 {
@@ -50,7 +52,7 @@ namespace IAM.Application.Tests.Services
       {
          var myCustomerId = Guid.NewGuid();
          _userContextMock.IsSystemAdmin.Returns(false);
-         _userContextMock.CustomerId.Returns(myCustomerId);
+         _userContextMock.UserOwnerId.Returns(myCustomerId);
 
          var actionCalled = false;
 
@@ -68,7 +70,7 @@ namespace IAM.Application.Tests.Services
       public async Task ExecuteIfUserOwnsAsync_ShouldFail_WhenUserIsNotOwnerAndNotAdmin()
       {
          _userContextMock.IsSystemAdmin.Returns(false);
-         _userContextMock.CustomerId.Returns(Guid.NewGuid());
+         _userContextMock.UserOwnerId.Returns(Guid.NewGuid());
 
          var targetCustomerId = Guid.NewGuid(); // Diferente do mock acima
          var actionCalled = false;
@@ -88,7 +90,7 @@ namespace IAM.Application.Tests.Services
       public async Task ExecuteIfUserOwnsAsync_Generic_ShouldReturnCorrectTypeOnFailure()
       {
          _userContextMock.IsSystemAdmin.Returns(false);
-         _userContextMock.CustomerId.Returns(Guid.NewGuid());
+         _userContextMock.UserOwnerId.Returns(Guid.NewGuid());
 
          var result = await _service.TestExecuteIfUserOwnsAsyncGeneric<Result<string>>(Guid.NewGuid(), () =>
              Task.FromResult(Result<string>.Success("Should not be called")));

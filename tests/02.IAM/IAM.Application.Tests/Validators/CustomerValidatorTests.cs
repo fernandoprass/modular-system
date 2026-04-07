@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using IAM.Application.Validators;
 using IAM.Domain.DTOs.Requests;
+using IAM.Domain.Enums;
 using IAM.Domain.Messages.Errors;
 
 namespace IAM.Application.Tests.Validators

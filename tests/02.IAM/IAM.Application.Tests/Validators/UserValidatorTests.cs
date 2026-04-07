@@ -6,6 +6,7 @@ using IAM.Domain.Entities;
 using IAM.Domain.Messages;
 using IAM.Domain.Messages.Errors;
 using Isopoh.Cryptography.Argon2;
+using Shared.Domain.Messages;
 
 
 namespace IAM.Application.Tests.Validators;
@@ -48,7 +49,7 @@ public class UserValidatorTests
       var result = _validator.ValidateCreate(request, emailAlreadyExists: false, customerExists: false);
 
       Assert.False(result.IsSuccess);
-      Assert.Contains(result.Messages, m => m is NotFoundError && m.Show().Contains(Const.Entity.Customer));
+      Assert.Contains(result.Messages, m => m is NotFoundError && m.Show().Contains(IamConst.Entity.Customer));
    }
 
    [Fact]

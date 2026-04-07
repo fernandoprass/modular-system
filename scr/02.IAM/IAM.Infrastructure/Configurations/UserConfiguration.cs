@@ -21,7 +21,7 @@ public class UserConfiguration : BaseConfiguration<User>
       builder.Property(u => u.LastLoginAt);
       builder.Property(u => u.CustomerId).IsRequired();
 
-      builder.HasIndex(u => u.Email).IsUnique();
+      builder.HasIndex(u => new { u.CustomerId, u.Email }).IsUnique();
 
       // Foreign key
       builder.HasOne(u => u.Customer)

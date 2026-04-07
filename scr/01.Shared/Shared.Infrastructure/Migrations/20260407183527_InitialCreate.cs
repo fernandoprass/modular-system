@@ -3,28 +3,36 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace IAM.Infrastructure.Migrations
+namespace Shared.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class IamDbParameter : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "shared");
+
             migrationBuilder.CreateTable(
                 name: "parameters",
+                schema: "shared",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
+                    module = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     group = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    key = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    key = table.Column<string>(type: "character varying(402)", maxLength: 402, nullable: false),
+                    title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     description = table.Column<string>(type: "text", nullable: false),
                     type = table.Column<byte>(type: "smallint", nullable: false),
                     value = table.Column<string>(type: "text", nullable: false),
-                    list_items = table.Column<string>(type: "text", nullable: false),
-                    external_list_endpoint = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    is_customer_editable = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    validation_regex = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    validation_error_custom_message = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    list_items = table.Column<string>(type: "text", nullable: true),
+                    external_list_endpoint = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    override_type = table.Column<byte>(type: "smallint", nullable: false, defaultValue: (byte)0),
                     is_visible = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -37,12 +45,13 @@ namespace IAM.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "parameter_customers",
+                name: "parameter_overrides",
+                schema: "shared",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     value = table.Column<string>(type: "text", nullable: false),
-                    customer_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    owner_id = table.Column<Guid>(type: "uuid", nullable: false),
                     parameter_id = table.Column<Guid>(type: "uuid", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -51,35 +60,34 @@ namespace IAM.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_parameter_customers", x => x.id);
+                    table.PrimaryKey("pk_parameter_overrides", x => x.id);
                     table.ForeignKey(
-                        name: "fk_parameter_customers_customers_customer_id",
-                        column: x => x.customer_id,
-                        principalTable: "customers",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "fk_parameter_customers_parameters_parameter_id",
+                        name: "fk_parameter_overrides_parameters_parameter_id",
                         column: x => x.parameter_id,
+                        principalSchema: "shared",
                         principalTable: "parameters",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "ix_parameter_customers_customer_id",
-                table: "parameter_customers",
-                column: "customer_id");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_parameter_customers_parameter_id",
-                table: "parameter_customers",
+                name: "ix_parameter_overrides_parameter_id",
+                schema: "shared",
+                table: "parameter_overrides",
                 column: "parameter_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_parameters_group_key",
+                name: "ix_parameters_key",
+                schema: "shared",
                 table: "parameters",
-                columns: new[] { "group", "key" },
+                column: "key",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_parameters_module_group_name",
+                schema: "shared",
+                table: "parameters",
+                columns: new[] { "module", "group", "name" },
                 unique: true);
         }
 
@@ -87,10 +95,12 @@ namespace IAM.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "parameter_customers");
+                name: "parameter_overrides",
+                schema: "shared");
 
             migrationBuilder.DropTable(
-                name: "parameters");
+                name: "parameters",
+                schema: "shared");
         }
     }
 }

@@ -1,6 +1,7 @@
+using Myce.Response;
 using Shared.Domain.DTOs.Requests;
 using Shared.Domain.DTOs.Responses;
-using Myce.Response;
+using System.Security.Cryptography;
 
 namespace Shared.Application.Contracts
 {
@@ -19,6 +20,8 @@ namespace Shared.Application.Contracts
       Task<Result<ParameterDto>> CreateAsync(ParameterCreateRequest request);
       Task<Result> UpdateAsync(Guid id, ParameterUpdateRequest request);
       Task<Result> DeleteAsync(Guid id);
+      Task<bool> ExistsAsync(Guid id);
+      Task<bool> ExistsAsync(string key);
       Task<ParameterDto?> GetByKeyAsync(string key);
       Task<bool> GetBoolAsync(string key);
       Task<int> GetIntAsync(string key);

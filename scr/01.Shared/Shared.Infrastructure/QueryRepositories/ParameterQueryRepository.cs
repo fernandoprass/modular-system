@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Shared.Domain.DTOs.Requests;
 using Shared.Domain.DTOs.Responses;
+using Shared.Domain.Entities;
 using Shared.Domain.Enums;
 using Shared.Domain.Interfaces;
 using Shared.Domain.Mappers;

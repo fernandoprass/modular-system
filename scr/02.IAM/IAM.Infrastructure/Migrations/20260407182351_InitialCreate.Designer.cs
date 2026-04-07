@@ -12,15 +12,16 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IAM.Infrastructure.Migrations
 {
     [DbContext(typeof(IamDbContext))]
-    [Migration("20260329205506_IamDbParameterFix")]
-    partial class IamDbParameterFix
+    [Migration("20260407182351_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
+                .HasDefaultSchema("iam")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -84,7 +85,7 @@ namespace IAM.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_customers");
 
-                    b.ToTable("customers", (string)null);
+                    b.ToTable("customers", "iam");
                 });
 
             modelBuilder.Entity("IAM.Domain.Entities.Feature", b =>
@@ -135,141 +136,7 @@ namespace IAM.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_features_name");
 
-                    b.ToTable("features", (string)null);
-                });
-
-            modelBuilder.Entity("IAM.Domain.Entities.Parameter", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uuid")
-                        .HasColumnName("created_by");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("description");
-
-                    b.Property<string>("ExternalListEndpoint")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("external_list_endpoint");
-
-                    b.Property<string>("Group")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("group");
-
-                    b.Property<bool>("IsCustomerEditable")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_customer_editable");
-
-                    b.Property<bool>("IsVisible")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_visible");
-
-                    b.Property<string>("Key")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("key");
-
-                    b.Property<string>("ListItems")
-                        .HasColumnType("text")
-                        .HasColumnName("list_items");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("name");
-
-                    b.Property<byte>("Type")
-                        .HasColumnType("smallint")
-                        .HasColumnName("type");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uuid")
-                        .HasColumnName("updated_by");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("value");
-
-                    b.HasKey("Id")
-                        .HasName("pk_parameters");
-
-                    b.HasIndex("Group", "Key")
-                        .IsUnique()
-                        .HasDatabaseName("ix_parameters_group_key");
-
-                    b.ToTable("parameters", (string)null);
-                });
-
-            modelBuilder.Entity("IAM.Domain.Entities.ParameterCustomer", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uuid")
-                        .HasColumnName("created_by");
-
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("customer_id");
-
-                    b.Property<Guid>("ParameterId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("parameter_id");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uuid")
-                        .HasColumnName("updated_by");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("value");
-
-                    b.HasKey("Id")
-                        .HasName("pk_parameter_customers");
-
-                    b.HasIndex("CustomerId")
-                        .HasDatabaseName("ix_parameter_customers_customer_id");
-
-                    b.HasIndex("ParameterId")
-                        .HasDatabaseName("ix_parameter_customers_parameter_id");
-
-                    b.ToTable("parameter_customers", (string)null);
+                    b.ToTable("features", "iam");
                 });
 
             modelBuilder.Entity("IAM.Domain.Entities.Role", b =>
@@ -318,7 +185,7 @@ namespace IAM.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_roles_name_customer_id");
 
-                    b.ToTable("roles", (string)null);
+                    b.ToTable("roles", "iam");
                 });
 
             modelBuilder.Entity("IAM.Domain.Entities.RoleFeature", b =>
@@ -337,7 +204,7 @@ namespace IAM.Infrastructure.Migrations
                     b.HasIndex("FeatureId")
                         .HasDatabaseName("ix_role_features_feature_id");
 
-                    b.ToTable("role_features", (string)null);
+                    b.ToTable("role_features", "iam");
                 });
 
             modelBuilder.Entity("IAM.Domain.Entities.User", b =>
@@ -412,14 +279,11 @@ namespace IAM.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_users");
 
-                    b.HasIndex("CustomerId")
-                        .HasDatabaseName("ix_users_customer_id");
-
-                    b.HasIndex("Email")
+                    b.HasIndex("CustomerId", "Email")
                         .IsUnique()
-                        .HasDatabaseName("ix_users_email");
+                        .HasDatabaseName("ix_users_customer_id_email");
 
-                    b.ToTable("users", (string)null);
+                    b.ToTable("users", "iam");
                 });
 
             modelBuilder.Entity("IAM.Domain.Entities.UserRole", b =>
@@ -438,24 +302,7 @@ namespace IAM.Infrastructure.Migrations
                     b.HasIndex("RoleId")
                         .HasDatabaseName("ix_user_roles_role_id");
 
-                    b.ToTable("user_roles", (string)null);
-                });
-
-            modelBuilder.Entity("IAM.Domain.Entities.ParameterCustomer", b =>
-                {
-                    b.HasOne("IAM.Domain.Entities.Customer", null)
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_parameter_customers_customers_customer_id");
-
-                    b.HasOne("IAM.Domain.Entities.Parameter", null)
-                        .WithMany("ParameterCustomers")
-                        .HasForeignKey("ParameterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_parameter_customers_parameters_parameter_id");
+                    b.ToTable("user_roles", "iam");
                 });
 
             modelBuilder.Entity("IAM.Domain.Entities.RoleFeature", b =>
@@ -520,11 +367,6 @@ namespace IAM.Infrastructure.Migrations
             modelBuilder.Entity("IAM.Domain.Entities.Feature", b =>
                 {
                     b.Navigation("RoleFeatures");
-                });
-
-            modelBuilder.Entity("IAM.Domain.Entities.Parameter", b =>
-                {
-                    b.Navigation("ParameterCustomers");
                 });
 
             modelBuilder.Entity("IAM.Domain.Entities.Role", b =>

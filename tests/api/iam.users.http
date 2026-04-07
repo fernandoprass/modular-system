@@ -9,7 +9,7 @@ Content-Type: application/json
 }
 
 ### Get by Id
-GET {{server}}/api/{{version}}/iam/users/019d360f-9cd7-7cad-b690-7907d3b50457
+GET {{server}}/api/{{version}}/iam/users/019d6932-e551-783b-a408-f6ee1e041e96
 Authorization: Bearer {{token}}
 
 ### Get Users by CustomerId

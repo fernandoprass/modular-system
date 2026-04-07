@@ -3,12 +3,15 @@ using IAM.Application.Services;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;
+using IAM.Domain.Enums;
 using IAM.Domain.Interfaces;
 using IAM.Domain.Messages.Errors;
 using IAM.Domain.QueryRepositories;
 using IAM.Domain.Repositories;
 using Myce.Response;
 using NSubstitute;
+using Shared.Application.Contracts;
+using Shared.Domain.Messages;
 
 namespace IAM.Application.Tests.Services;
 
@@ -17,7 +20,7 @@ public class CustomerServiceTests
    private readonly ICustomerQueryRepository _customerQueryRepository;
    private readonly ICustomerRepository _customerRepository;
    private readonly ICustomerValidator _customerValidator;
-   private readonly IUnitOfWork _unitOfWork;
+   private readonly IIamUnitOfWork _unitOfWork;
    private readonly IUserContext _userContext;
    private readonly CustomerService _service;
 
@@ -26,7 +29,7 @@ public class CustomerServiceTests
       _customerQueryRepository = Substitute.For<ICustomerQueryRepository>();
       _customerRepository = Substitute.For<ICustomerRepository>();
       _customerValidator = Substitute.For<ICustomerValidator>();
-      _unitOfWork = Substitute.For<IUnitOfWork>();
+      _unitOfWork = Substitute.For<IIamUnitOfWork>();
       _userContext = Substitute.For<IUserContext>();
 
       _service = new CustomerService(
@@ -109,7 +112,7 @@ public class CustomerServiceTests
 
       var customer = Customer.Create(CustomerType.Company, "OriginalCode", "Original Name", "description");
 
-      _userContext.CustomerId.Returns(id);
+      _userContext.UserOwnerId.Returns(id);
       _customerRepository.GetByIdAsync(id).Returns(customer);
       _customerValidator.ValidateUpdate(request, true).Returns(Result.Success());
 
@@ -127,7 +130,7 @@ public class CustomerServiceTests
       var request = GetCustomerUpdateRequest(string.Empty, "description", true);
       var customer = Customer.Create(CustomerType.Company, "OriginalCode", "Original Name", "description");
 
-      _userContext.CustomerId.Returns(id);
+      _userContext.UserOwnerId.Returns(id);
       _customerRepository.GetByIdAsync(id).Returns(customer);
       _customerValidator.ValidateUpdate(request, true).Returns(Result.Failure(new NotFoundError()));
 
@@ -143,7 +146,7 @@ public class CustomerServiceTests
       var request = new CustomerUpdateCodeRequest("NEWCODE");
       var customer = Customer.Create(CustomerType.Company, "OriginalCode", "Original Name", "description");
 
-      _userContext.CustomerId.Returns(id);
+      _userContext.UserOwnerId.Returns(id);
       _customerRepository.GetByCodeAsync(request.Code).Returns((Customer)null);
       _customerValidator.ValidateUpdateCode(request, false).Returns(Result.Success());
       _customerRepository.GetByIdAsync(id).Returns(customer);
@@ -161,7 +164,7 @@ public class CustomerServiceTests
       var request = new CustomerUpdateCodeRequest("EXISTING");
       var existingCustomer = Customer.Create(CustomerType.Company, "EXISTING", "Original Name", "description");
 
-      _userContext.CustomerId.Returns(id);
+      _userContext.UserOwnerId.Returns(id);
       _customerRepository.GetByCodeAsync(request.Code).Returns(existingCustomer);
       _customerValidator.ValidateUpdateCode(request, true).Returns(Result.Failure(new DuplicateCustomerCodeError(request.Code)));
 

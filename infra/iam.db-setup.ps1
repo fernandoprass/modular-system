@@ -50,8 +50,11 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # 5. Start and Monitor
+Write-Host "[INFO] Cleaning up old containers..." -ForegroundColor Gray
+docker-compose -f $DOCKER_COMPOSE_FILE down
+
 Write-Host "[INFO] Starting containers..." -ForegroundColor Cyan
-docker-compose up -d --remove-orphans
+docker-compose -f $DOCKER_COMPOSE_FILE up -d --remove-orphans
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "`n[WAIT] Waiting for Database to be Healthy..." -ForegroundColor Yellow

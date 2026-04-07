@@ -3,23 +3,21 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shared.Domain;
 using Shared.Domain.Entities;
 
-namespace Shared.Infrastructure.Configurations
+namespace Shared.Infrastructure.Configurations;
+
+public class ParameterOverrideConfiguration : BaseConfiguration<ParameterOverride>
 {
-   public class ParameterOverrideConfiguration : BaseConfiguration<ParameterOverride>
+   public override void Configure(EntityTypeBuilder<ParameterOverride> builder)
    {
-      public override void Configure(EntityTypeBuilder<ParameterOverride> builder)
-      {
-         base.Configure(builder);
-         builder.ToTable("ParameterOverrides", SharedConst.Database.Schema);
+      base.Configure(builder);
 
-         builder.Property(p => p.Value).IsRequired().HasColumnType("text");
-         builder.Property(pc => pc.OwnerId).IsRequired();
-         builder.Property(pc => pc.ParameterId).IsRequired();
+      builder.Property(p => p.Value).IsRequired().HasColumnType(SharedConst.Database.TextType);
+      builder.Property(pc => pc.OwnerId).IsRequired();
+      builder.Property(pc => pc.ParameterId).IsRequired();
 
-         builder.HasOne<Parameter>()
-                .WithMany(p => p.ParameterOwners)
-                .HasForeignKey(pc => pc.ParameterId)
-                .OnDelete(DeleteBehavior.Cascade);
-      }
+      builder.HasOne<Parameter>()
+             .WithMany(p => p.ParameterOwners)
+             .HasForeignKey(pc => pc.ParameterId)
+             .OnDelete(DeleteBehavior.Cascade);
    }
 }

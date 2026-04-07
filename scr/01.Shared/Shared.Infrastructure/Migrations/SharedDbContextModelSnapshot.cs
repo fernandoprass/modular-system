@@ -17,6 +17,7 @@ namespace Shared.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("shared")
                 .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -131,7 +132,7 @@ namespace Shared.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_parameters_module_group_name");
 
-                    b.ToTable("Parameters", "shared");
+                    b.ToTable("parameters", "shared");
                 });
 
             modelBuilder.Entity("Shared.Domain.Entities.ParameterOverride", b =>
@@ -176,7 +177,7 @@ namespace Shared.Infrastructure.Migrations
                     b.HasIndex("ParameterId")
                         .HasDatabaseName("ix_parameter_overrides_parameter_id");
 
-                    b.ToTable("ParameterOverrides", "shared");
+                    b.ToTable("parameter_overrides", "shared");
                 });
 
             modelBuilder.Entity("Shared.Domain.Entities.ParameterOverride", b =>

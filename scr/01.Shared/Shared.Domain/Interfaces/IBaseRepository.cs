@@ -7,7 +7,7 @@ namespace Shared.Domain.Interfaces;
 /// </summary>
 /// <typeparam name="T">The Type of the Entity</typeparam>
 /// <typeparam name="TId">The Type of the Entity Id</typeparam>
-public interface IBaseRepository<T, TId> where T : Entity
+public interface IBaseRepository<T, TId> where T : Entity<TId>
 {
     Task<T?> GetByIdAsync(TId id);
     Task AddAsync(T entity);

@@ -26,7 +26,7 @@ public class UserController(
       return OkOrNotFound(user);
    }
 
-   [HttpGet("by-customer/{customerI:guid}")]
+   [HttpGet("by-customer/{customerId:guid}")]
    [Authorize]
    public async Task<IActionResult> GetByCustomerId(Guid customerId)
    {

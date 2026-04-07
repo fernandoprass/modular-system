@@ -6,13 +6,17 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace IAM.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class IamDb : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "iam");
+
             migrationBuilder.CreateTable(
                 name: "customers",
+                schema: "iam",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -34,6 +38,7 @@ namespace IAM.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "features",
+                schema: "iam",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -52,6 +57,7 @@ namespace IAM.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "roles",
+                schema: "iam",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -70,6 +76,7 @@ namespace IAM.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "users",
+                schema: "iam",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -93,12 +100,14 @@ namespace IAM.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "fk_users_customers_customer_id",
                         column: x => x.customer_id,
+                        principalSchema: "iam",
                         principalTable: "customers",
                         principalColumn: "id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "role_features",
+                schema: "iam",
                 columns: table => new
                 {
                     role_id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -110,12 +119,14 @@ namespace IAM.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "fk_role_features_features_feature_id",
                         column: x => x.feature_id,
+                        principalSchema: "iam",
                         principalTable: "features",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "fk_role_features_roles_role_id",
                         column: x => x.role_id,
+                        principalSchema: "iam",
                         principalTable: "roles",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -123,6 +134,7 @@ namespace IAM.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "user_roles",
+                schema: "iam",
                 columns: table => new
                 {
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -134,12 +146,14 @@ namespace IAM.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "fk_user_roles_roles_role_id",
                         column: x => x.role_id,
+                        principalSchema: "iam",
                         principalTable: "roles",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "fk_user_roles_users_user_id",
                         column: x => x.user_id,
+                        principalSchema: "iam",
                         principalTable: "users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -147,35 +161,35 @@ namespace IAM.Infrastructure.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "ix_features_name",
+                schema: "iam",
                 table: "features",
                 column: "name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "ix_role_features_feature_id",
+                schema: "iam",
                 table: "role_features",
                 column: "feature_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_roles_name_customer_id",
+                schema: "iam",
                 table: "roles",
                 columns: new[] { "name", "customer_id" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "ix_user_roles_role_id",
+                schema: "iam",
                 table: "user_roles",
                 column: "role_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_users_customer_id",
+                name: "ix_users_customer_id_email",
+                schema: "iam",
                 table: "users",
-                column: "customer_id");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_users_email",
-                table: "users",
-                column: "email",
+                columns: new[] { "customer_id", "email" },
                 unique: true);
         }
 
@@ -183,22 +197,28 @@ namespace IAM.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "role_features");
+                name: "role_features",
+                schema: "iam");
 
             migrationBuilder.DropTable(
-                name: "user_roles");
+                name: "user_roles",
+                schema: "iam");
 
             migrationBuilder.DropTable(
-                name: "features");
+                name: "features",
+                schema: "iam");
 
             migrationBuilder.DropTable(
-                name: "roles");
+                name: "roles",
+                schema: "iam");
 
             migrationBuilder.DropTable(
-                name: "users");
+                name: "users",
+                schema: "iam");
 
             migrationBuilder.DropTable(
-                name: "customers");
+                name: "customers",
+                schema: "iam");
         }
     }
 }

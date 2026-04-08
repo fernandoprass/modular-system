@@ -101,8 +101,11 @@ public class DatabaseSeeder : IDatabaseSeeder
 
    private async Task SeedParamentersAsync()
    {
-      await AddParameter(IamParam.Security.PasswordExpireTime, "Password expiration time", "Password expiration time, in days.",
+      await AddParameter(SharedParam.System.DateFormat, "Date Format", "The Date Format, accepted characters: 'dd' for the day, 'MM' for the month, 'yyyy' for the year, and '-' or '/' as a separator.",
                          ParameterType.Integer, "60", ParameterOverrideType.None, false);
+
+      await AddParameter(IamParam.Security.PasswordExpireTime, "Password expiration time", "Password expiration time, in days.",
+                         ParameterType.String, "dd/MM/yyyy", ParameterOverrideType.UserOwnerId, true);
    }
 
    private async Task AddParameter(

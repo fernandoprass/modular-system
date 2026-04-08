@@ -23,8 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IAM.Infrastructure", "scr\0
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{237E2C74-BCEA-4576-A28A-259A846C9572}"
 	ProjectSection(SolutionItems) = preProject
-		docs\01.Shared.entities.md = docs\01.Shared.entities.md
 		docs\00.migrations.md = docs\00.migrations.md
+		docs\01.Shared.entities.md = docs\01.Shared.entities.md
 		docs\01.shared.enums.md = docs\01.shared.enums.md
 		docs\01.shared.infrastructure-repository.md = docs\01.shared.infrastructure-repository.md
 		docs\01.shared.infrastructure-uow.md = docs\01.shared.infrastructure-uow.md
@@ -37,11 +37,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infra", "infra", "{D2CC5424-073E-4EB9-8679-7E05134562ED}"
 	ProjectSection(SolutionItems) = preProject
 		infra\.env = infra\.env
-		infra\iam.db-backup.ps1 = infra\iam.db-backup.ps1
-		infra\create-module.ps1 = infra\create-module.ps1
 		infra\create-module-shared.ps1 = infra\create-module-shared.ps1
-		infra\iam.docker-compose.yml = infra\iam.docker-compose.yml
+		infra\create-module.ps1 = infra\create-module.ps1
+		infra\iam.db-backup.ps1 = infra\iam.db-backup.ps1
 		infra\iam.db-setup.ps1 = infra\iam.db-setup.ps1
+		infra\iam.docker-compose.yml = infra\iam.docker-compose.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
@@ -66,6 +66,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01.Shared", "01.Shared", "{047BDE5E-0696-4D20-A8CF-F97643ED2437}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Application.Tests", "tests\01.Shared\Shared.Application.Tests\Shared.Application.Tests.csproj", "{4FE7982C-D479-4DBB-9187-61B38B9A25C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Infrastructure.Tests", "tests\01.Shared\Shared.Infrastructure.Tests\Shared.Infrastructure.Tests.csproj", "{EF074A72-0851-479B-98D0-4FD8AE717187}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -109,6 +111,10 @@ Global
 		{4FE7982C-D479-4DBB-9187-61B38B9A25C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4FE7982C-D479-4DBB-9187-61B38B9A25C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4FE7982C-D479-4DBB-9187-61B38B9A25C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF074A72-0851-479B-98D0-4FD8AE717187}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF074A72-0851-479B-98D0-4FD8AE717187}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF074A72-0851-479B-98D0-4FD8AE717187}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF074A72-0851-479B-98D0-4FD8AE717187}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -126,6 +132,7 @@ Global
 		{A95467B8-D6F9-407E-98FF-C9228DEEEC89} = {560BEF3A-21C3-4882-9273-E7CE4047A1D3}
 		{047BDE5E-0696-4D20-A8CF-F97643ED2437} = {560BEF3A-21C3-4882-9273-E7CE4047A1D3}
 		{4FE7982C-D479-4DBB-9187-61B38B9A25C5} = {047BDE5E-0696-4D20-A8CF-F97643ED2437}
+		{EF074A72-0851-479B-98D0-4FD8AE717187} = {047BDE5E-0696-4D20-A8CF-F97643ED2437}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0261E40D-A39C-470A-BAF3-DE2F7156D08B}

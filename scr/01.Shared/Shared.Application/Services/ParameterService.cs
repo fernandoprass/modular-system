@@ -8,6 +8,7 @@ using Shared.Domain.Enums;
 using Shared.Domain.Interfaces;
 using Shared.Domain.Mappers;
 using Shared.Domain.Messages;
+using System.Globalization;
 
 namespace Shared.Application.Services;
 
@@ -185,7 +186,9 @@ internal class ParameterService(
 
    public Task<int> GetIntAsync(string key) => GetAndParseAsync<int>(key, int.TryParse);
 
-   public Task<decimal> GetDecimalAsync(string key) => GetAndParseAsync<decimal>(key, decimal.TryParse);
+   public Task<decimal> GetDecimalAsync(string key)
+      => GetAndParseAsync<decimal>(key, (string s, out decimal result) =>
+          decimal.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out result));
 
    public Task<DateTime> GetDateTimeAsync(string key) => GetAndParseAsync<DateTime>(key, DateTime.TryParse);
 

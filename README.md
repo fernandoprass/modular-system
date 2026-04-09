@@ -4,20 +4,26 @@ This repository documents the architecture for a distributed system designed for
 ## System Architecture Status
 |**System**  | **Role** |**Technology Stack**|**Status**|
 |--|--|--|--|
-| **IAM** | Identity & Access Management | .NET, PostgreSQL, Redis | **Active Development** |
+| **Shared** | Common utilities, models, and interfaces | .NET Standard | Ongoing |
+| **IAM** | Identity & Access Management | .NET, PostgreSQL, Redis | Ongoing |
 | **Courier** | Communication & Notification Hub | .NET, MongoDB, RabbitMQ | Planned |
 | **Sentinel** | Centralized Logging & Auditing | .NET, MongoDB, RabbitMQ | Planned |
+
 
 > **Current Focus:** Engineering efforts are currently dedicated **exclusively** to the **IAM module**. The specifications below for CommHub and Sentinel define the architectural blueprint for future expansion.
 
 ----------
 
-## 1. IAM (Identity & Access Management)
+## 1. Shared (common classes and interfaces)
+_Common codebase for shared models, utilities, and interfaces across all systems._
+- **Objective**: Promote code reuse and maintain consistency across modules.
+
+## 2. IAM (Identity & Access Management)
 _Core system for multi-tenant authentication, authorization, and user lifecycle management._
 -   **Objective**: Centralize user identity and tenant management.
 -   **Key Status**: Development is underway using Clean Architecture.
 
-## 2. Courier  (Communication & Notification Hub)
+## 3. Courier  (Communication & Notification Hub)
 _A centralized engine to manage all outbound and inbound communication flows._
 - **Objective**: Decouple communication logic (email, push, SMS) from business services.
 - **Technology**: .NET + MongoDB (Schema-less storage is ideal for varying message payloads).
@@ -28,7 +34,7 @@ _A centralized engine to manage all outbound and inbound communication flows._
     - **Conversation Threading**: Ability to group messages by context/user for chat-like UI support.
     - **Message Queuing**: Priority queues for time-sensitive alerts vs. marketing batches.
 
-## 3. Sentinel (Centralized Logging & Auditing)
+## 4. Sentinel (Centralized Logging & Auditing)
 _The system for distributed tracing, log aggregation, and long-term security auditing._
 - **Objective**: Provide a single source of truth for system observability and compliance.
 - **Technology**: .NET + MongoDB (leveraging TTL indexes for automatic log pruning).

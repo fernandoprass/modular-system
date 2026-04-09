@@ -8,6 +8,7 @@ using Shared.Domain.Enums;
 using Shared.Domain.Interfaces;
 using Shared.Domain.Mappers;
 using Shared.Domain.Messages;
+using System.Globalization;
 
 namespace Shared.Application.Services;
 
@@ -183,11 +184,21 @@ internal class ParameterService(
 
    public Task<bool> GetBoolAsync(string key) => GetAndParseAsync<bool>(key, bool.TryParse);
 
+   public Task<short> GetShortIntAsync(string key) => GetAndParseAsync<short>(key, short.TryParse);
    public Task<int> GetIntAsync(string key) => GetAndParseAsync<int>(key, int.TryParse);
+   public Task<long> GetLongIntAsync(string key) => GetAndParseAsync<long>(key, long.TryParse);
 
-   public Task<decimal> GetDecimalAsync(string key) => GetAndParseAsync<decimal>(key, decimal.TryParse);
+   public Task<double> GetDoubleAsync(string key)
+   => GetAndParseAsync<double>(key, (string s, out double result) =>
+       double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out result));
 
-   public Task<DateTime> GetDateTimeAsync(string key) => GetAndParseAsync<DateTime>(key, DateTime.TryParse);
+   public Task<decimal> GetDecimalAsync(string key)
+      => GetAndParseAsync<decimal>(key, (string s, out decimal result) =>
+          decimal.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out result));
+
+   public Task<DateTime> GetDateTimeAsync(string key)
+    => GetAndParseAsync<DateTime>(key, (string s, out DateTime result) =>
+        DateTime.TryParse(s, CultureInfo.InvariantCulture, DateTimeStyles.None, out result));
 
    public async Task<string> GetStringAsync(string key)
    {

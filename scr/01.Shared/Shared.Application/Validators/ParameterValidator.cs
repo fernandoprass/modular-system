@@ -53,7 +53,7 @@ public class ParameterValidator : IParameterValidator
             .IsRequired()
             .If(x => !string.IsNullOrEmpty(x.ValidationRegex),
                 x => x.Matches(request.ValidationRegex, new ParameterInvalidValueError(request.ValidationErrorCustomMessage)))
-         .RuleForValue(parameterExists).IsNotNull(new NotFoundError(SharedConst.Entity.Parameter))
+         .RuleForValue(parameterExists).IsTrue(new NotFoundError(SharedConst.Entity.Parameter))
          .RuleForValue(keyExists).IsFalse(new ParameterDuplicatedError(request.Module, request.Group, request.Name));
 
       var isValid = validator.Validate(request);
@@ -66,12 +66,11 @@ public class ParameterValidator : IParameterValidator
    {
       var validator = new FluentValidator<ParameterOwnerUpdateRequest>()
          .RuleForValue(parameter).IsNotNull(new NotFoundError(SharedConst.Entity.Parameter))
-         .RuleForValue(parameter?.OverrideType == ParameterOverrideType.None).IsTrue(new ParameterNotOwnerEditableError())
+         .RuleForValue(parameter?.OverrideType).IsNotEqualTo(ParameterOverrideType.None, new ParameterNotOwnerEditableError())
          .RuleFor(x => x.Value)
             .IsRequired()
             .If(x => !string.IsNullOrEmpty(parameter?.ValidationRegex),
-                x => x.Matches(parameter.ValidationRegex, new ParameterInvalidValueError(parameter.ValidationErrorCustomMessage)))
-         .RuleFor(x => x.Value).IsRequired();
+                x => x.Matches(parameter?.ValidationRegex, new ParameterInvalidValueError(parameter?.ValidationErrorCustomMessage)));
 
       var isValid = validator.Validate(request);
       if (!isValid) return Result.Failure(validator.Messages);

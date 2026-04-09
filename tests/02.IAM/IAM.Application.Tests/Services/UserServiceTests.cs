@@ -10,6 +10,7 @@ using IAM.Domain.Repositories;
 using Myce.Response;
 using NSubstitute;
 using Shared.Application.Contracts;
+using Shared.Domain.Messages;
 
 namespace IAM.Application.Tests.Services;
 
@@ -49,7 +50,7 @@ public class UserServiceTests
       var result = await _userService.CreateUserAsync(request, true);
 
       result.IsSuccess.Should().BeFalse();
-      result.Messages.Should().ContainSingle(m => m is ForbiddenCustomerError);
+      result.Messages.Should().ContainSingle(m => m is UnauthorizedAccessError);
 
       await _unitOfWorkMock.DidNotReceive().SaveChangesAsync();
    }
@@ -98,7 +99,7 @@ public class UserServiceTests
       var result = await _userService.DeleteAsync(userId);
 
       result.IsSuccess.Should().BeFalse();
-      result.Messages.Should().ContainSingle(m => m is ForbiddenCustomerError);
+      result.Messages.Should().ContainSingle(m => m is UnauthorizedAccessError);
 
       await _unitOfWorkMock.Users.DidNotReceive().DeleteAsync(Arg.Any<Guid>());
    }

@@ -1,28 +1,22 @@
 # Copilot Instructions for Modular System
 
 ## Architecture Overview
-This is a modular .NET system using Clean Architecture principles. Each business module (e.g., IAM) is self-contained with Domain, Core, Infrastructure, and API layers. The Shared module provides common utilities packaged as NuGet packages. This is a code-first approach without database-first scaffolding.
+This is a modular .NET system using Clean Architecture principles, it is a code-first approach without database-first scaffolding.
+
+Each business module (Shared and IAM) is self-contained with Domain, Application, Infrastructure, and API layers. The Shared module provides common utilities and is referenced as a dependency in the IAM module. MD files are available at `docs/` for detailed documentation.
 
 - **Domain**: Entities, value objects, interfaces (e.g., `IAM.Domain/`)
-- **Core**: Application logic, services, use cases (e.g., `IAM.Core/`)
+- **Application**: Application logic, services, use cases (e.g., `IAM.Application/`)
 - **Infrastructure**: External concerns like databases, APIs (e.g., `IAM.Infrastructure/` with EF Core + PostgreSQL)
 - **API**: Web API controllers, configuration (e.g., `IAM.API/`)
-- **Shared**: Cross-module utilities, built as NuGet packages
+- **Shared**: Cross-module utilities, built as NuGet packages but it is referenced directly during development (e.g., `Shared/`)
 
-Dependencies flow inward: API → Core → Infrastructure → Domain.
-
-## Module Creation
-Use `create-module.ps1` to scaffold new modules:
-- Run `.\create-module.ps1` (edit `$MODULE_NAME` inside)
-- Creates folder structure, .sln, projects with correct references
-- Infrastructure includes Npgsql.EntityFrameworkCore.PostgreSQL
-
-For Shared libraries: `create-module-shared.ps1` creates packagable projects with Moq/FluentAssertions for tests.
+Dependencies flow inward: API → Application → Infrastructure → Domain.
 
 ## Build and Test Workflows
 - **Build**: `dotnet build` in module root (e.g., `IAM/`) or project folders
 - **Test**: `dotnet test` in module root
-- **Run API**: `dotnet run` in `src/Module.API/`
+- **Run API**: `dotnet run` in `src/02.IAM/IAM.API/`
 - **Debug**: Use VS Code debugger on Program.cs or test files
 
 No custom scripts; standard .NET CLI commands.
@@ -37,16 +31,19 @@ No custom scripts; standard .NET CLI commands.
 - **Data Access classes**: When creating data access classes, user Repository (folder Repositories) for INSERT, UPDATE, DELETE, GetById, and GetAll operations and QueryRepository (folder QueryRepositories) for all other search queries. If the task involves listing, filtering, or reports, create or use a QueryRepository returning DTOs with no-tracking enabled.
 - **Use record types for DTOs** to ensure immutability and value-based equality.
 - **New tables**: should implement IEntityTypeConfiguration
+- **Commenting**: Use XML comments for public members only for complex logic
+- **Error Handling**: Use ErrorMessage for errors, return Result<T> for expected outcomes in Application layer
+- **New Entities**: Place in Domain layer, use value objects where appropriate, and ensure they are properly encapsulated. Use as example: User.cs, UserService.cs, UserValidator.cs and UserRepository.cs in the IAM module.
 
 
 ## Key Files
-- `create-module.ps1`: Template for new business modules
-- `IAM/src/IAM.API/Program.cs`: API entry point (minimal ASP.NET Core setup)
-- `Shared/src/Shared/Shared.csproj`: Packaged library example
+- `infra/create-module.ps1`: Template for new business modules
+- `src/01.Shared/Shared.Domain/Shared.Domain.csproj`: Packaged library example
+- `src/02.IAM/IAM.API/Program.cs`: API entry point (minimal ASP.NET Core setup)
 - `README.md`: Basic project info
 
 When adding features, place domain models in Domain, business logic in Core, data access in Infrastructure, and endpoints in API. Use Shared for reusable components.
 
-## Database Migrations~
+## Database Migrations
 IAM module uses Entity Framework Core with PostgreSQL.
 

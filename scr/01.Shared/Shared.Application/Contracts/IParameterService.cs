@@ -24,7 +24,10 @@ namespace Shared.Application.Contracts
       Task<bool> ExistsAsync(string key);
       Task<ParameterDto?> GetByKeyAsync(string key);
       Task<bool> GetBoolAsync(string key);
+      Task<short> GetShortIntAsync(string key);
       Task<int> GetIntAsync(string key);
+      Task<long> GetLongIntAsync(string key);
+      Task<double> GetDoubleAsync(string key);
       Task<decimal> GetDecimalAsync(string key);
       Task<DateTime> GetDateTimeAsync(string key);
       Task<string> GetStringAsync(string key);

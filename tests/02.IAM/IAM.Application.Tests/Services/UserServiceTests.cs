@@ -17,6 +17,7 @@ namespace IAM.Application.Tests.Services;
 public class UserServiceTests
 {
    private readonly IIamUnitOfWork _unitOfWorkMock;
+   private readonly IParameterService _parameterServiceMock;
    private readonly IUserValidator _userValidatorMock;
    private readonly IUserContext _userContextMock;
    private readonly IUserRepository _userRepositoryMock;
@@ -26,6 +27,7 @@ public class UserServiceTests
    public UserServiceTests()
    {
       _unitOfWorkMock = Substitute.For<IIamUnitOfWork>();
+      _parameterServiceMock = Substitute.For<IParameterService>();
       _userContextMock = Substitute.For<IUserContext>();
       _userValidatorMock = Substitute.For<IUserValidator>();
       _userRepositoryMock = Substitute.For<IUserRepository>();
@@ -36,6 +38,7 @@ public class UserServiceTests
 
       _userService = new UserService(
           _unitOfWorkMock,
+          _parameterServiceMock,
           _userContextMock,
           _userValidatorMock,
           _userRepositoryMock,
@@ -46,6 +49,8 @@ public class UserServiceTests
    public async Task CreateUserAsync_ShouldReturnForbiddenCustomerError_WhenOperatorIdDoesNotMatch()
    {
       var request = new UserCreateRequest(string.Empty, "test@test.com" , string.Empty, Guid.NewGuid());
+
+      _parameterServiceMock.GetShortIntAsync(Arg.Any<string>()).Returns((short)30);
 
       var result = await _userService.CreateUserAsync(request, true);
 
@@ -63,6 +68,8 @@ public class UserServiceTests
 
       _userQueryRepositoryMock.GetIdByEmailAsync(request.Email).Returns(Guid.NewGuid());
 
+      _parameterServiceMock.GetShortIntAsync(Arg.Any<string>()).Returns((short)30);
+
       _userValidatorMock.ValidateCreate(request,customerExists: true, emailAlreadyExists: true)
           .Returns(Result.Failure(new EmailAlreadyExistError(request.Email)));
 
@@ -79,6 +86,8 @@ public class UserServiceTests
       var request = new UserCreateRequest("John Doe", "new@test.com", "SecurePassword123", _userContextMock.UserOwnerId);
 
       _userQueryRepositoryMock.GetIdByEmailAsync(request.Email).Returns(Guid.Empty);
+
+      _parameterServiceMock.GetShortIntAsync(Arg.Any<string>()).Returns((short)30);
 
       _userValidatorMock.ValidateCreate(request, customerExists: true, emailAlreadyExists: false).Returns(Result.Success());
 

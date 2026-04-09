@@ -67,7 +67,7 @@ public class UserValidatorTests
    public void ValidateUpdatePassword_ShouldBeSuccess_WhenCredentialsAreValid()
    {
       var oldPassword = "Old#Password123";
-      var user = User.Create("User Test", "test@email.com", Argon2.Hash(oldPassword), Guid.NewGuid());
+      var user = User.Create("User Test", "test@email.com", Argon2.Hash(oldPassword), DateTime.UtcNow.AddDays(30), Guid.NewGuid());
       var request = new UserUpdatePasswordRequest(oldPassword, "New#StrongPass88");
 
       var result = _validator.ValidateUpdatePassword(user, request);
@@ -79,7 +79,7 @@ public class UserValidatorTests
    [Fact]
    public void ValidateUpdatePassword_ShouldHaveError_WhenOldPasswordIsIncorrect()
    {
-      var user = User.Create("User Test", "test@email.com", Argon2.Hash("Correct#123"), Guid.NewGuid());
+      var user = User.Create("User Test", "test@email.com", Argon2.Hash("Correct#123"), DateTime.UtcNow.AddDays(30), Guid.NewGuid());
       var request = new UserUpdatePasswordRequest("Wrong#123", "New#StrongPass88");
 
       var result = _validator.ValidateUpdatePassword(user, request);

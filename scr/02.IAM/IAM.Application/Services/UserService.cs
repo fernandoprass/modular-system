@@ -89,9 +89,9 @@ public class UserService(
    {
       var user = await _userRepository.GetByIdAsync(id);
 
-      var validator = _userValidator.ValidateUpdatePassword(user, request);
+      var validator = _userValidator.ValidateUpdatePassword(user, _userContext.UserId, request);
       if (validator.HasError)
-      {//todo validate the logged in user is the same as the user being updated and update tests
+      {
          return Result.Failure(validator.Messages);
       }
 

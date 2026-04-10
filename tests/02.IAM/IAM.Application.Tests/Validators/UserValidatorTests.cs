@@ -70,7 +70,7 @@ public class UserValidatorTests
       var user = User.Create("User Test", "test@email.com", Argon2.Hash(oldPassword), DateTime.UtcNow.AddDays(30), Guid.NewGuid());
       var request = new UserUpdatePasswordRequest(oldPassword, "New#StrongPass88");
 
-      var result = _validator.ValidateUpdatePassword(user, request);
+      var result = _validator.ValidateUpdatePassword(user, user.Id, request);
 
       Assert.True(result.IsSuccess);
       Assert.Empty(result.Messages);
@@ -82,7 +82,7 @@ public class UserValidatorTests
       var user = User.Create("User Test", "test@email.com", Argon2.Hash("Correct#123"), DateTime.UtcNow.AddDays(30), Guid.NewGuid());
       var request = new UserUpdatePasswordRequest("Wrong#123", "New#StrongPass88");
 
-      var result = _validator.ValidateUpdatePassword(user, request);
+      var result = _validator.ValidateUpdatePassword(user, user.Id, request);
 
       Assert.False(result.IsSuccess);
       Assert.Contains(result.Messages, m => m is PasswordNotValidError);
@@ -93,7 +93,7 @@ public class UserValidatorTests
    {
       var request = new UserUpdatePasswordRequest("any", "New#StrongPass88");
 
-      var result = _validator.ValidateUpdatePassword(null, request);
+      var result = _validator.ValidateUpdatePassword(null, Guid.NewGuid(), request);
 
       Assert.False(result.IsSuccess);
       Assert.Contains(result.Messages, m => m is NotFoundError);

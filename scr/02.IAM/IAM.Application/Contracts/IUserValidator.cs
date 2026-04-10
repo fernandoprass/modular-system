@@ -12,5 +12,5 @@ public interface IUserValidator
 
    Result ValidateUpdate(Guid? id, UserUpdateRequest request);
 
-   Result ValidateUpdatePassword(User? user, UserUpdatePasswordRequest request);
+   Result ValidateUpdatePassword(User? user, Guid loggedUserId, UserUpdatePasswordRequest request);
 }

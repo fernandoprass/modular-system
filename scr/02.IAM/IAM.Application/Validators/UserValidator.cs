@@ -53,13 +53,14 @@ public class UserValidator : IUserValidator
       return isValid ? Result.Success() : Result.Failure(validator.Messages);
    }
 
-   public Result ValidateUpdatePassword(User? user, UserUpdatePasswordRequest request)
+   public Result ValidateUpdatePassword(User? user, Guid loggedUserId, UserUpdatePasswordRequest request)
    {
       var isOldPasswordCorrect = user != null &&
                                  Argon2.Verify(user.PasswordHash, request.PasswordOld);
 
       var validator = new FluentValidator<UserUpdatePasswordRequest>()
          .RuleForValue(user).IsNotNull(new NotFoundError(IamConst.Entity.User))
+         .RuleForValue(user?.Id).IsEqualTo(loggedUserId, new UnauthorizedAccessError())
          .RuleFor(x => x.PasswordOld).IsRequired()
          .RuleForValue(isOldPasswordCorrect).IsTrue(new PasswordNotValidError())
          .RuleFor(x => x.PasswordNew).ApplyTemplate(ValidatorTemplate.PasswordRules);

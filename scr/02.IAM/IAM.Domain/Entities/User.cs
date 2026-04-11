@@ -19,7 +19,7 @@ public class User : Entity
 
    private User() { }
 
-   public static User Create(string name, string email, string passwordHash, Guid customerId)
+   public static User Create(string name, string email, string passwordHash, DateTime passwordExpiresAt, Guid customerId)
    {
       var id = Guid.CreateVersion7();
       return new User
@@ -28,7 +28,7 @@ public class User : Entity
          Name = name,
          Email = email.ToLower().Trim(),
          PasswordHash = passwordHash,
-         PasswordExpiresAt = DateTime.UtcNow.AddDays(IamConst.Security.User.PasswordExpireTime),
+         PasswordExpiresAt = passwordExpiresAt,
          IsActive = true,
          IsSystemAdmin = false,
          CustomerId = customerId
@@ -41,11 +41,11 @@ public class User : Entity
       IsActive = isActive;
    }
 
-   public void UpdatePassword(string newPasswordHash)
+   public void UpdatePassword(string newPasswordHash, DateTime expiresAt)
    {
       PasswordHash = newPasswordHash;
       UpdatedAt = DateTime.UtcNow;
-      PasswordExpiresAt = DateTime.UtcNow.AddDays(IamConst.Security.User.PasswordExpireTime);
+      PasswordExpiresAt = expiresAt;
    }
 
    public void UpdateLastLogin()

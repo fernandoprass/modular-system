@@ -26,11 +26,6 @@ public static partial class IamConst
 
    public class Security
    {
-      public static class User
-      {
-         public const int PasswordExpireTime = 60;
-      }
-
       public static class Claim
       {
          public const string UserOwnerId = "userOwnerId";

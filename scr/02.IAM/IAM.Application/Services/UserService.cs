@@ -17,12 +17,14 @@ namespace IAM.Application.Services;
 
 public class UserService(
     IIamUnitOfWork iamUnitOfWork,
+    IParameterService parameterService,
     IUserContext userContext,
     IUserValidator userValidator,
     IUserRepository userRepository,
     IUserQueryRepository userQueryRepository) : BaseService(userContext), IUserService
 {
    private readonly IIamUnitOfWork _iamUnitOfWork = iamUnitOfWork;
+   private readonly IParameterService _parameterService = parameterService;
    private readonly IUserValidator _userValidator = userValidator;
    private readonly IUserRepository _userRepository = userRepository;
    private readonly IUserQueryRepository _userQueryRepository = userQueryRepository;
@@ -50,10 +52,13 @@ public class UserService(
             return Result<UserDto>.Failure(validation.Messages);
          }
 
+         var passwordExpiresAt = await GetPasswordExpiresAt();
+
          var user = User.Create(
              request.Name,
              request.Email,
              Argon2.Hash(request.Password),
+             passwordExpiresAt,
              request.CustomerId);
 
          await _iamUnitOfWork.Users.AddAsync(user);
@@ -84,15 +89,25 @@ public class UserService(
    {
       var user = await _userRepository.GetByIdAsync(id);
 
-      var validator = _userValidator.ValidateUpdatePassword(user, request);
+      var validator = _userValidator.ValidateUpdatePassword(user, _userContext.UserId, request);
       if (validator.HasError)
-      {//todo validate the logged in user is the same as the user being updated and update tests
+      {
          return Result.Failure(validator.Messages);
       }
-      
-      user.UpdatePassword(Argon2.Hash(request.PasswordNew));
+
+      var passwordExpiresAt = await GetPasswordExpiresAt();
+
+      user.UpdatePassword(Argon2.Hash(request.PasswordNew), passwordExpiresAt);
 
       return await CommitUpdateAsync(user);
+   }
+
+   private async Task<DateTime> GetPasswordExpiresAt()
+   {
+      short numberOfDay = await _parameterService.GetShortIntAsync(IamParam.Security.PasswordExpireTime);
+
+      var passwordExpiresAt = DateTime.UtcNow.AddDays(numberOfDay);
+      return passwordExpiresAt;
    }
 
    public async Task<Result> DeleteAsync(Guid id)

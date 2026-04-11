@@ -55,13 +55,13 @@ public class DatabaseSeeder : IDatabaseSeeder
 
       var passwordHash = Argon2.Hash(DefaultPassword);
 
-      var superUser = User.Create("System Root", "admin@saas.com", passwordHash, customerId);
+      var superUser = User.Create("System Root", "admin@saas.com", passwordHash, DateTime.UtcNow.AddDays(30), customerId);
       superUser.IsSystemAdmin = true;
       customer.CreatedBy = superUser.Id;
 
       await _iamUnitOfWork.Customers.AddAsync(customer);
       await _iamUnitOfWork.Users.AddAsync(superUser);
-      await _iamUnitOfWork.Users.AddAsync(User.Create("Internal Support", "support@saas.com", passwordHash, customerId));
+      await _iamUnitOfWork.Users.AddAsync(User.Create("Internal Support", "support@saas.com", passwordHash, DateTime.UtcNow.AddDays(30), customerId));
       await _iamUnitOfWork.SaveChangesAsync();
    }
     
@@ -94,7 +94,7 @@ public class DatabaseSeeder : IDatabaseSeeder
 
       foreach (var (name, email) in members)
       {
-         await _iamUnitOfWork.Users.AddAsync(User.Create(name, email, passwordHash, customerId));
+         await _iamUnitOfWork.Users.AddAsync(User.Create(name, email, passwordHash, DateTime.UtcNow.AddDays(30), customerId));
       }
       await _iamUnitOfWork.SaveChangesAsync();
    }

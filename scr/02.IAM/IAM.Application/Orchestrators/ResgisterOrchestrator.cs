@@ -66,6 +66,7 @@ public class ResgisterOrchestrator(
        customerCreate.User.Name,
        customerCreate.User.Email,
        Argon2.Hash(customerCreate.User.Password),
+       DateTime.UtcNow.AddDays(30),
        customer.Id
       );
 

@@ -132,15 +132,15 @@ public class UserServiceTests
 
 
    [Fact]
-   public async Task UpdatePasswordAsync_ShouldReturnUnauthorizedAccessError_EvenWhenUserIsDifferentOdLoggedUser()
+   public async Task UpdatePasswordAsync_ShouldReturnError_WhenValidatorFails()
    {
       var request = new UserUpdatePasswordRequest("OldPass123", "NewSecurePass123");
       var user = User.Create("Name", "test@test.com", "OldHash", DateTime.UtcNow, _userContextMock.UserOwnerId);
 
-      _userContextMock.UserId.Returns(user.Id);
+      _userContextMock.UserId.Returns(Guid.NewGuid());
       _userRepositoryMock.GetByIdAsync(user.Id).Returns(user);
       _parameterServiceMock.GetShortIntAsync(Arg.Any<string>()).Returns((short)90); // 90 days
-     // _userValidatorMock.ValidateUpdatePassword(user, user.Id, request).Returns(Result.Success());
+      _userValidatorMock.ValidateUpdatePassword(user, _userContextMock.UserId, request).Returns(Result.Failure(new UnauthorizedAccessError()));
 
       var result = await _userService.UpdatePasswordAsync(user.Id, request);
 

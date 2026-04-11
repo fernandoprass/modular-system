@@ -27,5 +27,5 @@ public class ParameterKey
       Key = $"{module}.{group}.{name}"; 
    }
 
-   public static implicit operator ParameterKey(string path) => new(path);
+   public static implicit operator ParameterKey(string key) => new(key);
 }

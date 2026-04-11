@@ -4,7 +4,7 @@ using Shared.Domain.Entities;
 
 namespace Shared.Infrastructure.Configurations
 {
-   public abstract class BaseConfiguration<T> : IEntityTypeConfiguration<T> where T : Entity
+   public abstract class BaseConfiguration<T> : IEntityTypeConfiguration<T> where T : EntityAudited
    {
       public virtual void Configure(EntityTypeBuilder<T> builder)
       {

@@ -1,8 +1,6 @@
 using IAM.Domain.Entities;
 using IAM.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Shared.Domain.Interfaces;
-using Shared.Infrastructure;
 using Shared.Infrastructure.Repositories;
 
 namespace IAM.Infrastructure.Repositories;

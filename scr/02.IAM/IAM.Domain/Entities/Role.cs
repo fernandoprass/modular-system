@@ -2,7 +2,7 @@ using Shared.Domain.Entities;
 
 namespace IAM.Domain.Entities;
 
-public class Role : Entity
+public class Role : EntityAudited
 {
    public string Name { get; private set; }
    public Guid? CustomerId { get; private set; } // Roles can be global or specific to a Customer

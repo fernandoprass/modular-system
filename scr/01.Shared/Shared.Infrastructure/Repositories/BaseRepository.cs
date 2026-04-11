@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Shared.Domain.Entities;
 using Shared.Domain.Interfaces;
 
@@ -55,7 +54,7 @@ public class BaseRepository<T, TId>(DbContext context) : IBaseRepository<T, TId>
 /// <typeparam name="T">The Type of the Entity</typeparam>
 /// <param name="context">The DbContext instance used for database operations</param>
 public class BaseRepository<T>(DbContext context) 
-   : BaseRepository<T, Guid>(context) where T : Entity
+   : BaseRepository<T, Guid>(context) where T : Entity<Guid>
 {
 
 }

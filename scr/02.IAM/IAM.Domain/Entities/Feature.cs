@@ -2,7 +2,7 @@ using Shared.Domain.Entities;
 
 namespace IAM.Domain.Entities;
 
-public class Feature : Entity
+public class Feature : EntityAudited
 {
    public string Name { get; private set; } // e.g., "User_Create"
    public string Description { get; private set; }

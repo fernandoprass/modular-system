@@ -1,8 +1,10 @@
 using IAM.Application.Contracts;
+using IAM.Domain;
 using IAM.Domain.DTOs.Requests;
 using IAM.Domain.DTOs.Responses;
 using IAM.Domain.Entities;
 using IAM.Domain.Interfaces;
+using IAM.Domain.Mappers;
 using IAM.Domain.QueryRepositories;
 using Myce.Response;
 using Shared.Application.Contracts;
@@ -21,7 +23,6 @@ public class RoleService(
    private readonly IIamUnitOfWork _iamUnitOfWork = iamUnitOfWork;
    private readonly IRoleValidator _roleValidator = roleValidator;
    private readonly IRoleQueryRepository _roleQueryRepository = roleQueryRepository;
-   private readonly IUserContext _userContext = userContext;
    private readonly IUserQueryRepository _userQueryRepository = userQueryRepository;
 
    public async Task<Result<RoleDto>> CreateAsync(RoleCreateRequest request)
@@ -34,12 +35,12 @@ public class RoleService(
          if (!validation.IsSuccess)
             return Result<RoleDto>.Failure(validation.Messages);
 
-         var role = Role.Create(request.Name, request.CustomerId, request.IsDefault);
+         var role = Role.Create(request.Name, request.Description, request.IsDefault, request.IsActive, request.CustomerId);
 
          await _iamUnitOfWork.Roles.AddAsync(role);
          await _iamUnitOfWork.SaveChangesAsync();
 
-         return Result<RoleDto>.Success(new RoleDto(role.Id, role.Name, role.CustomerId, role.IsDefault, Enumerable.Empty<FeatureDto>()));
+         return Result<RoleDto>.Success(new RoleDto(role.Id, role.Name, role.CustomerId, role.IsDefault, Enumerable.Empty<PermissionDto>()));
       });
    }
 
@@ -48,7 +49,7 @@ public class RoleService(
       var role = await _iamUnitOfWork.Roles.GetByIdAsync(id);
 
       if (role == null)
-         return Result.Failure(new NotFoundError("Role"));
+         return Result.Failure(new NotFoundError(IamConst.Entity.Role));
 
       return await ExecuteIfUserOwnsAsync(role.CustomerId, async () =>
       {
@@ -57,7 +58,7 @@ public class RoleService(
          if (!validation.IsSuccess)
             return validation;
 
-         role.Update(request.Name);
+         role.Update(request.Name, request.Description, request.IsDefault, request.IsActive);
          _iamUnitOfWork.Roles.Update(role);
          await _iamUnitOfWork.SaveChangesAsync();
 
@@ -70,13 +71,13 @@ public class RoleService(
       var user = await _iamUnitOfWork.Users.GetByIdAsync(request.UserId);
       
       if (user == null)
-         return Result.Failure(new NotFoundError("User"));
+         return Result.Failure(new NotFoundError(IamConst.Entity.User));
 
       return await ExecuteIfUserOwnsAsync(user.CustomerId, async () =>
       {
          // Simple check for all roles existing and being within same customer or global
          var roles = await _roleQueryRepository.GetAllAsync(_userContext.UserOwnerId);
-         var allRequestedRolesExist = request.RoleIds.All(rid => roles.Any(r => r.Id == rid));
+         var allRequestedRolesExist = request.Roles.All(roleAssigned => roles.Any(r => r.Id == roleAssigned.Id && r.IsActive));
 
          var validation = _roleValidator.ValidateAssign(request, true, allRequestedRolesExist);
 
@@ -84,9 +85,9 @@ public class RoleService(
             return validation;
 
          user.ClearRoles();
-         foreach (var roleId in request.RoleIds)
+         foreach (var role in request.Roles)
          {
-            user.AddRole(roleId);
+            user.AddRole(role.Id, role.ExpiresAt);
          }
 
          _iamUnitOfWork.Users.Update(user);
@@ -104,23 +105,23 @@ public class RoleService(
          r.Name, 
          r.CustomerId, 
          r.IsDefault, 
-         r.RoleFeatures.Select(rf => new FeatureDto(rf.Feature.Id, rf.Feature.Name, rf.Feature.Description, rf.Feature.Group))
+         r.RolePermissions.Select(rp => rp.Permission.ToPermissionDto())
       ));
 
       return Result<IEnumerable<RoleDto>>.Success(dtos);
    }
 
-   public async Task<Result<IEnumerable<FeatureDto>>> GetUserFeaturesAsync(Guid userId)
+   public async Task<Result<IEnumerable<PermissionDto>>> GetUserPermissionsAsync(Guid userId)
    {
       var user = await _iamUnitOfWork.Users.GetByIdAsync(userId);
       if (user == null)
-         return Result<IEnumerable<FeatureDto>>.Failure(new NotFoundError("User"));
+         return Result<IEnumerable<PermissionDto>>.Failure(new NotFoundError(IamConst.Entity.User));
 
       return await ExecuteIfUserOwnsAsync(user.CustomerId, async () =>
       {
-         var features = await _roleQueryRepository.GetUserFeaturesAsync(userId);
-         var dtos = features.Select(f => new FeatureDto(f.Id, f.Name, f.Description, f.Group));
-         return Result<IEnumerable<FeatureDto>>.Success(dtos);
+         var permissions = await _roleQueryRepository.GetUserPermissionsAsync(userId);
+         var permissionDto = permissions.Select(p => p.ToPermissionDto());
+         return Result<IEnumerable<PermissionDto>>.Success(permissionDto);
       });
    }
 }

@@ -10,5 +10,5 @@ public interface IRoleService
    Task<Result> UpdateAsync(Guid id, RoleUpdateRequest request);
    Task<Result> AssignToUserAsync(RoleAssignRequest request);
    Task<Result<IEnumerable<RoleDto>>> GetAllAsync();
-   Task<Result<IEnumerable<FeatureDto>>> GetUserFeaturesAsync(Guid userId);
+   Task<Result<IEnumerable<PermissionDto>>> GetUserPermissionsAsync(Guid userId);
 }

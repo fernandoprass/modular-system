@@ -41,10 +41,10 @@ public class RoleController(IRoleService roleService) : BaseController
       return OkOrNotFound(result);
    }
 
-   [HttpGet("user/{userId:guid}/features")]
-   public async Task<IActionResult> GetUserFeatures(Guid userId)
+   [HttpGet("user/{userId:guid}/permissions")]
+   public async Task<IActionResult> GetUserPermissions(Guid userId)
    {
-      var result = await _roleService.GetUserFeaturesAsync(userId);
+      var result = await _roleService.GetUserPermissionsAsync(userId);
       return OkOrNotFound(result);
    }
 }

@@ -53,11 +53,11 @@ public class User : EntityAudited
       LastLoginAt = DateTime.UtcNow;
    }
 
-   public void AddRole(Guid roleId)
+   public void AddRole(Guid roleId, DateTime? expiresAt)
    {
       if (!_userRoles.Any(ur => ur.RoleId == roleId))
       {
-         _userRoles.Add(new UserRole(Id, roleId));
+         _userRoles.Add(new UserRole(Id, roleId, expiresAt));
       }
    }
 

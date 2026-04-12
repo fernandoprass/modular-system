@@ -10,7 +10,7 @@ public class RoleRepository(IamDbContext dbContext) : BaseRepository<Role>(dbCon
    public override async Task<Role?> GetByIdAsync(Guid id)
    {
       return await _dbSet
-         .Include(r => r.RoleFeatures)
+         .Include(r => r.RolePermissions)
          .FirstOrDefaultAsync(r => r.Id == id);
    }
 }

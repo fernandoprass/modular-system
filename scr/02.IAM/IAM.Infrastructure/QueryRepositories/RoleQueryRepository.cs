@@ -12,8 +12,8 @@ public class RoleQueryRepository(IamDbContext context) : IRoleQueryRepository
    {
       return await _context.Roles
          .AsNoTracking()
-         .Include(r => r.RoleFeatures)
-            .ThenInclude(rf => rf.Feature)
+         .Include(r => r.RolePermissions)
+            .ThenInclude(rf => rf.Permission)
          .FirstOrDefaultAsync(r => r.Id == id);
    }
 
@@ -22,8 +22,8 @@ public class RoleQueryRepository(IamDbContext context) : IRoleQueryRepository
       return await _context.Roles
          .AsNoTracking()
          .Where(r => r.CustomerId == null || r.CustomerId == customerId)
-         .Include(r => r.RoleFeatures)
-            .ThenInclude(rf => rf.Feature)
+         .Include(r => r.RolePermissions)
+            .ThenInclude(rf => rf.Permission)
          .ToListAsync();
    }
 
@@ -33,12 +33,12 @@ public class RoleQueryRepository(IamDbContext context) : IRoleQueryRepository
          .AnyAsync(r => r.Name == name && r.CustomerId == customerId);
    }
 
-   public async Task<IEnumerable<Feature>> GetUserFeaturesAsync(Guid userId)
+   public async Task<IEnumerable<Permission>> GetUserPermissionsAsync(Guid userId)
    {
        return await _context.UserRoles
            .AsNoTracking()
            .Where(ur => ur.UserId == userId)
-           .SelectMany(ur => ur.Role.RoleFeatures.Select(rf => rf.Feature))
+           .SelectMany(ur => ur.Role.RolePermissions.Select(rf => rf.Permission))
            .Distinct()
            .ToListAsync();
    }
